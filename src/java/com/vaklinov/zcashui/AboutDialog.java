@@ -246,7 +246,7 @@ public class AboutDialog
 		});
 		PD2.add(PD3, BorderLayout.EAST);
 		PD.add(PD2, BorderLayout.CENTER);
-		copyrigthPanel.add(PD, BorderLayout.CENTER);
+		//copyrigthPanel.add(PD, BorderLayout.CENTER); - no donations stuff for ZEN
 
 		
 		tabs.add("About", copyrigthPanel);
