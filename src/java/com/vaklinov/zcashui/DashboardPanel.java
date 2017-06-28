@@ -405,7 +405,7 @@ public class DashboardPanel
 		}
 		
 		// TODO: Get the start date right after ZCash release - from first block!!!
-		final Date startDate = new Date("28 Oct 2016 02:00:00 GMT");
+		final Date startDate = new Date("06 Nov 2016 02:00:00 GMT");
 		final Date nowDate = new Date(System.currentTimeMillis());
 		
 		long fullTime = nowDate.getTime() - startDate.getTime();
@@ -515,11 +515,11 @@ public class DashboardPanel
 		String text =
 			"<html>" + 
 		    "<span style=\"font-family:monospace;font-size:8.9px;" + color1 + "\">Transparent balance: <span style=\"font-size:9px\">" + 
-				transparentUCBalance + " ZEC </span></span><br/> " +
+				transparentUCBalance + " ZEN </span></span><br/> " +
 			"<span style=\"font-family:monospace;font-size:8.9px;" + color2 + "\">Private (Z) balance: <span style=\"font-weight:bold;font-size:9px\">" + 
-		    	privateUCBalance + " ZEC </span></span><br/> " +
+		    	privateUCBalance + " ZEN </span></span><br/> " +
 			"<span style=\"font-family:monospace;font-size:8.9px;" + color3 + "\">Total (Z+T) balance: <span style=\"font-weight:bold;font-size:11.5px;\">" + 
-		    	totalUCBalance + " ZEC </span></span>" +
+		    	totalUCBalance + " ZEN </span></span>" +
 			"<br/>  </html>";
 		
 		this.walletBalanceLabel.setText(text);
@@ -533,9 +533,9 @@ public class DashboardPanel
 					  "Unconfirmed (unspendable) balance is being shown due to an<br/>" + 
 		              "ongoing transaction! Actual confirmed (spendable) balance is:<br/>" +
 		              "<span style=\"font-size:5px\"><br/></span>" +
-					  "Transparent: " + transparentBalance + " ZEC<br/>" +
-		              "Private ( Z ): <span style=\"font-weight:bold\">" + privateBalance + " ZEC</span><br/>" +
-					  "Total ( Z+T ): <span style=\"font-weight:bold\">" + totalBalance + " ZEC</span>" +
+					  "Transparent: " + transparentBalance + " ZEN<br/>" +
+		              "Private ( Z ): <span style=\"font-weight:bold\">" + privateBalance + " ZEN</span><br/>" +
+					  "Total ( Z+T ): <span style=\"font-weight:bold\">" + totalBalance + " ZEN</span>" +
 					  "</html>";
 		}
 		
