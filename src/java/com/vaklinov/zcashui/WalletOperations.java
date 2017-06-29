@@ -380,7 +380,7 @@ public class WalletOperations
 			}
 			
 			// TODO: We need a much more precise criterion to distinguish T/Z adresses;
-			boolean isZAddress = address.startsWith("z") && address.length() > 40;
+			boolean isZAddress = address.startsWith("zc") && address.length() > 40;
 			
 			String privateKey = isZAddress ?
 				this.clientCaller.getZPrivateKey(address) : this.clientCaller.getTPrivateKey(address);

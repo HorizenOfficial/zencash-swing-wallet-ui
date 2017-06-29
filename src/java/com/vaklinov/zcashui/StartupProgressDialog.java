@@ -69,8 +69,8 @@ public class StartupProgressDialog extends JFrame {
         southPanel.add(progressBar, BorderLayout.NORTH);
         progressLabel.setText("Starting...");
         southPanel.add(progressLabel, BorderLayout.SOUTH);
-        setLocationRelativeTo(null);
         pack();
+        setLocationRelativeTo(null);
         
         this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
     }

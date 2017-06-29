@@ -71,7 +71,7 @@ public class AddressTable
 						String address = AddressTable.this.getModel().getValueAt(lastRow, 2).toString();
 
 						// TODO: We need a much more precise criterion to distinguish T/Z adresses;
-						boolean isZAddress = address.startsWith("z") && address.length() > 40;
+						boolean isZAddress = address.startsWith("zc") && address.length() > 40;
 						
 						// Check for encrypted wallet
 						final boolean bEncryptedWallet = caller.isWalletEncrypted();

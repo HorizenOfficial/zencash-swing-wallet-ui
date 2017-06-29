@@ -159,7 +159,7 @@ public class TransactionTable
 						acc = acc.replaceAll("\"", ""); // In case it has quotes
 						
 						// TODO: We need a much more precise criterion to distinguish T/Z adresses;
-						boolean isZAddress = acc.startsWith("z") && acc.length() > 40;
+						boolean isZAddress = acc.startsWith("zc") && acc.length() > 40;
 						if (!isZAddress)
 						{
 					        JOptionPane.showMessageDialog(
