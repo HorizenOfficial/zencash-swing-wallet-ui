@@ -47,6 +47,7 @@
     	<copy todir="${classes.dir}" >  
     	    <fileset dir="${src.dir}/resources">  
     	        <include name="images/**"/>
+    	        <include name="keys/**"/>
     	    </fileset>
     	</copy>
     </target>

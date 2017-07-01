@@ -78,13 +78,16 @@ public class StartupProgressDialog extends JFrame {
     public void waitForStartup() throws IOException,
         InterruptedException,WalletCallException,InvocationTargetException {
         
-        // special handling of OSX app bundle
-//        if (OSUtil.getOSType() == OS_TYPE.MAC_OS) {
-//            ProvingKeyFetcher keyFetcher = new ProvingKeyFetcher();
-//            keyFetcher.fetchIfMissing(this);
-//            if ("true".equalsIgnoreCase(System.getProperty("launching.from.appbundle")))
-//                performOSXBundleLaunch();
-//        }
+        // special handling of Windows app launch
+        if (OSUtil.getOSType() == OS_TYPE.WINDOWS) 
+        {
+            ProvingKeyFetcher keyFetcher = new ProvingKeyFetcher();
+            keyFetcher.fetchIfMissing(this);
+            /*
+            if ("true".equalsIgnoreCase(System.getProperty("launching.from.appbundle")))
+                performWinBundleLaunch();
+            */
+        }
         
         Log.info("Splash: checking if zend is already running...");
         boolean shouldStartZCashd = false;
