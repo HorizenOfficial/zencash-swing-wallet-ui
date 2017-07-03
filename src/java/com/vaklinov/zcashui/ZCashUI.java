@@ -554,7 +554,7 @@ public class ZCashUI
 			                                       Math.abs(r.nextInt()) + "" + 
 					                               Math.abs(r.nextInt()));
 			configOut.println("");
-			configOut.println("# Well-knon nodes to connect to - to speed up acquiring initial connections");
+			configOut.println("# Well-known nodes to connect to - to speed up acquiring initial connections");
 			configOut.println("addnode=zpool.blockoperations.com"); 
 			configOut.println("addnode=luckpool.org:8333");
 			configOut.println("addnode=zencash.cloud");
