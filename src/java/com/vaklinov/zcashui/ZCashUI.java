@@ -100,7 +100,7 @@ public class ZCashUI
     public ZCashUI(StartupProgressDialog progressDialog)
         throws IOException, InterruptedException, WalletCallException
     {
-        super("ZENCash Swing Wallet UI 0.70.2 (beta)");
+        super("ZENCash Swing Wallet UI 0.70.3 (beta)");
         
         if (progressDialog != null)
         {
@@ -554,6 +554,10 @@ public class ZCashUI
 			                                       Math.abs(r.nextInt()) + "" + 
 					                               Math.abs(r.nextInt()));
 			configOut.println("");
+			
+			/*
+			 * This is not necessary as of release:
+			 *  https://github.com/ZencashOfficial/zen/releases/tag/v2.0.9-3-b8d2ebf
 			configOut.println("# Well-known nodes to connect to - to speed up acquiring initial connections");
 			configOut.println("addnode=zpool.blockoperations.com"); 
 			configOut.println("addnode=luckpool.org:8333");
@@ -561,6 +565,7 @@ public class ZCashUI
 			configOut.println("addnode=zen.suprnova.cc");
 			configOut.println("addnode=zen.bitfire.one");
 			configOut.println("addnode=zenmine.pro");
+			*/
 			
 			configOut.close();
 		}
