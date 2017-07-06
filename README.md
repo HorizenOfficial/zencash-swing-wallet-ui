@@ -7,6 +7,8 @@ presents the information in a user-friendly manner.
 
 ![Screenshot](https://github.com/vaklinov/zencash-swing-wallet-ui/raw/master/docs/ZENCashWallet.png "Main Window")
 
+#### New/Experimental: [ZENCash Desktop GUI Wallet for Windows](https://github.com/vaklinov/zencash-swing-wallet-ui/blob/master/docs/Release_0.70.3.md) is available
+
 
 ## Building, installing and running the Wallet GUI
 
