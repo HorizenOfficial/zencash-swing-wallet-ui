@@ -10,7 +10,7 @@ It requires a 64-bit Windows 7 or later version to run. It also includes
 ### Installing the ZENCash Desktop GUI Wallet on Windows
 
 1. Download the Wallet ZIP file 
-[ZENCashWallet_0.70.3_Windows.zip]https://github.com/vaklinov/zencash-swing-wallet-ui/releases/download/0.70.3/ZENCashWallet_0.70.3_Windows.zip). 
+[ZENCashWallet_0.70.3_Windows.zip](https://github.com/vaklinov/zencash-swing-wallet-ui/releases/download/0.70.3/ZENCashWallet_0.70.3_Windows.zip). 
 
 2. Security check: You may decide to run a virus scan on it, before proceeding... In addition using a tool 
 such as [http://quickhash-gui.org/](http://quickhash-gui.org/) you may calculate the its SHA256 checksum. The 
