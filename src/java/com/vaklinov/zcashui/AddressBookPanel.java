@@ -3,6 +3,7 @@
 package com.vaklinov.zcashui;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.FlowLayout;
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
@@ -42,6 +43,7 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableColumnModel;
+import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 
 public class AddressBookPanel extends JPanel {
@@ -102,6 +104,12 @@ public class AddressBookPanel extends JPanel {
         table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION); // one at a time
         table.getSelectionModel().addListSelectionListener(new AddressListSelectionListener());
         table.addMouseListener(new AddressMouseListener());
+        
+        // TODO: isolate in utility
+		TableCellRenderer renderer = table.getCellRenderer(0, 0);
+		Component comp = renderer.getTableCellRendererComponent(table, "123", false, false, 0, 0);
+		table.setRowHeight(new Double(comp.getPreferredSize().getHeight()).intValue() + 2);
+        
         JScrollPane scrollPane = new JScrollPane(table);
         return scrollPane;
     }
@@ -261,6 +269,14 @@ public class AddressBookPanel extends JPanel {
             
             menu.show(e.getComponent(), e.getPoint().x, e.getPoint().y);
             e.consume();
+        }
+        
+        public void mouseReleased(MouseEvent e)
+        {
+        	if ((!e.isConsumed()) && e.isPopupTrigger())
+        	{
+        		mousePressed(e);
+            }
         }
     }
     

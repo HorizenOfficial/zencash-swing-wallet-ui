@@ -231,7 +231,7 @@ public class TransactionTable
 			JPanel tempPanel = new JPanel(new BorderLayout(0, 0));
 			tempPanel.setBorder(BorderFactory.createEmptyBorder(4, 4, 4, 4));
 			JLabel infoLabel = new JLabel(
-					"<html><span style=\"font-size:9px;\">" +
+					"<html><span style=\"font-size:0.85em;\">" +
 					"The table shows the information about the transaction with technical details as " +
 					"they appear at ZENCash network level." +
 				    "</span>");

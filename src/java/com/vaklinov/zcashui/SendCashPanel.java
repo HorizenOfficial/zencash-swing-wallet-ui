@@ -120,7 +120,7 @@ public class SendCashPanel
 		JPanel tempPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
 		tempPanel.add(new JLabel("Send cash from:       "));
 		tempPanel.add(new JLabel(
-			"<html><span style=\"font-size:8px;\">" +
+			"<html><span style=\"font-size:0.8em;\">" +
 			"* Only addresses with a confirmed balance are shown as sources for sending!" +
 		    "</span>  "));
 		sendCashPanel.add(tempPanel);
@@ -150,7 +150,7 @@ public class SendCashPanel
 		tempPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
 		tempPanel.add(new JLabel("Memo (optional):     "));
 		tempPanel.add(new JLabel(
-				"<html><span style=\"font-size:8px;\">" +
+				"<html><span style=\"font-size:0.8em;\">" +
 				"* Memo may be specified only if the destination is a Z (Private) address!" +
 			    "</span>  "));
 		sendCashPanel.add(tempPanel);
@@ -202,7 +202,7 @@ public class SendCashPanel
 		JPanel warningPanel = new JPanel();
 		warningPanel.setLayout(new BorderLayout(7, 3));
 		JLabel warningL = new JLabel(
-				"<html><span style=\"font-size:8px;\">" +
+				"<html><span style=\"font-size:0.8em;\">" +
 				" * When sending cash from a T (Transparent) address, the remining unspent balance is sent to another " +
 				"auto-generated T address. When sending from a Z (Private) address, the remining unspent balance remains with " +
 				"the Z address. In both cases the original sending address cannot be used for sending again until the " +

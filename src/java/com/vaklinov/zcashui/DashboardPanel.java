@@ -122,14 +122,14 @@ public class DashboardPanel
 			this.getClass().getClassLoader().getResource("images/ZEN-yellow.orange-logo-small.png")));
 		tempPanel.add(logoLabel);
 		//tempPanel.add(new JLabel(" "));
-		JLabel zcLabel = new JLabel("ZENCash Wallet      ");
+		JLabel zcLabel = new JLabel("ZENCash Wallet    ");
 		zcLabel.setFont(new Font("Helvetica", Font.BOLD | Font.ITALIC, 28));
 		tempPanel.add(zcLabel);
 		tempPanel.setToolTipText("Powered by ZEN");
 		balanceStatusPanel.add(tempPanel, BorderLayout.WEST);
 				
 		JLabel transactionHeadingLabel = new JLabel(
-			"<html><span style=\"font-size:23px\"><br/></span>Transactions:</html>");
+			"<html><span style=\"font-size:2em\"><br/></span>Transactions:</html>");
 		transactionHeadingLabel.setFont(new Font("Helvetica", Font.BOLD, 19));
 		balanceStatusPanel.add(transactionHeadingLabel, BorderLayout.CENTER);
 						
@@ -356,7 +356,7 @@ public class DashboardPanel
 		
 		if (daemonInfo.status == DAEMON_STATUS.RUNNING)
 		{
-			runtimeInfo = "<span style=\"font-size:8px\">" +
+			runtimeInfo = "<span style=\"font-size:0.8em\">" +
 					      "Resident: " + daemonInfo.residentSizeMB + " MB" + virtual +
 					       cpuPercentage + "</span>";
 		}
@@ -374,7 +374,7 @@ public class DashboardPanel
 		if (this.walletIsEncrypted != null)
 		{
 			walletEncryption = 
-					"<span style=\"font-size:8px\">" + 
+					"<span style=\"font-size:0.8em\">" + 
 			        " (" + (this.walletIsEncrypted ? "" : "not ") + "encrypted)" +
 			        "</span>";
 		}
@@ -385,7 +385,7 @@ public class DashboardPanel
 			"Wallet: <span style=\"font-weight:bold;color:#303030\">" + walletDAT.getCanonicalPath() + "</span>" + 
 			walletEncryption + " <br/> " +
 			"<span style=\"font-size:3px\"><br/></span>" +
-			"<span style=\"font-size:8px\">" +
+			"<span style=\"font-size:0.8em\">" +
 			"Installation: " + OSUtil.getProgramDirectory() + ", " +
 	        "Blockchain: " + OSUtil.getBlockchainDirectory() + " <br/> " +
 		    "System: " + this.OSInfo + " </span> </html>";
@@ -454,7 +454,7 @@ public class DashboardPanel
 		String tick = "";
 		if (percentage.equals("100"))
 		{
-			tick = "<span style=\"font-weight:bold;font-size:12px;color:green\">" + tickSymbol + "</span>";
+			tick = "<span style=\"font-weight:bold;font-size:1.4em;color:green\">" + tickSymbol + "</span>";
 		}
 		
 		String netColor = "red";
@@ -477,11 +477,11 @@ public class DashboardPanel
 			"<html> " +
 		    "Blockchain synchronized: <span style=\"font-weight:bold\">" + 
 			percentage + "% </span> " + tick + " <br/>" +
-			"Up to: <span style=\"font-size:8px;font-weight:bold\">" + 
+			"Up to: <span style=\"font-size:0.8em;font-weight:bold\">" + 
 		    info.lastBlockDate.toLocaleString() + "</span>  <br/> " + 
 			"<span style=\"font-size:1px\"><br/></span>" + 
 			"Network: <span style=\"font-weight:bold\">" + info.numConnections + " connections</span>" +
-			"<span style=\"font-size:16px;color:" + netColor + "\">" + connections + "</span>";
+			"<span style=\"font-size:1.7em;color:" + netColor + "\">" + connections + "</span>";
 		this.networkAndBlockchainLabel.setText(text);
 	}
 	
@@ -497,7 +497,7 @@ public class DashboardPanel
 			return;
 		}
 		
-		// Format double numbers - else sometimes we get exponential notation 1E-4 ZEC
+		// Format double numbers - else sometimes we get exponential notation 1E-4 ZEN
 		DecimalFormat df = new DecimalFormat("########0.00######");
 		
 		String transparentBalance = df.format(balance.transparentBalance);
@@ -514,11 +514,11 @@ public class DashboardPanel
 		
 		String text =
 			"<html>" + 
-		    "<span style=\"font-family:monospace;font-size:8.9px;" + color1 + "\">Transparent balance: <span style=\"font-size:9px\">" + 
+		    "<span style=\"font-family:monospace;font-size:1em;" + color1 + "\">Transparent balance: <span style=\"font-size:1.1em;\">" + 
 				transparentUCBalance + " ZEN </span></span><br/> " +
-			"<span style=\"font-family:monospace;font-size:8.9px;" + color2 + "\">Private (Z) balance: <span style=\"font-weight:bold;font-size:9px\">" + 
+			"<span style=\"font-family:monospace;font-size:1em;" + color2 + "\">Private (Z) balance: <span style=\"font-weight:bold;font-size:1.1em;\">" + 
 		    	privateUCBalance + " ZEN </span></span><br/> " +
-			"<span style=\"font-family:monospace;font-size:8.9px;" + color3 + "\">Total (Z+T) balance: <span style=\"font-weight:bold;font-size:11.5px;\">" + 
+			"<span style=\"font-family:monospace;;font-size:1em;" + color3 + "\">Total (Z+T) balance: <span style=\"font-weight:bold;font-size:1.35em;\">" + 
 		    	totalUCBalance + " ZEN </span></span>" +
 			"<br/>  </html>";
 		

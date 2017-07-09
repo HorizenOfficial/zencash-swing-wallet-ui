@@ -114,7 +114,7 @@ public class AddressesPanel
 		warningPanel.setLayout(new BorderLayout(3, 3));
 		warningPanel.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
 		JLabel warningL = new JLabel(
-				"<html><span style=\"font-size:8px;\">" +
+				"<html><span style=\"font-size:0.8em;\">" +
 				"* If the balance of an address is flagged as not confirmed, the address is currently taking " +
 				"part in a transaction. The shown balance then is the expected value it will have when " +
 				"the transaction is confirmed. " +
@@ -357,7 +357,7 @@ public class AddressesPanel
 		
 		String[][] addressBalances = new String[zAddresses.length + tAddressesCombined.size()][];
 		
-		// Format double numbers - else sometimes we get exponential notation 1E-4 ZEC
+		// Format double numbers - else sometimes we get exponential notation 1E-4 ZEN
 		DecimalFormat df = new DecimalFormat("########0.00######");
 		
 		String confirmed    = "\u2690";

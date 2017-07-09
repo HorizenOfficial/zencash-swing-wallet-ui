@@ -28,6 +28,7 @@
  **********************************************************************************/
 package com.vaklinov.zcashui;
 
+import java.awt.Component;
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
@@ -50,6 +51,7 @@ import javax.swing.JPopupMenu;
 import javax.swing.JTable;
 import javax.swing.KeyStroke;
 import javax.swing.filechooser.FileNameExtensionFilter;
+import javax.swing.table.TableCellRenderer;
 
 
 
@@ -69,6 +71,11 @@ public class DataTable
 	public DataTable(final Object[][] rowData, final Object[] columnNames)
 	{
 		super(rowData, columnNames);
+		
+		// TODO: isolate in utility
+		TableCellRenderer renderer = this.getCellRenderer(0, 0);
+		Component comp = renderer.getTableCellRendererComponent(this, "123", false, false, 0, 0);
+		this.setRowHeight(new Double(comp.getPreferredSize().getHeight()).intValue() + 2);
 		
 		popupMenu = new JPopupMenu();
 		int accelaratorKeyMask = Toolkit.getDefaultToolkit ().getMenuShortcutKeyMask();
