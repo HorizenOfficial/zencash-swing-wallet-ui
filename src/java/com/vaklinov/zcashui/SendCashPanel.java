@@ -473,17 +473,41 @@ public class SendCashPanel
 		destinationMemoField.setEnabled(false);
 		transactionFeeField.setEnabled(false);
 		
+		// Start a data gathering thread specific to the operation being executed - this is done is a separate 
+		// thread since the server responds more slowly during JoinSPlits and this blocks he GUI somewhat.
+		final DataGatheringThread<Boolean> opFollowingThread = new DataGatheringThread<Boolean>(
+			new DataGatheringThread.DataGatherer<Boolean>() 
+			{
+				public Boolean gatherData()
+					throws Exception
+				{
+					long start = System.currentTimeMillis();
+					Boolean result = clientCaller.isSendingOperationComplete(operationStatusID);
+					long end = System.currentTimeMillis();
+					Log.info("Checking for operation " + operationStatusID + " status done in " + (end - start) + "ms." );
+					
+					return result;
+				}
+			}, 
+			this.errorReporter, 2000, true);
+		
 		// Start a timer to update the progress of the operation
 		operationStatusCounter = 0;
-		operationStatusTimer = new Timer(2000, new ActionListener() {
+		operationStatusTimer = new Timer(2000, new ActionListener() 
+		{
 			@Override
 			public void actionPerformed(ActionEvent e) 
 			{
 				try
 				{
 					// TODO: Handle errors in case of restarted server while wallet is sending ...
-					if (clientCaller.isSendingOperationComplete(operationStatusID))
+					Boolean opComplete = opFollowingThread.getLastData();
+					
+					if ((opComplete != null) && opComplete.booleanValue())
 					{
+						// End the special thread used to follow the operation
+						opFollowingThread.setSuspended(true);
+						
 						if (clientCaller.isCompletedOperationSuccessful(operationStatusID))
 						{
 							operationStatusLabel.setText(

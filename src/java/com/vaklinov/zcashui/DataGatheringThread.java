@@ -166,6 +166,8 @@ public class DataGatheringThread<T>
 				break mainLoop;
 			}
 		}
+		
+		Log.info("Ending data gathering thread {0} ...", this.getName());
 	} // End public void run()
 	
 	

@@ -122,7 +122,7 @@ public class DashboardPanel
 			this.getClass().getClassLoader().getResource("images/ZEN-yellow.orange-logo-small.png")));
 		tempPanel.add(logoLabel);
 		//tempPanel.add(new JLabel(" "));
-		JLabel zcLabel = new JLabel("ZENCash Wallet    ");
+		JLabel zcLabel = new JLabel("ZENCash Wallet ");
 		zcLabel.setFont(new Font("Helvetica", Font.BOLD | Font.ITALIC, 28));
 		tempPanel.add(zcLabel);
 		tempPanel.setToolTipText("Powered by ZEN");
@@ -130,8 +130,10 @@ public class DashboardPanel
 				
 		JLabel transactionHeadingLabel = new JLabel(
 			"<html><span style=\"font-size:2em\"><br/></span>Transactions:</html>");
+		tempPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 1, 1));
 		transactionHeadingLabel.setFont(new Font("Helvetica", Font.BOLD, 19));
-		balanceStatusPanel.add(transactionHeadingLabel, BorderLayout.CENTER);
+		tempPanel.add(transactionHeadingLabel);
+		balanceStatusPanel.add(tempPanel, BorderLayout.CENTER);
 						
 		PresentationPanel walletBalancePanel = new PresentationPanel();
 		walletBalancePanel.add(walletBalanceLabel = new JLabel());
@@ -255,7 +257,7 @@ public class DashboardPanel
 					return data;
 				}
 			}, 
-			this.errorReporter, 25000);
+			this.errorReporter, 20000);
 		this.threads.add(this.transactionGatheringThread);
 		
 		ActionListener alTransactions = new ActionListener() {

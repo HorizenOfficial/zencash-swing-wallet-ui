@@ -109,7 +109,7 @@ public class SingleKeyImportDialog
 		tempPanel.add(this.lowerLabel = new JLabel(
 			"<html><span style=\"font-weight:bold\">" + 
 		    "Warning:</span> Private key import is a slow operation that " +
-		    "requires blockchain rescanning (may take many minutes). The GUI " +
+		    "requires blockchain rescanning (may take many minutes). <br/>The GUI " +
 			"will not be usable for other functions during this time</html>"), 
 			BorderLayout.CENTER);
 		controlsPanel.add(tempPanel);
@@ -160,6 +160,8 @@ public class SingleKeyImportDialog
 		this.setSize(740, 210);
 		this.validate();
 		this.repaint();
+		
+		this.pack();
 	}
 	
 	
