@@ -117,3 +117,12 @@ transactions). A corresponding issue [#1438](https://github.com/zcash/zcash/issu
 for the ZCash developers. 
 1. Limitation: The CPU percentage shown to be taken by zend on Linux is the average for the entire lifetime 
 of the process. This is not very useful. This will be improved in future versions.
+1. Limitation: When using a natively compiled wallet version (e.g. `ZENCashSwingWalletUI.exe` for Windows) on a 
+very high resolution monitor with a specifically configured DPI scaling (enlargement) factor to make GUI 
+elements look larger, the GUI elements of the wallet actually do not scale as expected. To correct this on
+Windows you need to right-click on `ZENCashSwingWalletUI.exe` and choose option:
+```
+Properties >> Compatibility >> Override High DPI scaling behavior >> Scaling Performed by (Application)
+```
+Example:
+![DPI Scaling](https://github.com/vaklinov/zencash-swing-wallet-ui/raw/master/docs/EXEScalingSettings.png "DPI Scaling")
