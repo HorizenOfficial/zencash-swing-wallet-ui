@@ -11,6 +11,7 @@ import java.io.InputStream;
 import java.io.InterruptedIOException;
 import java.io.OutputStream;
 import java.net.URL;
+import java.net.URLConnection;
 import java.security.DigestInputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -92,9 +93,12 @@ public class ProvingKeyFetcher {
         provingKeyFile.delete();
         OutputStream os = new BufferedOutputStream(new FileOutputStream(provingKeyFile));
         URL keyURL = new URL(pathURL);
+        URLConnection urlc = keyURL.openConnection();
+        urlc.setRequestProperty("User-Agent", "Wget/1.17.1 (linux-gnu)");        
+        
         try 
         {
-        	is = keyURL.openStream();
+        	is = urlc.getInputStream();
             ProgressMonitorInputStream pmis = new ProgressMonitorInputStream(parent, "Downloading proving key", is);
             pmis.getProgressMonitor().setMaximum(PROVING_KEY_SIZE);
             pmis.getProgressMonitor().setMillisToPopup(10);
