@@ -21,6 +21,8 @@ import javax.swing.JOptionPane;
 import javax.swing.ProgressMonitorInputStream;
 import javax.xml.bind.DatatypeConverter;
 
+import com.vaklinov.zcashui.OSUtil.OS_TYPE;
+
 
 /**
  * Fetches the proving key.  Deliberately hardcoded.
@@ -42,8 +44,22 @@ public class ProvingKeyFetcher {
         }
     }
     
-    private void verifyOrFetch(StartupProgressDialog parent) throws IOException {
-        File zCashParams = new File(System.getenv("APPDATA") + "/ZcashParams");
+    private void verifyOrFetch(StartupProgressDialog parent) 
+    	throws IOException 
+    {
+    	OS_TYPE ost = OSUtil.getOSType();
+        
+    	File zCashParams = null;
+        // TODO: isolate getting ZcashParams in a utility method
+        if (ost == OS_TYPE.WINDOWS)  
+        {
+        	zCashParams = new File(System.getenv("APPDATA") + "/ZcashParams");
+        } else if (ost == OS_TYPE.MAC_OS)
+        {
+        	File userHome = new File(System.getProperty("user.home"));
+        	zCashParams = new File(userHome, "Library/Application Support/ZcashParams");
+        }
+        
         zCashParams = zCashParams.getCanonicalFile();
         
         boolean needsFetch = false;

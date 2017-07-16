@@ -82,15 +82,12 @@ public class StartupProgressDialog extends JFrame {
     public void waitForStartup() throws IOException,
         InterruptedException,WalletCallException,InvocationTargetException {
         
-        // special handling of Windows app launch
-        if (OSUtil.getOSType() == OS_TYPE.WINDOWS) 
+        // special handling of Windows/Mac OS app launch
+    	OS_TYPE os = OSUtil.getOSType();
+        if ((os == OS_TYPE.WINDOWS) || (os == OS_TYPE.MAC_OS)) 
         {
             ProvingKeyFetcher keyFetcher = new ProvingKeyFetcher();
             keyFetcher.fetchIfMissing(this);
-            /*
-            if ("true".equalsIgnoreCase(System.getProperty("launching.from.appbundle")))
-                performWinBundleLaunch();
-            */
         }
         
         Log.info("Splash: checking if zend is already running...");
@@ -212,18 +209,6 @@ public class StartupProgressDialog extends JFrame {
 				progressLabel.setText(text);
 			}
 	     });
-    }
-    
-    // TODO: Unused for now
-    private void performOSXBundleLaunch() throws IOException, InterruptedException {
-    	Log.info("performing OSX Bundle-specific launch");
-        File bundlePath = new File(System.getProperty("zen.location.dir"));
-        bundlePath = bundlePath.getCanonicalFile();
-        
-        // run "first-run.sh"
-        File firstRun = new File(bundlePath,"first-run.sh");
-        Process firstRunProcess = Runtime.getRuntime().exec(firstRun.getCanonicalPath());
-        firstRunProcess.waitFor();
     }
     
     

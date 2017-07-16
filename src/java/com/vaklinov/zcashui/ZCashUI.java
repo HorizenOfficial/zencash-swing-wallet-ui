@@ -100,7 +100,7 @@ public class ZCashUI
     public ZCashUI(StartupProgressDialog progressDialog)
         throws IOException, InterruptedException, WalletCallException
     {
-        super("ZENCash Swing Wallet UI 0.71.2 (beta)");
+        super("ZENCash Swing Wallet UI 0.71.3 (beta)");
         
         if (progressDialog != null)
         {
@@ -379,8 +379,7 @@ public class ZCashUI
         	Log.info("Class path: " + System.getProperty("java.class.path"));
         	Log.info("Environment PATH: " + System.getenv("PATH"));
 
-            // Look and feel settings - for now a custom OS-look and feel is set for Windows,
-            // Mac OS will follow later.
+            // Look and feel settings - a custom OS-look and feel is set for Windows
             if (os == OS_TYPE.WINDOWS)
             {
             	// Custom Windows L&F and font settings
@@ -389,13 +388,19 @@ public class ZCashUI
             	// This font looks good but on Windows 7 it misses some chars like the stars...
             	//FontUIResource font = new FontUIResource("Lucida Sans Unicode", Font.PLAIN, 11);
             	//UIManager.put("Table.font", font);
-            } else
+            } else if (os == OS_TYPE.MAC_OS)
+            {
+            	// The MacOS L&F is active by default - the property sets the menu bar Mac style
+            	System.setProperty("apple.laf.useScreenMenuBar", "true");
+            }
+            else
             {            
 	            for (LookAndFeelInfo ui : UIManager.getInstalledLookAndFeels())
 	            {
 	            	Log.info("Available look and feel: " + ui.getName() + " " + ui.getClassName());
 	                if (ui.getName().equals("Nimbus"))
 	                {
+	                	Log.info("Setting look and feel: {0}", ui.getClassName());
 	                    UIManager.setLookAndFeel(ui.getClassName());
 	                    break;
 	                };
