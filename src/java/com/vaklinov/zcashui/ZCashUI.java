@@ -100,7 +100,7 @@ public class ZCashUI
     public ZCashUI(StartupProgressDialog progressDialog)
         throws IOException, InterruptedException, WalletCallException
     {
-        super("ZENCash Swing Wallet UI 0.71.3 (beta)");
+        super("ZENCash Swing Wallet UI 0.71.4 (beta)");
         
         if (progressDialog != null)
         {
@@ -139,7 +139,17 @@ public class ZCashUI
         this.walletOps = new WalletOperations(
             	this, tabs, dashboard, addresses, sendPanel, installationObserver, clientCaller, errorReporter);
 
-        this.setSize(new Dimension(870, 427));
+        int width = 870;
+        
+        OS_TYPE os = OSUtil.getOSType();
+    	
+        // Window needs to be larger on Mac/Windows - typically
+    	if ((os == OS_TYPE.WINDOWS) || (os == OS_TYPE.MAC_OS))
+    	{
+    		width += 100;
+    	}
+        
+        this.setSize(new Dimension(width, 440));
 
         // Build menu
         JMenuBar mb = new JMenuBar();
