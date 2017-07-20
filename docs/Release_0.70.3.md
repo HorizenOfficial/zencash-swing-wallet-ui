@@ -1,27 +1,28 @@
-## [ZENCash](https://zensystem.io/) Desktop GUI Wallet binary release 0.70.3 for Windows
+## [ZENCash](https://zensystem.io/) Desktop GUI Wallet binary release 0.70.3a for Windows
 
-This is a [ZENCash](https://zensystem.io/) Desktop GUI Wallet binary release 0.70.3 for Windows. 
-It requires a 64-bit Windows 7 or later version to run. It also includes 
-[ZENCash 2.0.9-3 binaries](https://github.com/ZencashOfficial/zen/releases/tag/v2.0.9-3-b8d2ebf) by 
+This is a [ZENCash](https://zensystem.io/) Desktop GUI Wallet binary release 0.70.3a for Windows. 
+It requires a 64-bit Windows 7 or later version to run. It has also been updated to include [ZENCash 2.0.9-4 binaries](https://github.com/ZencashOfficial/zen/releases/tag/v2.0.9-4) by 
 [@cronicc](https://github.com/cronicc). 
+
+**This release contains the ZenCash [Mandatory Software Upgrade](https://blog.zensystem.io/zencash-hard-fork-at-block-139200-on-friday-july-21th-1400-edt/) at Block 139,200 on Friday July 21th 14:00 EDT**
 
 ![Screenshot](ZENCashWalletWindows.png "Main Window")
 
 ### Installing the ZENCash Desktop GUI Wallet on Windows
 
 1. Download the Wallet ZIP file 
-[ZENCashWallet_0.70.3_Windows.zip](https://github.com/vaklinov/zencash-swing-wallet-ui/releases/download/0.70.3/ZENCashWallet_0.70.3_Windows.zip). 
+[ZENCashWallet_0.70.3a_Windows.zip](https://github.com/vaklinov/zencash-swing-wallet-ui/releases/download/0.70.3/ZENCashWallet_0.70.3a_Windows.zip). 
 
 2. Security check: You may decide to run a virus scan on it, before proceeding... In addition using a tool 
 such as [http://quickhash-gui.org/](http://quickhash-gui.org/) you may calculate the its SHA256 checksum. The 
 result should be:
 ```
-47cbf70aa82c297f2f2e2c651df3d78f2458a44302b3bf2ad1d66b024222db5b *ZENCashWallet_0.70.3_Windows.zip
+91099f708fe536c3475a0d7ce676e6e330759e2ae255bb735da333b1b1dba94d  ZENCashWallet_0.70.3a_Windows.zip
 ```
-**If the resulting checksum is not `47cbf70aa82c297f2f2e2c651df3d78f2458a44302b3bf2ad1d66b024222db5b` then**
+**If the resulting checksum is not `91099f708fe536c3475a0d7ce676e6e330759e2ae255bb735da333b1b1dba94d` then**
 **something is wrong and you should discard the downloaded wallet!**
 
-3. Unzip the Wallet ZIP file ZENCashWallet_0.70.3_Windows.zip in some directory that it will run from.
+3. Unzip the Wallet ZIP file `ZENCashWallet_0.70.3a_Windows.zip` in some directory that it will run from.
    
 ### Running the ZENCash Desktop GUI Wallet on Windows
 
