@@ -191,7 +191,7 @@ public class DataGatheringThread<T>
 				}
 			} else
 			{
-				Log.warning("DataGatheringThread: ignoring " + e.getClass().getName() + " due to suspension!");
+				Log.info("DataGatheringThread: ignoring " + e.getClass().getName() + " due to suspension!");
 			}
 		}
 		
