@@ -65,6 +65,7 @@ import com.vaklinov.zcashui.ZCashClientCaller.WalletCallException;
 import com.vaklinov.zcashui.ZCashInstallationObserver.DAEMON_STATUS;
 import com.vaklinov.zcashui.ZCashInstallationObserver.DaemonInfo;
 import com.vaklinov.zcashui.ZCashInstallationObserver.InstallationDetectionException;
+import com.vaklinov.zcashui.msg.MessagingPanel;
 
 
 /**
@@ -94,6 +95,7 @@ public class ZCashUI
     private AddressesPanel   addresses;
     private SendCashPanel    sendPanel;
     private AddressBookPanel addressBookPanel;
+    private MessagingPanel   messagingPanel;
     
     JTabbedPane tabs;
 
@@ -134,6 +136,9 @@ public class ZCashUI
         tabs.addTab("Address book ",
     		        new ImageIcon(cl.getResource("images/address-book.png")),
     		        addressBookPanel = new AddressBookPanel(sendPanel, tabs));
+        tabs.addTab("Messaging ",
+		            new ImageIcon(cl.getResource("images/messaging.png")),
+		            messagingPanel = new MessagingPanel(clientCaller, errorReporter));
         contentPane.add(tabs);
 
         this.walletOps = new WalletOperations(

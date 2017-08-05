@@ -557,7 +557,80 @@ public class ZCashClientCaller
 
 		return strResponse.trim();
 	}
+	
+	
+	// Returns OPID
+	public synchronized String sendMessage(String from, String to, String amountAndFee, String memo)
+		throws WalletCallException, IOException, InterruptedException
+	{
+		// TODO: isolate hex encoding in a method
+		StringBuilder hexMemo = new StringBuilder();
+		for (byte c : memo.getBytes("UTF-8"))
+		{
+			String hexChar = Integer.toHexString((int)c);
+			if (hexChar.length() < 2)
+			{
+				hexChar = "0" + hexChar;
+			}
+			hexMemo.append(hexChar);
+		}
 
+		JsonObject toArgument = new JsonObject();
+		toArgument.set("address", to);
+		if (hexMemo.length() >= 2)
+		{
+			toArgument.set("memo", hexMemo.toString());
+		}
+
+		// TODO: The JSON Builder has a problem with double values that have no fractional part
+		// it serializes them as integers that ZCash does not accept. This will work with the 
+		// fractional amounts always used for messaging
+		toArgument.set("amount", Double.valueOf(amountAndFee));
+
+		JsonArray toMany = new JsonArray();
+		toMany.add(toArgument);
+		
+		String toManyArrayStr =	toMany.toString();		
+		String[] sendCashParameters = new String[]
+	    {
+		    this.zcashcli.getCanonicalPath(), "z_sendmany", wrapStringParameter(from),
+		    wrapStringParameter(toManyArrayStr),
+		    // Default min confirmations for the input transactions is 1
+		    "1",
+		    // transaction fee
+		    amountAndFee
+		};
+				
+		// Create caller to send cash
+	    CommandExecutor caller = new CommandExecutor(sendCashParameters);
+	    String strResponse = caller.execute();
+
+		if (strResponse.trim().toLowerCase(Locale.ROOT).startsWith("error:") ||
+			strResponse.trim().toLowerCase(Locale.ROOT).startsWith("error code:"))
+		{
+		  	throw new WalletCallException("Error response from wallet: " + strResponse);
+		}
+
+		Log.info("Sending cash message with the following command: " +
+                sendCashParameters[0] + " " + sendCashParameters[1] + " " +
+                sendCashParameters[2] + " " + sendCashParameters[3] + " " +
+                sendCashParameters[4] + " " + sendCashParameters[5] + "." +
+                " Got result: [" + strResponse + "]");
+
+		return strResponse.trim();
+	}
+
+
+	// Returns the message signature
+	public synchronized String signMessage(String address, String message)
+		throws WalletCallException, IOException, InterruptedException
+	{
+	    String response = this.executeCommandAndGetSingleStringResponse(
+	    	"signmessage", wrapStringParameter(address), wrapStringParameter(address));
+
+		return response.trim();
+	}
+	
 
 	public synchronized boolean isSendingOperationComplete(String opID)
 	    throws WalletCallException, IOException, InterruptedException

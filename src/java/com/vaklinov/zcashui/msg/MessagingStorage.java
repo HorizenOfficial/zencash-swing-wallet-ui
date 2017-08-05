@@ -102,7 +102,7 @@ public class MessagingStorage
 	}
 		
 		
-	public void updateIdentity(MessagingIdentity newIdentity)
+	public void updateOwnIdentity(MessagingIdentity newIdentity)
 		throws IOException
 	{
 		File identityFile = new File(rootDir, "ownidentity.json");	
@@ -152,7 +152,7 @@ public class MessagingStorage
 	}
 	
 	
-	// Get all messages by identity or by T adderss we shall sew
+	// Get all messages by identity or by T adderss we shall see what is needed
 	
 	
 	///////////////////////////////////////////////////////////////////////////////////////////////////
