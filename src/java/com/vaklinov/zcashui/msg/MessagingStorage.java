@@ -35,6 +35,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
+import com.vaklinov.zcashui.Log;
 import com.vaklinov.zcashui.OSUtil;
 
 
@@ -152,7 +153,58 @@ public class MessagingStorage
 	}
 	
 	
-	// Get all messages by identity or by T adderss we shall see what is needed
+	/**
+	 * Returns all known messages for a certain contact in ascending date order. 
+	 * If identity not found etc. thorws an exception
+	 * 
+	 * @param conact
+	 * 
+	 * @return all known messages for a certain contact in ascending date order.
+	 */
+	public List<Message> getAllMessagesForContact(MessagingIdentity contact)
+		throws IOException
+	{
+		// Find the contact
+		SingleContactStorage contactStorage = null;
+		for (SingleContactStorage scs : this.contactsList)
+		{
+			if (scs.getIdentity().isIdenticalTo(contact))
+			{
+				contactStorage = scs;
+			}
+		}
+		
+		List<Message> messages = new ArrayList<Message>();
+		
+		// Should never happen but ...
+		if (contactStorage == null)
+		{
+			Log.warning("Could not find messaging identity in the contact list {0}", 
+					    contact.toJSONObject().toString());
+			throw new IOException("Could not find messaging identity in the contact list " +
+					              contact.toJSONObject().toString());
+		}
+		
+		messages.addAll(contactStorage.getAllReceivedMessages());
+		messages.addAll(contactStorage.getAllSentMessages());
+		
+		// Finally sort them
+		messages.sort(
+			new Comparator<Message>() 
+			{
+				@Override
+				public int compare(Message o1, Message o2) 
+				{
+					return o1.getTime().compareTo(o2.getTime());
+				}
+			}
+		);
+		
+		return messages;
+	}
+	
+	
+	// TODO more Get all messages by identity or by T adderss we shall see what is needed
 	
 	
 	///////////////////////////////////////////////////////////////////////////////////////////////////

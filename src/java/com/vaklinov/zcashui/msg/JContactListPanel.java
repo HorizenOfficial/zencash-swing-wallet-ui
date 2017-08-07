@@ -44,7 +44,12 @@ import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.ListCellRenderer;
-import javax.swing.SwingConstants;
+import javax.swing.ListSelectionModel;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+
+import com.vaklinov.zcashui.Log;
+import com.vaklinov.zcashui.StatusUpdateErrorReporter;
 
 
 /**
@@ -55,18 +60,24 @@ import javax.swing.SwingConstants;
 public class JContactListPanel
 	extends JPanel
 {
+	private MessagingPanel   parent;
 	private MessagingStorage mesagingStorage;
+	private ContactList      list;
+	private StatusUpdateErrorReporter errorReporter;
 	
-	public JContactListPanel(MessagingStorage messagingStorage)
+	public JContactListPanel(MessagingPanel parent, MessagingStorage messagingStorage, 
+			                 StatusUpdateErrorReporter errorReporter)
 		throws IOException
 	{
 		super();
 		
+		this.parent = parent;
 		this.mesagingStorage = messagingStorage;
+		this.errorReporter   = errorReporter;
 		
 		this.setLayout(new BorderLayout(0, 0));
 		
-		ContactList list = new ContactList();
+		list = new ContactList();
 		list.setIdentities(this.mesagingStorage.getContactIdentities());
 		this.add(new JScrollPane(list), BorderLayout.CENTER);
 		
@@ -74,6 +85,24 @@ public class JContactListPanel
 		upperPanel.add(new JLabel("Contact list:"));
 		upperPanel.setBorder(BorderFactory.createEmptyBorder(3, 3, 3, 3));
 		this.add(upperPanel, BorderLayout.NORTH);
+		
+		// Take care of updating the messages on selection
+		list.addListSelectionListener(new ListSelectionListener() 
+		{	
+			@Override
+			public void valueChanged(ListSelectionEvent e) 
+			{
+				try
+				{
+					MessagingIdentity id = JContactListPanel.this.list.getSelectedValue();
+					JContactListPanel.this.parent.displayMessagesForContact(id);
+				} catch (IOException ioe)
+				{
+					Log.error("Unexpected error: ", ioe);
+					JContactListPanel.this.errorReporter.reportError(ioe, false);
+				}
+			}
+		});
 	}
 	
 	
@@ -83,13 +112,19 @@ public class JContactListPanel
 		extends JList<MessagingIdentity>
 	{
 		ImageIcon contactBlackIcon;
+		JLabel    renderer;
 		
 		public ContactList()
 		{
 			super();
 			
+			this.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+			
 	        URL iconUrl = this.getClass().getClassLoader().getResource("images/contact-black.png");
 	        contactBlackIcon = new ImageIcon(iconUrl);
+	        
+	        renderer = new JLabel();
+	        renderer.setOpaque(true);
 		}
 		
 		
@@ -113,19 +148,17 @@ public class JContactListPanel
 				@Override
 				public Component getListCellRendererComponent(JList<? extends MessagingIdentity> list,
 						MessagingIdentity id, int index, boolean isSelected, boolean cellHasFocus) 
-				{
-					// TODO: better string
-					JLabel renderer = new JLabel(
-						id.getNickname() + " (" + 
-					      (id.getFirstname() != null ? id.getFirstname() : "") + 
-					      (id.getSurname() != null ? " " : "") + 
-						  (id.getSurname() != null ? id.getSurname() : "") + ")",
-						contactBlackIcon,
-						SwingConstants.LEFT);
+				{					
+					renderer.setText(id.getDiplayString());
+					renderer.setIcon(contactBlackIcon);
 					
-					if (isSelected || cellHasFocus)
+					if (isSelected) 
 					{
-						renderer.setBackground(Color.LIGHT_GRAY);
+						renderer.setBackground(list.getSelectionBackground());
+					} else 
+					{
+						// TODO: list background issues on Linux - if used directly
+						renderer.setBackground(new Color(list.getBackground().getRGB()));  
 					}
 					
 					return renderer;

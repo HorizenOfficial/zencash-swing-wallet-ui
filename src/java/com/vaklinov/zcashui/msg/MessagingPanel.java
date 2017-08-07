@@ -32,6 +32,8 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.io.IOException;
+import java.util.Date;
+import java.util.List;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
@@ -49,6 +51,7 @@ import com.vaklinov.zcashui.StatusUpdateErrorReporter;
 import com.vaklinov.zcashui.WalletTabPanel;
 import com.vaklinov.zcashui.ZCashClientCaller;
 import com.vaklinov.zcashui.ZCashClientCaller.WalletCallException;
+import com.vaklinov.zcashui.msg.Message.DIRECTION_TYPE;
 
 
 /**
@@ -66,6 +69,11 @@ public class MessagingPanel
 	
 	private JContactListPanel contactList;
 	
+	private JLabel conversationLabel;
+	private JTextArea conversationTextArea;
+	
+	private JTextArea writeMessageTextArea;
+	
 
 	
 	public MessagingPanel(ZCashClientCaller clientCaller, StatusUpdateErrorReporter errorReporter)
@@ -75,9 +83,10 @@ public class MessagingPanel
 		
 		this.clientCaller = clientCaller;
 		this.errorReporter = errorReporter;
-		
 		this.messagingStorage = new MessagingStorage();
 		
+		
+		// Start building UI
 		this.setLayout(new BorderLayout(0, 0));
 		this.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
 		
@@ -85,14 +94,19 @@ public class MessagingPanel
 		//textAndContactsPane.setDividerLocation(480); // TODO - not sure
 		this.add(textAndContactsPane, BorderLayout.CENTER);
 		
-		this.contactList = new JContactListPanel(this.messagingStorage);
+		this.contactList = new JContactListPanel(this, this.messagingStorage, this.errorReporter);
 		textAndContactsPane.setRightComponent(this.contactList);
 		
 		JPanel conversationPanel = new JPanel(new BorderLayout(0, 0));
 		conversationPanel.add(
-			new JScrollPane(new JTextArea("xfgfffffffffffffffff")), BorderLayout.CENTER);
+			new JScrollPane(
+				this.conversationTextArea = new JTextArea("xfgfffffffffffffffff"),
+				JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+				JScrollPane.HORIZONTAL_SCROLLBAR_NEVER), 
+			BorderLayout.CENTER);
+		this.conversationTextArea.setLineWrap(true);
 		JPanel upperPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
-		upperPanel.add(new JLabel("Conversation with Rolf Versluis:"));
+		upperPanel.add(this.conversationLabel = new JLabel("Conversation with Rolf Versluis:"));
 		upperPanel.setBorder(BorderFactory.createEmptyBorder(3, 3, 3, 3));
 		conversationPanel.add(upperPanel, BorderLayout.NORTH);		
 		
@@ -109,9 +123,14 @@ public class MessagingPanel
 		this.add(writeAndSendPanel, BorderLayout.SOUTH);
 		
 		JPanel writePanel = new JPanel(new BorderLayout(0, 0));
-		JTextArea messageTextArea = new JTextArea(3, 50);
-		messageTextArea.setBorder(BorderFactory.createEmptyBorder(3, 3, 3, 3));
-		writePanel.add(new JScrollPane(messageTextArea), BorderLayout.CENTER);
+		this.writeMessageTextArea = new JTextArea(3, 50);
+		this.writeMessageTextArea.setBorder(BorderFactory.createEmptyBorder(3, 3, 3, 3));
+		this.writeMessageTextArea.setLineWrap(true);
+		writePanel.add(
+			new JScrollPane(this.writeMessageTextArea,
+					        JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+					        JScrollPane.HORIZONTAL_SCROLLBAR_NEVER), 
+			BorderLayout.CENTER);
 		JLabel sendLabel = new JLabel("Message to send:");
 		sendLabel.setBorder(BorderFactory.createEmptyBorder(3, 3, 3, 3));
 		writePanel.add(sendLabel, BorderLayout.NORTH);
@@ -145,7 +164,40 @@ public class MessagingPanel
 		
 		sendPanel.add(sendButtonPanel);
 		writeAndSendPanel.add(sendPanel, BorderLayout.EAST);
+		
+		// Attach logic
+		
 	}
 	
 	
+	/**
+	 * Loads all messages for a specific contact and displays them in the conversation text area.
+	 * 
+	 * @param conact
+	 */
+	public void displayMessagesForContact(MessagingIdentity contact)
+		throws IOException
+	{
+		MessagingIdentity ownIdentity = this.messagingStorage.getOwnIdentity();
+		List<Message> messages = this.messagingStorage.getAllMessagesForContact(contact);
+		
+		Date now = new Date();
+		StringBuilder text = new StringBuilder();
+		
+		for (Message msg : messages)
+		{
+			text.append("[");
+			text.append(msg.getTime().toString()); // TODO: correct date
+			text.append("] ");
+			text.append(msg.getDirection() == DIRECTION_TYPE.SENT ? 
+					       ownIdentity.getNickname() : contact.getNickname());
+			text.append(msg.getDirection() == DIRECTION_TYPE.SENT ? ": => " : ": <= ");
+			text.append(msg.getMessage());
+			text.append("\n");
+		}
+		
+		this.conversationTextArea.setText(text.toString());
+		
+		this.conversationLabel.setText("Conversation with: " + contact.getDiplayString());
+	}
 }

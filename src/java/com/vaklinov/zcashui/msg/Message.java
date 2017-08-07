@@ -62,10 +62,10 @@ public class Message
 	private String  message;
 	private String  sign;
 	
-	// Addiitonal internal fields
-	private String  transactionID;
-	private Date    time;
-	// TODO: direction
+	// Addiitonal internal fields - not to be used when transmitted over the wire
+	private String         transactionID;
+	private Date           time;
+	private DIRECTION_TYPE direction;
 	
 	
 	public Message()
@@ -87,6 +87,8 @@ public class Message
 			
 		try
 		{
+			// TODO: Repackage ParseException as IOEx!!! - 
+			
 			r = new BufferedReader(new InputStreamReader(new FileInputStream(f), "UTF-8"));
 			JsonObject obj = Json.parse(r).asObject();
 			
@@ -103,12 +105,17 @@ public class Message
 
 	public void copyFromJSONObject(JsonObject obj)
 	{
+		// Wire protocol fields
 		this.version       = obj.getInt("version",          1);
 		this.from          = obj.getString("from",          null);
 		this.message       = obj.getString("message",       null);
 		this.sign          = obj.getString("sign",          null);
+		
+		// Additional fields - may be missing, get default values
 		this.transactionID = obj.getString("transactionID", null);
 		this.time          = new Date(obj.getLong("time",   0));
+		this.direction     = DIRECTION_TYPE.valueOf(
+				                 obj.getString("direction", DIRECTION_TYPE.RECEIVED.toString()));
 	}
 	
 	
@@ -125,6 +132,7 @@ public class Message
 		{
 			obj.set("transactionID", transactionID);
 			obj.set("time",          this.time.getTime());
+			obj.set("direction",     this.direction.toString());
 		}
 		
 		return obj;
@@ -219,6 +227,18 @@ public class Message
 	public void setTime(Date time) 
 	{
 		this.time = time;
+	}
+
+
+	public DIRECTION_TYPE getDirection() 
+	{
+		return direction;
+	}
+
+
+	public void setDirection(DIRECTION_TYPE direction) 
+	{
+		this.direction = direction;
 	}
 	
 }

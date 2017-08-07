@@ -50,7 +50,7 @@ import com.eclipsesource.json.JsonObject;
 public class MessagingIdentity
 {
 	private String nickname;
-	private String sendreceiverddress;
+	private String sendreceiveaddress;
 	private String senderidaddress;
 	private String firstname;
 	private String middlename;
@@ -80,6 +80,8 @@ public class MessagingIdentity
 			
 		try
 		{
+			// TODO: Repackage ParseException as IOEx!!! - 
+			
 			r = new BufferedReader(new InputStreamReader(new FileInputStream(f), "UTF-8"));
 			JsonObject obj = Json.parse(r).asObject();
 			
@@ -97,7 +99,7 @@ public class MessagingIdentity
 	public void copyFromJSONObject(JsonObject obj)
 	{
 		this.nickname           = obj.getString("nickname",           null);
-		this.sendreceiverddress = obj.getString("sendreceiverddress", null);
+		this.sendreceiveaddress = obj.getString("sendreceiveaddress", null);
 		this.senderidaddress    = obj.getString("senderidaddress",    null);
 		this.firstname          = obj.getString("firstname",          null);
 		this.middlename         = obj.getString("middlename",         null);
@@ -114,7 +116,7 @@ public class MessagingIdentity
 		JsonObject obj = new JsonObject();
 		
 		obj.set("nickname",           nickname);
-		obj.set("sendreceiverddress", sendreceiverddress);
+		obj.set("sendreceiveaddress", sendreceiveaddress);
 		obj.set("senderidaddress",    senderidaddress);
 		obj.set("firstname",          firstname);
 		obj.set("middlename",         middlename);
@@ -157,14 +159,14 @@ public class MessagingIdentity
 		this.nickname = nickname;
 	}
 	
-	public String getSendreceiverddress() 
+	public String getSendreceiveaddress() 
 	{
-		return sendreceiverddress;
+		return sendreceiveaddress;
 	}
 	
-	public void setSendreceiverddress(String sendreceiverddress) 
+	public void setSendreceiveaddress(String sendreceiveaddress) 
 	{
-		this.sendreceiverddress = sendreceiverddress;
+		this.sendreceiveaddress = sendreceiveaddress;
 	}
 	
 	public String getSenderidaddress() 
@@ -247,4 +249,43 @@ public class MessagingIdentity
 		this.twitter = twitter;
 	}
 	
+	
+	/**
+	 * Produces a string in the form nick (first middle sur) suitable for display purposes.
+	 * 
+	 * @return a string in the form nick (first middle sur) suitable for display purposes.
+	 */
+	public String getDiplayString()
+	{
+		
+		MessagingIdentity id = this;
+		String contactString = id.getNickname();
+		
+		// TODO: avoid space if no surname
+		if ((id.getFirstname() != null) || (id.getMiddlename() != null) || (id.getSurname() != null))
+		{
+			contactString += " (";
+			contactString += (id.getFirstname() != null)  ? (id.getFirstname() + " ")  : "";
+			contactString += (id.getMiddlename() != null) ? (id.getMiddlename() + " ") : "";
+			contactString += (id.getSurname() != null)    ? (id.getSurname())          : "";
+			contactString += ")";
+		}
+		
+		return contactString;
+	}
+	
+	
+	/**
+	 * Performs a comparison of whether one messaging identity object is identical to another.
+	 * Currently the criterion is that the two addresses used must be the same!
+	 * 
+	 * @param other other messaging identity to compare to
+	 * 
+	 * @return true if identical;
+	 */
+	public boolean isIdenticalTo(MessagingIdentity other)
+	{
+		return this.senderidaddress.equals(other.senderidaddress) &&
+			   this.sendreceiveaddress.equals(other.sendreceiveaddress);
+	}
 }
