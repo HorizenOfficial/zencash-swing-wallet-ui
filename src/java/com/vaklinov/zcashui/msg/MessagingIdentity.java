@@ -60,6 +60,7 @@ public class MessagingIdentity
 	private String facebook;
 	private String twitter;
 	
+	// TODO: automatically cut fields to XXX length to avoid issues with accidental big data
 	
 	public MessagingIdentity()
 	{

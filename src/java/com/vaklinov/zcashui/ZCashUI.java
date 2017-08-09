@@ -58,6 +58,8 @@ import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.UIManager.LookAndFeelInfo;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 import com.vaklinov.zcashui.OSUtil.OS_TYPE;
 import com.vaklinov.zcashui.ZCashClientCaller.NetworkAndBlockchainInfo;
@@ -90,6 +92,7 @@ public class ZCashUI
     private JMenuItem menuItemImportKeys;
     private JMenuItem menuItemShowPrivateKey;
     private JMenuItem menuItemImportOnePrivateKey;
+    private JMenuItem menuItemOwnIdentity;
 
     private DashboardPanel   dashboard;
     private AddressesPanel   addresses;
@@ -138,7 +141,7 @@ public class ZCashUI
     		        addressBookPanel = new AddressBookPanel(sendPanel, tabs));
         tabs.addTab("Messaging ",
 		            new ImageIcon(cl.getResource("images/messaging.png")),
-		            messagingPanel = new MessagingPanel(clientCaller, errorReporter));
+		            messagingPanel = new MessagingPanel(this, clientCaller, errorReporter));
         contentPane.add(tabs);
 
         this.walletOps = new WalletOperations(
@@ -184,12 +187,11 @@ public class ZCashUI
         menuItemImportOnePrivateKey.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, accelaratorKeyMask));        
         mb.add(wallet);
 
-        // Some day the extras menu will be populated with less essential funcitons
-        //JMenu extras = new JMenu("Extras");
-        //extras.setMnemonic(KeyEvent.VK_ NOT R);
-        //extras.add(menuItemAddressBook = new JMenuItem("Address book...", KeyEvent.VK_D));
-        //menuItemAddressBook.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_D, accelaratorKeyMask));        
-        //mb.add(extras);
+        JMenu messaging = new JMenu("Messaging");
+        messaging.setMnemonic(KeyEvent.VK_S);
+        messaging.add(menuItemOwnIdentity = new JMenuItem("Own identity...", KeyEvent.VK_O));
+        menuItemOwnIdentity.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, accelaratorKeyMask));        
+        mb.add(messaging);
 
         // TODO: Temporarily disable encryption until further notice - Oct 24 2016
         menuItemEncrypt.setEnabled(false);
@@ -293,6 +295,17 @@ public class ZCashUI
            }
        );
        
+       menuItemOwnIdentity.addActionListener(   
+               new ActionListener()
+               {
+                   @Override
+                   public void actionPerformed(ActionEvent e)
+                   {
+            			ZCashUI.this.messagingPanel.openOwnIdentityDialog();
+                   }
+               }
+        );
+       
         // Close operation
         this.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
         this.addWindowListener(new WindowAdapter()
@@ -349,6 +362,23 @@ public class ZCashUI
         {
         	progressDialog.doDispose();
         }
+        
+        // Notify the messaging TAB that it is being selected - every time
+        tabs.addChangeListener(
+            new ChangeListener() 
+            {	
+    			@Override
+    			public void stateChanged(ChangeEvent e) 
+    			{
+    				JTabbedPane tabs = (JTabbedPane)e.getSource();
+    				if (tabs.getSelectedIndex() == 4)
+    				{
+    					ZCashUI.this.messagingPanel.tabSelected();
+    				}
+    			}
+    		}
+        );
+  
     }
 
     public void exitProgram()

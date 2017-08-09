@@ -31,6 +31,7 @@ package com.vaklinov.zcashui.msg;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.io.File;
 import java.io.IOException;
 import java.util.Date;
 import java.util.List;
@@ -38,7 +39,9 @@ import java.util.List;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
@@ -47,9 +50,12 @@ import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
 import javax.swing.border.EtchedBorder;
 
+import com.vaklinov.zcashui.Log;
+import com.vaklinov.zcashui.OSUtil;
 import com.vaklinov.zcashui.StatusUpdateErrorReporter;
 import com.vaklinov.zcashui.WalletTabPanel;
 import com.vaklinov.zcashui.ZCashClientCaller;
+import com.vaklinov.zcashui.ZCashUI;
 import com.vaklinov.zcashui.ZCashClientCaller.WalletCallException;
 import com.vaklinov.zcashui.msg.Message.DIRECTION_TYPE;
 
@@ -62,6 +68,7 @@ import com.vaklinov.zcashui.msg.Message.DIRECTION_TYPE;
 public class MessagingPanel
 	extends WalletTabPanel
 {
+	private JFrame parentFrame;
 	private ZCashClientCaller clientCaller;
 	private StatusUpdateErrorReporter errorReporter;
 	
@@ -76,13 +83,14 @@ public class MessagingPanel
 	
 
 	
-	public MessagingPanel(ZCashClientCaller clientCaller, StatusUpdateErrorReporter errorReporter)
+	public MessagingPanel(JFrame parentFrame, ZCashClientCaller clientCaller, StatusUpdateErrorReporter errorReporter)
 		throws IOException, InterruptedException, WalletCallException
 	{
 		super();
 		
-		this.clientCaller = clientCaller;
-		this.errorReporter = errorReporter;
+		this.parentFrame      = parentFrame;
+		this.clientCaller     = clientCaller;
+		this.errorReporter    = errorReporter;
 		this.messagingStorage = new MessagingStorage();
 		
 		
@@ -111,7 +119,7 @@ public class MessagingPanel
 		conversationPanel.add(upperPanel, BorderLayout.NORTH);		
 		
 		textAndContactsPane.setLeftComponent(conversationPanel);
-		SwingUtilities.invokeLater(new Runnable() { // TODO: does not work
+		SwingUtilities.invokeLater(new Runnable() { // TODO: does not work... or maybe it does
 			@Override
 			public void run() {
 				textAndContactsPane.setDividerLocation(570);			
@@ -186,12 +194,13 @@ public class MessagingPanel
 		
 		for (Message msg : messages)
 		{
-			text.append("[");
-			text.append(msg.getTime().toString()); // TODO: correct date
-			text.append("] ");
+			text.append(msg.getDirection() == DIRECTION_TYPE.SENT ? "\u21E8 " : "\u21E6 ");
+			text.append("(");
+			text.append(msg.getTime().toString()); // TODO: correct date further
+			text.append(") ");
 			text.append(msg.getDirection() == DIRECTION_TYPE.SENT ? 
 					       ownIdentity.getNickname() : contact.getNickname());
-			text.append(msg.getDirection() == DIRECTION_TYPE.SENT ? ": => " : ": <= ");
+			text.append(": ");
 			text.append(msg.getMessage());
 			text.append("\n");
 		}
@@ -199,5 +208,82 @@ public class MessagingPanel
 		this.conversationTextArea.setText(text.toString());
 		
 		this.conversationLabel.setText("Conversation with: " + contact.getDiplayString());
+	}
+	
+
+	/**
+	 * Called when the TAB is selected - currently shows the welcome mesage
+	 */
+	public void tabSelected()
+	{
+		try
+		{
+			if (this.messagingStorage.getOwnIdentity() == null)
+			{
+		        JOptionPane.showMessageDialog(
+	                this.parentFrame,
+	                "Welcome to ZENCash messaging. As start you will need to create a new messaging\n" + 
+	                "identity for yourself. As a part of this mesaging identity a pair of T+Z addresses\n" +
+	                "will be created. The T address is to be used for identifying you to other users.\n" +
+	                "It must never be used for other financial transactions since this might reduce or\n" +
+	                "fully compromise your privacy. The Z address is to be used to send and receive\n" +
+	                "messages.\n\n" +
+	                "When creating a new messaging identity it is only mandatory to specify a nick-name\n" +
+	                "for yourself. All other items such as names/addresses etc. are optional. The \n" +
+	                "information in the mesaging identity is meant to be shared with other users so \n" +
+	                "you need to be careful about the details you disclose.\n\n" +
+	                "Once your messaging identity has been created you can export it to a file using the\n" +
+	                "menu option Messaging >> Export own identity. This file may then be shared with\n" +
+	                "other users who wish to import it. To establish contact with other users you need to\n" +
+	                "import their messaging identity, using the menu option Messaging >> Import contact \n" +
+	                "identity.\n\n" +
+	                "(This mesage will be shown only once.)",
+	                "Welcome to messaging", JOptionPane.INFORMATION_MESSAGE);
+		        	        
+		        // Show the GUI dialog to edit an initially empty messaging identity
+		        this.openOwnIdentityDialog();
+			}
+		} catch (Exception ex)
+		{
+			Log.error("Unexpected error in messagign TAB selection processing", ex);
+			this.errorReporter.reportError(ex, false);
+		}
+	}
+	
+	
+	
+	/**
+	 * Shows the UI dialog to edit+save one's own identity.
+	 */
+	public void openOwnIdentityDialog()
+	{
+		try
+		{
+			MessagingIdentity ownIdentity = this.messagingStorage.getOwnIdentity();
+			boolean identityIsBeingCreated = false;
+			
+			if (ownIdentity == null)
+			{
+				identityIsBeingCreated = true;
+				ownIdentity = new MessagingIdentity();
+				
+				// TODO: maybe set wait cursor here
+				// Create the T/Z addresses to be used for messaging
+				String TAddress = this.clientCaller.createNewAddress(false);
+				String ZAddress = this.clientCaller.createNewAddress(true);
+				
+				ownIdentity.setSenderidaddress(TAddress);
+				ownIdentity.setSendreceiveaddress(ZAddress);
+			}
+			
+			// Dialog will automatically save the identity if the user chooses so 
+			OwnIdentityEditDialog ownIdentityDialog = new OwnIdentityEditDialog(
+				this.parentFrame, ownIdentity, this.messagingStorage, this.errorReporter, identityIsBeingCreated);
+			ownIdentityDialog.setVisible(true);
+		} catch (Exception ex)
+		{
+			Log.error("Unexpected error in editing own messaging identity!", ex);
+			this.errorReporter.reportError(ex, false);
+		}
 	}
 }

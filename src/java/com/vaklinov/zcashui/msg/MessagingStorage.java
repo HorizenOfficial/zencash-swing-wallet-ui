@@ -32,6 +32,7 @@ import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
@@ -98,6 +99,11 @@ public class MessagingStorage
 	{
 		// TODO: cache in memory
 		File identityFile = new File(rootDir, "ownidentity.json");
+		
+		if (!identityFile.exists())
+		{
+			return null;
+		}
 			
 		return new MessagingIdentity(identityFile);
 	}
@@ -189,7 +195,7 @@ public class MessagingStorage
 		messages.addAll(contactStorage.getAllSentMessages());
 		
 		// Finally sort them
-		messages.sort(
+		Collections.sort(messages,
 			new Comparator<Message>() 
 			{
 				@Override
@@ -347,7 +353,7 @@ public class MessagingStorage
 				this.collectMessagesFromDir(dir, allMessages);
 			}
 			
-			allMessages.sort(
+			Collections.sort(allMessages,
 				new Comparator<Message>() 
 				{
 					public int compare(Message m1, Message m2)
