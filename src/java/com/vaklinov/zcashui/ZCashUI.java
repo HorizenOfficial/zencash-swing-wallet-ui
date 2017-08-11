@@ -93,6 +93,8 @@ public class ZCashUI
     private JMenuItem menuItemShowPrivateKey;
     private JMenuItem menuItemImportOnePrivateKey;
     private JMenuItem menuItemOwnIdentity;
+    private JMenuItem menuItemExportOwnIdentity;
+    private JMenuItem menuItemImportContactIdentity;
 
     private DashboardPanel   dashboard;
     private AddressesPanel   addresses;
@@ -191,6 +193,10 @@ public class ZCashUI
         messaging.setMnemonic(KeyEvent.VK_S);
         messaging.add(menuItemOwnIdentity = new JMenuItem("Own identity...", KeyEvent.VK_O));
         menuItemOwnIdentity.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, accelaratorKeyMask));        
+        messaging.add(menuItemExportOwnIdentity = new JMenuItem("Export own identity...", KeyEvent.VK_D));
+        menuItemExportOwnIdentity.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_D, accelaratorKeyMask));        
+        messaging.add(menuItemImportContactIdentity = new JMenuItem("Import contact identity...", KeyEvent.VK_C));
+        menuItemImportContactIdentity.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, accelaratorKeyMask));
         mb.add(messaging);
 
         // TODO: Temporarily disable encryption until further notice - Oct 24 2016
@@ -305,6 +311,29 @@ public class ZCashUI
                    }
                }
         );
+       
+       menuItemExportOwnIdentity.addActionListener(   
+               new ActionListener()
+               {
+                   @Override
+                   public void actionPerformed(ActionEvent e)
+                   {
+            			ZCashUI.this.messagingPanel.exportOwnIdentity();
+                   }
+               }
+        );
+
+       menuItemImportContactIdentity.addActionListener(   
+               new ActionListener()
+               {
+                   @Override
+                   public void actionPerformed(ActionEvent e)
+                   {
+            			ZCashUI.this.messagingPanel.importContactIdentity();
+                   }
+               }
+        );
+
        
         // Close operation
         this.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);

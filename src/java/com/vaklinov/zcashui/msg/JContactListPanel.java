@@ -106,6 +106,25 @@ public class JContactListPanel
 	}
 	
 	
+	public void reloadMessagingIdentities()
+		throws IOException
+	{
+		list.setIdentities(this.mesagingStorage.getContactIdentities());
+		list.revalidate();
+	}
+	
+	
+	public int getNumberOfCOntacts()
+	{
+		return list.getModel().getSize();
+	}
+	
+	
+	// Null if nothing selected
+	public MessagingIdentity getSelectedContact()
+	{
+		return this.list.getSelectedValue();
+	}
 	
 	
 	private static class ContactList

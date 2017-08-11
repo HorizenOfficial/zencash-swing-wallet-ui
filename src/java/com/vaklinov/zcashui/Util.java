@@ -116,4 +116,23 @@ public class Util
     	return jInfo;
 	}
 	
+	
+	public static String escapeHTMLValue(String inputValue) 
+	{
+	    StringBuilder outputValue = new StringBuilder();
+	    for (char c : inputValue.toCharArray()) 
+	    {
+	        if ((c > 127) || (c == '"') || (c == '<') || (c == '>') || (c == '&')) 
+	        {
+	            outputValue.append("&#");
+	            outputValue.append((int)c);
+	            outputValue.append(';');
+	        } else 
+	        {
+	            outputValue.append(c);
+	        }
+	    }
+	    return outputValue.toString();
+	}
+	
 }

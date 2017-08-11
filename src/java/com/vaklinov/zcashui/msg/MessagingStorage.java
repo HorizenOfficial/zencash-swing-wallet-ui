@@ -210,6 +210,23 @@ public class MessagingStorage
 	}
 	
 	
+	public void writeNewSentMessageForContact(MessagingIdentity contact, Message msg)
+		throws IOException
+	{
+		// Find the contact
+		SingleContactStorage contactStorage = null;
+		for (SingleContactStorage scs : this.contactsList)
+		{
+			if (scs.getIdentity().isIdenticalTo(contact))
+			{
+				contactStorage = scs;
+			}
+		}
+
+		contactStorage.sentMessages.writeNewMessage(msg);
+	}
+	
+	
 	// TODO more Get all messages by identity or by T adderss we shall see what is needed
 	
 	

@@ -41,6 +41,7 @@ import java.io.Writer;
 
 import com.eclipsesource.json.Json;
 import com.eclipsesource.json.JsonObject;
+import com.eclipsesource.json.WriterConfig;
 
 /**
  * Encapsulates a messaging identity.
@@ -69,6 +70,7 @@ public class MessagingIdentity
 	
 	
 	public MessagingIdentity(JsonObject obj)
+		 throws IOException
 	{
 		this.copyFromJSONObject(obj);
 	}
@@ -98,17 +100,26 @@ public class MessagingIdentity
 
 
 	public void copyFromJSONObject(JsonObject obj)
+		throws IOException
 	{
+		// Mandatory fields!
 		this.nickname           = obj.getString("nickname",           null);
 		this.sendreceiveaddress = obj.getString("sendreceiveaddress", null);
 		this.senderidaddress    = obj.getString("senderidaddress",    null);
-		this.firstname          = obj.getString("firstname",          null);
-		this.middlename         = obj.getString("middlename",         null);
-		this.surname            = obj.getString("surname",            null);
-		this.email              = obj.getString("email",              null);
-		this.streetaddress      = obj.getString("streetaddress",      null);
-		this.facebook           = obj.getString("facebook",           null);		
-		this.twitter            = obj.getString("twitter",            null);		
+	
+		this.firstname          = obj.getString("firstname",          "");
+		this.middlename         = obj.getString("middlename",         "");
+		this.surname            = obj.getString("surname",            "");
+		this.email              = obj.getString("email",              "");
+		this.streetaddress      = obj.getString("streetaddress",      "");
+		this.facebook           = obj.getString("facebook",           "");		
+		this.twitter            = obj.getString("twitter",            "");		
+		
+		// Make sure the mandatory fields are there
+		if ((this.nickname == null) || (this.sendreceiveaddress == null) || (this.senderidaddress == null))
+		{
+			throw new IOException("Mandatory field is missing in creating messaging identity!");
+		}
 	}
 	
 	
@@ -139,7 +150,7 @@ public class MessagingIdentity
 		try
 		{
 			w = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(f), "UTF-8"));
-			w.write(this.toJSONObject().toString());
+			w.write(this.toJSONObject().toString(WriterConfig.PRETTY_PRINT));
 		} finally
 		{
 			if (w != null)

@@ -42,6 +42,7 @@ import java.util.Date;
 
 import com.eclipsesource.json.Json;
 import com.eclipsesource.json.JsonObject;
+import com.eclipsesource.json.WriterConfig;
 
 
 /**
@@ -62,7 +63,7 @@ public class Message
 	private String  message;
 	private String  sign;
 	
-	// Addiitonal internal fields - not to be used when transmitted over the wire
+	// Additional internal fields - not to be used when transmitted over the wire
 	private String         transactionID;
 	private Date           time;
 	private DIRECTION_TYPE direction;
@@ -147,7 +148,7 @@ public class Message
 		try
 		{
 			w = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(f), "UTF-8"));
-			w.write(this.toJSONObject(false).toString());
+			w.write(this.toJSONObject(false).toString(WriterConfig.PRETTY_PRINT));
 		} finally
 		{
 			if (w != null)
