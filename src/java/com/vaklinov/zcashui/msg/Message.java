@@ -113,7 +113,7 @@ public class Message
 		this.sign          = obj.getString("sign",          null);
 		
 		// Additional fields - may be missing, get default values
-		this.transactionID = obj.getString("transactionID", null);
+		this.transactionID = obj.getString("transactionID", "");
 		this.time          = new Date(obj.getLong("time",   0));
 		this.direction     = DIRECTION_TYPE.valueOf(
 				                 obj.getString("direction", DIRECTION_TYPE.RECEIVED.toString()));

@@ -404,7 +404,7 @@ public class MessagingStorage
 			{
 				name = "0" + name;
 			}
-			name += "message_" + name + ".json";
+			name = "message_" + name + ".json";
 			
 			msg.writeToFile(new File(dir, name));
 		}

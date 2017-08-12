@@ -56,6 +56,7 @@ import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
+import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextPane;
 import javax.swing.SwingUtilities;
@@ -87,6 +88,9 @@ public class MessagingPanel
 	extends WalletTabPanel
 {
 	private JFrame parentFrame;
+	private SendCashPanel sendCashPanel; 
+	private JTabbedPane parentTabs;
+	
 	private ZCashClientCaller clientCaller;
 	private StatusUpdateErrorReporter errorReporter;
 	
@@ -105,12 +109,16 @@ public class MessagingPanel
 	private Timer operationStatusTimer;
 
 	
-	public MessagingPanel(JFrame parentFrame, ZCashClientCaller clientCaller, StatusUpdateErrorReporter errorReporter)
+	public MessagingPanel(JFrame parentFrame, SendCashPanel sendCashPanel, JTabbedPane parentTabs, 
+			              ZCashClientCaller clientCaller, StatusUpdateErrorReporter errorReporter)
 		throws IOException, InterruptedException, WalletCallException
 	{
 		super();
 		
 		this.parentFrame      = parentFrame;
+		this.sendCashPanel    = sendCashPanel;
+		this.parentTabs       = parentTabs;
+		
 		this.clientCaller     = clientCaller;
 		this.errorReporter    = errorReporter;
 		this.messagingStorage = new MessagingStorage();
@@ -173,11 +181,11 @@ public class MessagingPanel
 		JLabel filler = new JLabel(" ");
 		filler.setBorder(BorderFactory.createEmptyBorder(3, 3, 3, 3));
 		sendButtonPanel.add(filler); // TODO: filler
-		sendButton = new JButton("Send message \u27A4");
+		sendButton = new JButton("Send message  \u27A4\u27A4\u27A4");
 		JPanel tempPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
 		tempPanel.add(sendButton);
 		sendButtonPanel.add(tempPanel);
-		sendMessageProgressBar = new JProgressBar();
+		sendMessageProgressBar = new JProgressBar(0, 200);
 		sendMessageProgressBar.setPreferredSize(
 			new Dimension(sendButton.getPreferredSize().width, 
 					      sendMessageProgressBar.getPreferredSize().height * 2 / 3));
@@ -186,7 +194,7 @@ public class MessagingPanel
 		sendButtonPanel.add(tempPanel);
 		sendResultLabel = new JLabel(
 				"<html><span style=\"font-size:0.8em;\">" +
-				"Sending status: &nbsp;</span>");
+				"Send status: &nbsp;</span>");
 		tempPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
 		tempPanel.add(sendResultLabel);
 		sendButtonPanel.add(tempPanel);
@@ -195,7 +203,14 @@ public class MessagingPanel
 		writeAndSendPanel.add(sendPanel, BorderLayout.EAST);
 		
 		// Attach logic
-		
+		sendButton.addActionListener(new ActionListener() 
+		{	
+			@Override
+			public void actionPerformed(ActionEvent e) 
+			{
+				MessagingPanel.this.sendMessageAndHandleErrors();
+			}
+		});
 	}
 	
 	
@@ -511,10 +526,11 @@ public class MessagingPanel
 	{
 		try
 		{
-			
+			sendMessage();
 		} catch (Exception e)
 		{
-			
+			Log.error("Unexpected error in sending message (wrapper): ", e);
+			this.errorReporter.reportError(e);
 		}
 	}
 	
@@ -562,11 +578,57 @@ public class MessagingPanel
 		// Disable sending controls, set status.
 		this.sendButton.setEnabled(false);
 		this.writeMessageTextArea.setEnabled(false);
-		
-		// TODO: check to make sure the sending address has some funds!!!
-		
+				
 		// Form the JSON message to be sent
-		MessagingIdentity ownIdentity = this.messagingStorage.getOwnIdentity();
+		MessagingIdentity ownIdentity = this.messagingStorage.getOwnIdentity(); 
+		
+		// Check to make sure the sending address has some funds!!!
+		final double minimumBalance = 0.0002d; // TODO: for now hard coded - must be configurable
+		Double balance = Double.valueOf(
+			this.clientCaller.getBalanceForAddress(ownIdentity.getSendreceiveaddress()));
+		Double unconfirmedBalance = (balance > 0d) ? -1d : Double.valueOf(
+			this.clientCaller.getUnconfirmedBalanceForAddress(ownIdentity.getSendreceiveaddress()));
+		
+		if ((balance < minimumBalance) && (unconfirmedBalance < minimumBalance))
+		{
+	        JOptionPane.showMessageDialog(
+	        	this.parentFrame,
+	        	"The Z address used to send/receive messages has insufficient balance: \n" +
+	        	ownIdentity.getSendreceiveaddress() + "\n" +
+	        	"You will be redirected to the UI tab for sending ZEN to add some balance to it. You need only\n" +
+	        	"a small amount e.g. typically 0.1 ZEN is suffucient to send 500 messages. After sending some\n" +
+	        	"ZEN you need to wait for the transaciton to be confirmed (typically takes 2.5 minutes). It is\n" +
+	        	"recommended to send ZEN to this Z address in two or more separate transactions (though one \n" +
+	        	"transaction is sufficient).", 
+		        "Z address to send/receive messages has insufficient balance...", JOptionPane.ERROR_MESSAGE);
+		        
+	            // Restore controls and move to the send cash tab etc.
+		        this.sendButton.setEnabled(true);
+				this.writeMessageTextArea.setEnabled(true);
+				
+				sendCashPanel.prepareForSending(ownIdentity.getSendreceiveaddress());
+	            parentTabs.setSelectedIndex(2);				
+				return;
+		}
+		
+		if ((balance < minimumBalance) && (unconfirmedBalance >= minimumBalance))
+		{
+	        JOptionPane.showMessageDialog(
+	        	this.parentFrame,
+	        	"The Z address used to send/receive messages has insufficient confirmed balance: \n" +
+	        	ownIdentity.getSendreceiveaddress() + "\n" +
+	        	"This usually means that the previous mesasaging transaction is not yet confirmed. You\n" +
+	        	"need to wait for the transaciton to be confirmed (typically takes 2.5 minutes). This\n" +
+	        	"problem may be avoided if you send ZEN to this Z address in two or more separate \n" +
+	        	"transactions (when you supply the ZEN balance to be used for messaging).", 
+		        "Z address to send/receive messages has insufficient confirmed balance...", JOptionPane.ERROR_MESSAGE);
+		        
+	            // Restore controls and move to the send cash tab etc.
+		        this.sendButton.setEnabled(true);
+				this.writeMessageTextArea.setEnabled(true);
+				
+				return;
+		}
 		
 		// TODO: maybe sign a HEX encoded message ... change the spec as well.
 		String signature = this.clientCaller.signMessage(ownIdentity.getSenderidaddress(), textToSend);
@@ -589,7 +651,10 @@ public class MessagingPanel
         		"The text of the message you have written is too long to be sent. The current\n" +
         		"version of the ZEN messaging protocol supports approximately 330 characters\n" +
         		"per message (number is not exact - depends on character encoding specifics).", 
-	        	"Message size exceeds currently supported limits...", JOptionPane.ERROR_MESSAGE);					
+	        	"Message size exceeds currently supported limits...", JOptionPane.ERROR_MESSAGE);
+	        // Restore controls and exit
+	        this.sendButton.setEnabled(true);
+			this.writeMessageTextArea.setEnabled(true);
 			return;
 		}
 			
@@ -635,13 +700,13 @@ public class MessagingPanel
 						if (clientCaller.isCompletedOperationSuccessful(operationStatusID))
 						{
 							sendResultLabel.setText(
-								"<html><span style=\"font-size:0.8em;\">Sending status: &nbsp;" +
+								"<html><span style=\"font-size:0.8em;\">Send status: &nbsp;" +
 								"<span style=\"color:green;font-weight:bold\">SUCCESSFUL</span></span></html>");
 						} else
 						{
 							String errorMessage = clientCaller.getOperationFinalErrorMessage(operationStatusID); 
 							sendResultLabel.setText(
-								"<html><span style=\"font-size:0.8em;\">Sending status: &nbsp;" +
+								"<html><span style=\"font-size:0.8em;\">Send status: &nbsp;" +
 								"<span style=\"color:red;font-weight:bold\">ERROR! </span></span></html>");
 							JOptionPane.showMessageDialog(
 								MessagingPanel.this.getRootPane().getParent(), 
@@ -663,16 +728,19 @@ public class MessagingPanel
 						Message msg = new Message(jsonInnerMessage);
 						msg.setTime(new Date());
 						msg.setDirection(DIRECTION_TYPE.SENT);
-						msg.setTransactionID(null); // TODO: see if we can get the transaction ID for outgoing
+						// TODO: We can get the transaction ID for outgoing messages but is is probably unnecessary
+						msg.setTransactionID(""); 
 						messagingStorage.writeNewSentMessageForContact(contactIdentity, msg);
 					    
-					    // TODO: update conversation text pane
+					    // Update conversation text pane
+						// TODO: full reload may be inefficient - do it better
+						displayMessagesForContact(contactIdentity);
 								
 					} else
 					{
 						// Update the progress
 						sendResultLabel.setText(
-							"<html><span style=\"font-size:0.8em;\">Sending status: &nbsp;" +
+							"<html><span style=\"font-size:0.8em;\">Send status: &nbsp;" +
 							"<span style=\"color:orange;font-weight:bold\">IN PROGRESS</span></span></html>");
 						operationStatusCounter += 2;
 						int progress = 0;
@@ -689,7 +757,7 @@ public class MessagingPanel
 					MessagingPanel.this.repaint();
 				} catch (Exception ex)
 				{
-					Log.error("Unexpected error: ", ex);
+					Log.error("Unexpected error in sending message: ", ex);
 					MessagingPanel.this.errorReporter.reportError(ex);
 				}
 			}

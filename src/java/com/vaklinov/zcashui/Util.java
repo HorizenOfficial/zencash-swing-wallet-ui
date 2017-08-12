@@ -135,4 +135,9 @@ public class Util
 	    return outputValue.toString();
 	}
 	
+	
+	public static boolean stringIsEmpty(String s)
+	{
+		return (s == null) || (s.length() <= 0);
+	}
 }

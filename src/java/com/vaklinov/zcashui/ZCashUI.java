@@ -143,7 +143,7 @@ public class ZCashUI
     		        addressBookPanel = new AddressBookPanel(sendPanel, tabs));
         tabs.addTab("Messaging ",
 		            new ImageIcon(cl.getResource("images/messaging.png")),
-		            messagingPanel = new MessagingPanel(this, clientCaller, errorReporter));
+		            messagingPanel = new MessagingPanel(this, sendPanel, tabs, clientCaller, errorReporter));
         contentPane.add(tabs);
 
         this.walletOps = new WalletOperations(

@@ -42,6 +42,8 @@ import java.io.Writer;
 import com.eclipsesource.json.Json;
 import com.eclipsesource.json.JsonObject;
 import com.eclipsesource.json.WriterConfig;
+import com.vaklinov.zcashui.Util;
+
 
 /**
  * Encapsulates a messaging identity.
@@ -273,8 +275,9 @@ public class MessagingIdentity
 		MessagingIdentity id = this;
 		String contactString = id.getNickname();
 		
-		// TODO: avoid space if no surname
-		if ((id.getFirstname() != null) || (id.getMiddlename() != null) || (id.getSurname() != null))
+		// TODO: avoid space if no surname - check for empty strng too
+		if ((!Util.stringIsEmpty(id.getFirstname())) || (!Util.stringIsEmpty(id.getMiddlename())) || 
+			(!Util.stringIsEmpty(id.getSurname())))
 		{
 			contactString += " (";
 			contactString += (id.getFirstname() != null)  ? (id.getFirstname() + " ")  : "";

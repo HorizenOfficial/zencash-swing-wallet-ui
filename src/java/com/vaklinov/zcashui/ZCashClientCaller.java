@@ -626,7 +626,7 @@ public class ZCashClientCaller
 		throws WalletCallException, IOException, InterruptedException
 	{
 	    String response = this.executeCommandAndGetSingleStringResponse(
-	    	"signmessage", wrapStringParameter(address), wrapStringParameter(address));
+	    	"signmessage", wrapStringParameter(address), wrapStringParameter(message));
 
 		return response.trim();
 	}
