@@ -108,9 +108,9 @@ public class Message
 	{
 		// Wire protocol fields
 		this.version       = obj.getInt("version",          1);
-		this.from          = obj.getString("from",          null);
-		this.message       = obj.getString("message",       null);
-		this.sign          = obj.getString("sign",          null);
+		this.from          = obj.getString("from",          "");
+		this.message       = obj.getString("message",       "");
+		this.sign          = obj.getString("sign",          "");
 		
 		// Additional fields - may be missing, get default values
 		this.transactionID = obj.getString("transactionID", "");

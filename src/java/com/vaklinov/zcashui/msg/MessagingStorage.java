@@ -133,6 +133,25 @@ public class MessagingStorage
 	}
 	
 	
+	public MessagingIdentity getContactIdentityForSenderIDAddress(String senderIDAddress)
+		throws IOException
+	{
+		List<MessagingIdentity> allIdentities = this.getContactIdentities();
+		
+		MessagingIdentity id = null;
+		
+		for (MessagingIdentity tempID : allIdentities)
+		{
+			if (tempID.getSenderidaddress().equals(senderIDAddress))
+			{
+				id = tempID;
+			}
+		}
+		
+		return id;		
+	}
+	
+	
 	public void addContactIdentity(MessagingIdentity identity)
 		throws IOException
 	{
@@ -224,6 +243,22 @@ public class MessagingStorage
 		}
 
 		contactStorage.sentMessages.writeNewMessage(msg);
+	}
+	
+	
+	public void writeNewReceivedMessageForContact(MessagingIdentity contact, Message msg)
+		throws IOException
+	{
+		// Find the contact
+		SingleContactStorage contactStorage = null;
+		for (SingleContactStorage scs : this.contactsList)
+		{
+			if (scs.getIdentity().isIdenticalTo(contact))
+			{
+				contactStorage = scs;
+			}
+		}
+		contactStorage.receivedMessages.writeNewMessage(msg);
 	}
 	
 	

@@ -234,7 +234,7 @@ public class ZCashClientCaller
 		}
 		
 	    JsonArray jsonTransactions = executeCommandAndGetJsonArray(
-	    	"listtransactions", wrapStringParameter(""), "200");
+	    	"listtransactions", wrapStringParameter(""), "300");
 	    String strTransactions[][] = new String[jsonTransactions.size()][];
 	    for (int i = 0; i < jsonTransactions.size(); i++)
 	    {
@@ -305,6 +305,22 @@ public class ZCashClientCaller
 		return zReceivedTransactions.toArray(new String[0][]);
 	}
 
+	
+	public synchronized JsonObject[] getTransactionMessagingDataForZaddress(String ZAddress)
+		throws WalletCallException, IOException, InterruptedException
+	{
+	    JsonArray jsonTransactions = executeCommandAndGetJsonArray(
+		    	"z_listreceivedbyaddress", wrapStringParameter(ZAddress), "0");
+	    List<JsonObject> transactions = new ArrayList<JsonObject>();
+		for (int i = 0; i < jsonTransactions.size(); i++)
+		{
+		   	JsonObject trans = jsonTransactions.get(i).asObject();
+	    	transactions.add(trans);
+	    }
+		
+		return transactions.toArray(new JsonObject[0]);
+	}
+	
 
 	// ./src/zcash-cli listunspent only returns T addresses it seems
 	public synchronized String[] getWalletPublicAddressesWithUnspentOutputs()
@@ -371,23 +387,8 @@ public class ZCashClientCaller
             		return null;
             	}
             	
-                String MemoHex = jsonTransactions.get(i).asObject().getString("memo", "ERROR!");
-                // Skip empty memos
-                if (MemoHex.startsWith("f60000"))
-                {
-                	return null;
-                }
-                
-                StringBuilder MemoAscii = new StringBuilder("");
-                for (int j = 0; j < MemoHex.length(); j += 2)
-                {
-                    String str = MemoHex.substring(j, j + 2);
-                    if (!str.equals("00")) // Zero bytes are empty
-                    {
-                    	MemoAscii.append((char) Integer.parseInt(str, 16));
-                    }
-                }
-                return MemoAscii.toString();
+                String memoHex = jsonTransactions.get(i).asObject().getString("memo", "ERROR!");
+                return Util.decodeHexMemo(memoHex);
             }
         }
 
@@ -563,18 +564,7 @@ public class ZCashClientCaller
 	public synchronized String sendMessage(String from, String to, String amountAndFee, String memo)
 		throws WalletCallException, IOException, InterruptedException
 	{
-		// TODO: isolate hex encoding in a method
-		StringBuilder hexMemo = new StringBuilder();
-		for (byte c : memo.getBytes("UTF-8"))
-		{
-			String hexChar = Integer.toHexString((int)c);
-			if (hexChar.length() < 2)
-			{
-				hexChar = "0" + hexChar;
-			}
-			hexMemo.append(hexChar);
-		}
-
+		String hexMemo = Util.encodeHexString(memo);
 		JsonObject toArgument = new JsonObject();
 		toArgument.set("address", to);
 		if (hexMemo.length() >= 2)

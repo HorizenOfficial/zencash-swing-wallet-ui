@@ -29,7 +29,6 @@
 package com.vaklinov.zcashui.msg;
 
 import java.awt.BorderLayout;
-import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
@@ -42,8 +41,11 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
@@ -74,7 +76,6 @@ import com.vaklinov.zcashui.StatusUpdateErrorReporter;
 import com.vaklinov.zcashui.Util;
 import com.vaklinov.zcashui.WalletTabPanel;
 import com.vaklinov.zcashui.ZCashClientCaller;
-import com.vaklinov.zcashui.ZCashUI;
 import com.vaklinov.zcashui.ZCashClientCaller.WalletCallException;
 import com.vaklinov.zcashui.msg.Message.DIRECTION_TYPE;
 
@@ -107,6 +108,8 @@ public class MessagingPanel
 	private JProgressBar sendMessageProgressBar;
 	
 	private Timer operationStatusTimer;
+	
+	private DataGatheringThread<Object> receivedMesagesGatheringThread = null;
 
 	
 	public MessagingPanel(JFrame parentFrame, SendCashPanel sendCashPanel, JTabbedPane parentTabs, 
@@ -170,6 +173,11 @@ public class MessagingPanel
 					        JScrollPane.HORIZONTAL_SCROLLBAR_NEVER), 
 			BorderLayout.CENTER);
 		JLabel sendLabel = new JLabel("Message to send:");
+		MessagingIdentity ownIdentity = this.messagingStorage.getOwnIdentity();
+		if (ownIdentity != null)
+		{
+			sendLabel.setText("Message to send as: " + ownIdentity.getDiplayString());
+		}
 		sendLabel.setBorder(BorderFactory.createEmptyBorder(3, 3, 3, 3));
 		writePanel.add(sendLabel, BorderLayout.NORTH);
 		writePanel.add(new JLabel(""), BorderLayout.EAST); // dummy
@@ -211,6 +219,26 @@ public class MessagingPanel
 				MessagingPanel.this.sendMessageAndHandleErrors();
 			}
 		});
+		
+		// Start the thread to periodically gather messages
+		this.receivedMesagesGatheringThread = new DataGatheringThread<Object>(
+			new DataGatheringThread.DataGatherer<Object>() 
+			{
+				public String[][] gatherData()
+					throws Exception
+				{
+					long start = System.currentTimeMillis();
+					
+					MessagingPanel.this.collectAndStoreNewReceivedMessagesAndHandleErrors();
+					
+					long end = System.currentTimeMillis();
+					Log.info("Gathering of received messages done in " + (end - start) + "ms." );
+						
+					return null;
+				}
+			}, 
+			this.errorReporter, 120 * 1000, true);
+		this.threads.add(receivedMesagesGatheringThread);
 	}
 	
 	
@@ -507,7 +535,7 @@ public class MessagingPanel
 			
 			JOptionPane.showMessageDialog(
 				this.parentFrame, 
-				"Your partner's messaging identity has been successfully imported: \n" + 
+				"Your contact's messaging identity has been successfully imported: \n" + 
 				contactIdentity.getDiplayString() + "\n" +
 				"You can now send and receive messages from this contact.",
 				"Messaging identity is successfully imported...", JOptionPane.INFORMATION_MESSAGE);
@@ -630,8 +658,9 @@ public class MessagingPanel
 				return;
 		}
 		
-		// TODO: maybe sign a HEX encoded message ... change the spec as well.
-		String signature = this.clientCaller.signMessage(ownIdentity.getSenderidaddress(), textToSend);
+		// Sign a HEX encoded message ... to avoid possibl UNICODE issues
+		String signature = this.clientCaller.signMessage(
+			ownIdentity.getSenderidaddress(), Util.encodeHexString(textToSend));
 		
 		final JsonObject jsonInnerMessage = new JsonObject();
 		jsonInnerMessage.set("ver", 1d);
@@ -646,6 +675,7 @@ public class MessagingPanel
 		// Check the size of the message to be sent, error if it exceeds.
 		if (memoString.getBytes("UTF-8").length > 512)
 		{
+			// TODO: gove exact size and advice on reduction...
 	        JOptionPane.showMessageDialog(
         		this.parentFrame,
         		"The text of the message you have written is too long to be sent. The current\n" +
@@ -765,4 +795,132 @@ public class MessagingPanel
 		operationStatusTimer.setInitialDelay(0);
 		operationStatusTimer.start();	    
 	}
+	
+	
+	private void collectAndStoreNewReceivedMessagesAndHandleErrors()
+	{
+		try
+		{
+			collectAndStoreNewReceivedMessages();
+		} catch (Exception e)
+		{
+			Log.error("Unexpected error in gathering received messages (wrapper): ", e);
+			this.errorReporter.reportError(e);
+		}
+	}
+	
+	
+	private void collectAndStoreNewReceivedMessages()
+		throws IOException, WalletCallException, InterruptedException
+	{
+		// Get the transaction IDs from all received transactions in the local storage
+		// TODO: optimize/cache this
+		Set<String> storedTransactionIDs = new HashSet<String>();
+		for (MessagingIdentity identity : this.messagingStorage.getContactIdentities())
+		{
+			for (Message localMessage : this.messagingStorage.getAllMessagesForContact(identity))
+			{
+				if ((localMessage.getDirection() == DIRECTION_TYPE.RECEIVED) &&
+					(!Util.stringIsEmpty(localMessage.getTransactionID())))
+				{
+					storedTransactionIDs.add(localMessage.getTransactionID());
+				}
+			}
+		}
+		
+		// Get all known transactions received from the wallet
+		// TODO: there seems to be no way to limit the number of transactions returned!
+		MessagingIdentity ownIdentity = this.messagingStorage.getOwnIdentity(); 
+		String ZAddress = ownIdentity.getSendreceiveaddress();
+		JsonObject[] walletTransactions = this.clientCaller.getTransactionMessagingDataForZaddress(ZAddress);
+		
+		// Filter the transactions to obtain only those that have memos parsable as JSON
+		// and being real messages. In addition only those remain that are not registered before
+		List<Message> filteredMessages = new ArrayList<Message>();
+		for (JsonObject trans : walletTransactions)
+		{
+			String memoHex = trans.getString("memo", "ERROR");
+			String transactionID = trans.getString("txid",  "ERROR");
+			if (!memoHex.equals("ERROR"))
+			{
+				String decodedMemo = Util.decodeHexMemo(memoHex);
+				JsonObject jsonMessage = null;
+				try
+				{
+					if (decodedMemo != null)
+					{
+						jsonMessage = Json.parse(decodedMemo).asObject();
+					}
+				} catch (Exception ex) // TODO: filter parsing exceptions
+				{
+					// TODO: maybe log unparsable memos 
+				}
+				
+				if (jsonMessage != null)
+				{
+					if ((jsonMessage.get("zenmsg") != null) &&
+						(!storedTransactionIDs.contains(transactionID)))
+					{
+						// Finally test that the message has all attributes required
+						// TODO: handle anonymous messages differently
+						Message message = new Message(jsonMessage.get("zenmsg").asObject());
+						// Set additional mesage attributes not available over the wire
+						message.setDirection(DIRECTION_TYPE.RECEIVED);
+						message.setTransactionID(transactionID);
+						String UNIXDate = this.clientCaller.getWalletTransactionTime(transactionID);
+						message.setTime(new Date(Long.valueOf(UNIXDate).longValue() * 1000L));
+						
+						if ((!Util.stringIsEmpty(message.getFrom()))    &&
+							(!Util.stringIsEmpty(message.getMessage())) &&
+							(!Util.stringIsEmpty(message.getSign())))
+						{
+							filteredMessages.add(message);
+						} else
+						{
+							// TODO: maybe warn of unexpected message content
+						}
+					}
+				}
+			}
+		}
+
+		// Finally we have all messages that are new and unprocessed. For every message we find out
+		// who the sender is, verify it and store it
+		for (Message message : filteredMessages)
+		{
+			MessagingIdentity contactID = 
+				this.messagingStorage.getContactIdentityForSenderIDAddress(message.getFrom());
+			if (contactID == null)
+			{
+				// TODO: for now warn user, later update list of contacts with an unknown
+				Log.error("Message is from unknown contact: {0}", message.toJSONObject(false).toString());
+			}
+			
+			// TODO: verify the message siganture and set verification status
+
+			this.messagingStorage.writeNewReceivedMessageForContact(contactID, message);
+		}
+		
+		// Reload the messages for the currently selected user
+		final MessagingIdentity selectedContact = this.contactList.getSelectedContact();
+		if (selectedContact != null)
+		{
+			SwingUtilities.invokeLater(new Runnable() 
+			{	
+				@Override
+				public void run() 
+				{
+					try
+					{
+						MessagingPanel.this.displayMessagesForContact(selectedContact);
+					} catch (Exception e)
+					{
+						Log.error("Unexpected error in updating message pane after gathering messages: ", e);
+						MessagingPanel.this.errorReporter.reportError(e);
+					}
+				}
+			});
+		}
+	}
+	
 }

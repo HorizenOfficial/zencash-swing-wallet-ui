@@ -30,7 +30,9 @@ package com.vaklinov.zcashui;
 
 import java.io.IOException;
 import java.io.LineNumberReader;
+import java.io.Reader;
 import java.io.StringReader;
+import java.io.UnsupportedEncodingException;
 
 import com.eclipsesource.json.JsonObject;
 
@@ -140,4 +142,59 @@ public class Util
 	{
 		return (s == null) || (s.length() <= 0);
 	}
+	
+	
+	public static String decodeHexMemo(String memoHex)
+		throws UnsupportedEncodingException
+	{
+        // Skip empty memos
+        if (memoHex.startsWith("f600000000"))
+        {
+        	return null;
+        }
+        
+        // should be read with UTF-8
+        byte[] bytes = new byte[(memoHex.length() / 2) + 1];
+        int count = 0;
+        
+        for (int j = 0; j < memoHex.length(); j += 2)
+        {
+            String str = memoHex.substring(j, j + 2);
+            bytes[count++] = (byte)Integer.parseInt(str, 16);
+        }
+        
+        // Remove zero padding
+        // TODO: may cause problems if UNICODE chars have trailing ZEROS
+        while (count > 0)
+        {
+        	if (bytes[count - 1] == 0)
+        	{
+        		count--;
+        	} else
+        	{
+        		break;
+        	}
+        }
+        
+        return new String(bytes, 0, count, "UTF-8");
+	}
+	
+	
+	public static String encodeHexString(String str)
+		throws UnsupportedEncodingException
+	{
+		StringBuilder encoded = new StringBuilder();
+		for (byte c : str.getBytes("UTF-8"))
+		{
+			String hexChar = Integer.toHexString((int)c);
+			if (hexChar.length() < 2)
+			{
+				hexChar = "0" + hexChar;
+			}
+			encoded.append(hexChar);
+		}
+		
+		return encoded.toString();
+	}
+	
 }

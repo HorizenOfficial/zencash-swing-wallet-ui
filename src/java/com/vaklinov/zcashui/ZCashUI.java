@@ -107,7 +107,7 @@ public class ZCashUI
     public ZCashUI(StartupProgressDialog progressDialog)
         throws IOException, InterruptedException, WalletCallException
     {
-        super("ZENCash Swing Wallet UI 0.72");
+        super("ZENCash Swing Wallet UI 0.73");
         
         if (progressDialog != null)
         {
@@ -419,15 +419,7 @@ public class ZCashUI
         this.dashboard.stopThreadsAndTimers();
         this.addresses.stopThreadsAndTimers();
         this.sendPanel.stopThreadsAndTimers();
-
-//        Integer blockchainProgress = this.dashboard.getBlockchainPercentage();
-//        
-//        if ((blockchainProgress != null) && (blockchainProgress >= 100))
-//        {
-//	        this.dashboard.waitForEndOfThreads(3000);
-//	        this.addresses.waitForEndOfThreads(3000);
-//	        this.sendPanel.waitForEndOfThreads(3000);
-//        }
+        this.messagingPanel.stopThreadsAndTimers();
         
         ZCashUI.this.setVisible(false);
         ZCashUI.this.dispose();
