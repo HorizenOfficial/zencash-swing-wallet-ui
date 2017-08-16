@@ -660,7 +660,7 @@ public class MessagingPanel
 		
 		// Sign a HEX encoded message ... to avoid possibl UNICODE issues
 		String signature = this.clientCaller.signMessage(
-			ownIdentity.getSenderidaddress(), Util.encodeHexString(textToSend));
+			ownIdentity.getSenderidaddress(), Util.encodeHexString(textToSend).toUpperCase());
 		
 		final JsonObject jsonInnerMessage = new JsonObject();
 		jsonInnerMessage.set("ver", 1d);
@@ -894,11 +894,21 @@ public class MessagingPanel
 			{
 				// TODO: for now warn user, later update list of contacts with an unknown
 				Log.error("Message is from unknown contact: {0}", message.toJSONObject(false).toString());
+				Log.error("TODO: create unknown contact - show message etc.");
+			} else
+			{
+			    // Verify the message signature
+				if (this.clientCaller.verifyMessage(message.getFrom(), message.getSign(), 
+					                                Util.encodeHexString(message.getMessage()).toUpperCase()))
+				{
+				    // TODO: set verification status permanently - display even invalid messages perhaps
+				    this.messagingStorage.writeNewReceivedMessageForContact(contactID, message);
+				} else
+				{
+					Log.error("Message signature is invalid {0}", message.toJSONObject(false).toString());
+					Log.error("TODO: Store it anyway - show it to the user as invalid etc.");
+				}
 			}
-			
-			// TODO: verify the message siganture and set verification status
-
-			this.messagingStorage.writeNewReceivedMessageForContact(contactID, message);
 		}
 		
 		// Reload the messages for the currently selected user

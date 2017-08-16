@@ -621,6 +621,20 @@ public class ZCashClientCaller
 		return response.trim();
 	}
 	
+	
+	// Verifies a message - true if OK
+	public synchronized boolean verifyMessage(String address, String signature, String message)
+		throws WalletCallException, IOException, InterruptedException
+	{
+	    String response = this.executeCommandAndGetSingleStringResponse(
+	    	"verifymessage", 
+	    	wrapStringParameter(address), 
+	    	wrapStringParameter(signature), 
+	    	wrapStringParameter(message));
+
+		return response.trim().equalsIgnoreCase("true");
+	}
+
 
 	public synchronized boolean isSendingOperationComplete(String opID)
 	    throws WalletCallException, IOException, InterruptedException
@@ -1002,13 +1016,24 @@ public class ZCashClientCaller
 	{
 		return this.executeCommandAndGetSingleStringResponse(command1, command2, null);
 	}
-
-
+	
+	
 	private String executeCommandAndGetSingleStringResponse(String command1, String command2, String command3)
 		throws WalletCallException, IOException, InterruptedException
 	{
+		return executeCommandAndGetSingleStringResponse(command1, command2, command3, null);
+	}
+
+
+	private String executeCommandAndGetSingleStringResponse(
+			                        String command1, String command2, String command3, String command4)
+		throws WalletCallException, IOException, InterruptedException
+	{
 		String[] params;
-		if (command3 != null)
+		if (command4 != null)
+		{
+			params = new String[] { this.zcashcli.getCanonicalPath(), command1, command2, command3, command4 };
+		} else if (command3 != null)
 		{
 			params = new String[] { this.zcashcli.getCanonicalPath(), command1, command2, command3 };
 		} else if (command2 != null)
