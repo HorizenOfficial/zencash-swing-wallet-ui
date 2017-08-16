@@ -831,6 +831,11 @@ public class MessagingPanel
 		// Get all known transactions received from the wallet
 		// TODO: there seems to be no way to limit the number of transactions returned!
 		MessagingIdentity ownIdentity = this.messagingStorage.getOwnIdentity(); 
+		if (ownIdentity == null)
+		{
+			Log.warning("Own messaging identity does not exist yet. No received messages collected!");
+		}
+
 		String ZAddress = ownIdentity.getSendreceiveaddress();
 		JsonObject[] walletTransactions = this.clientCaller.getTransactionMessagingDataForZaddress(ZAddress);
 		
