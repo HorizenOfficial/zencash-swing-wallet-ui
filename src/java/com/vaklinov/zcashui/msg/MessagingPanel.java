@@ -834,6 +834,7 @@ public class MessagingPanel
 		if (ownIdentity == null)
 		{
 			Log.warning("Own messaging identity does not exist yet. No received messages collected!");
+			return;
 		}
 
 		String ZAddress = ownIdentity.getSendreceiveaddress();
