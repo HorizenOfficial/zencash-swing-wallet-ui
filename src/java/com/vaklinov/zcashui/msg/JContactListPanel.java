@@ -95,6 +95,22 @@ public class JContactListPanel
 				try
 				{
 					MessagingIdentity id = JContactListPanel.this.list.getSelectedValue();
+					
+					if (id == null)
+					{
+						return; // Nothing selected
+					}
+					
+					if (id.getSenderidaddress() == null)
+					{
+						throw new IOException("Invalid selected value!");
+					}
+					
+					if (id.getSendreceiveaddress() == null)
+					{
+						throw new IOException("Invalid selected value!");
+					}
+					
 					JContactListPanel.this.parent.displayMessagesForContact(id);
 				} catch (IOException ioe)
 				{
