@@ -572,6 +572,7 @@ public class MessagingPanel
 							this.parentFrame, 
 							"Your contact's messaging identity has been successfully updated.\n", 
 							"Messaging identity is successfully updated", JOptionPane.INFORMATION_MESSAGE);
+						this.contactList.reloadMessagingIdentities();
 			        }
 			        
 			        // In any case - not a new identity to add
@@ -588,7 +589,7 @@ public class MessagingPanel
 		        int choice = JOptionPane.showConfirmDialog(
 		        	this.parentFrame,
 		        	"There is a contact in your contact list with the same sender identification address \n" +
-		        	"but with yet unknwon/not yet imported full identity:\n\n" +
+		        	"but with yet unknown/not yet imported full identity:\n\n" +
 		        	"Existing contact identity: " + existingUnknownID.getDiplayString() + "\n" +
 		        	"Contact identity being imported: " + contactIdentity.getDiplayString() + "\n\n" +
 		        	"Please confirm that you want to update the details of the existing contact identity\n" +
@@ -604,6 +605,7 @@ public class MessagingPanel
 						this.parentFrame, 
 						"Your contact's messaging identity has been successfully updated.\n", 
 						"Messaging identity is successfully updated", JOptionPane.INFORMATION_MESSAGE);
+					this.contactList.reloadMessagingIdentities();
 			    }
 				
 				return;
@@ -677,8 +679,8 @@ public class MessagingPanel
         		this.parentFrame,
         		"The messaging contact selected: " + contactIdentity.getDiplayString() + "\n" +
         		"seems to have no valid Z address for sending and receiving messages. \n" +
-        		"Most likely the reaosn is that this contact's messaging identity is \n" +
-        		"not imported yet. Message cannot be sent!",
+        		"Most likely the reason is that this contact's messaging identity is not \n" +
+        		"imported yet. Message cannot be sent!",
 	        	"Selected contact has to Z address to send message to!", JOptionPane.ERROR_MESSAGE);					
 			return;
 		}
@@ -983,6 +985,7 @@ public class MessagingPanel
 							(!Util.stringIsEmpty(message.getMessage())) &&
 							(!Util.stringIsEmpty(message.getSign())))
 						{
+							// TODO: additional sanity check that T/Z addresses are valid etc.
 							filteredMessages.add(message);
 						} else
 						{
@@ -997,6 +1000,7 @@ public class MessagingPanel
 
 		// Finally we have all messages that are new and unprocessed. For every message we find out
 		// who the sender is, verify it and store it
+		boolean bNewContactCreated = false;
 		for (Message message : filteredMessages)
 		{
 			MessagingIdentity contactID = 
@@ -1008,6 +1012,7 @@ public class MessagingPanel
 						    "A new Unknown_xxx contact will be created!", 
 						    message.toJSONObject(false).toString());
 				contactID = this.messagingStorage.createAndStoreUnknownContactIdentity(message.getFrom());
+			    bNewContactCreated = true;
 			}
 			
 			// Verify the message signature
@@ -1026,9 +1031,7 @@ public class MessagingPanel
 		    this.messagingStorage.writeNewReceivedMessageForContact(contactID, message);
 		}
 		
-		// Reload the messages for the currently selected user
-		final MessagingIdentity selectedContact = this.contactList.getSelectedContact();
-		if (selectedContact != null)
+		if (bNewContactCreated)
 		{
 			SwingUtilities.invokeLater(new Runnable() 
 			{	
@@ -1037,15 +1040,36 @@ public class MessagingPanel
 				{
 					try
 					{
-						MessagingPanel.this.displayMessagesForContact(selectedContact);
+						MessagingPanel.this.contactList.reloadMessagingIdentities();
 					} catch (Exception e)
 					{
-						Log.error("Unexpected error in updating message pane after gathering messages: ", e);
+						Log.error("Unexpected error in reloading contacts after gathering messages: ", e);
 						MessagingPanel.this.errorReporter.reportError(e);
 					}
 				}
 			});
-		}
+		}		
+		
+		SwingUtilities.invokeLater(new Runnable() 
+		{	
+			@Override
+			public void run() 
+			{
+				try
+				{
+					// Reload the messages for the currently selected user
+					final MessagingIdentity selectedContact = MessagingPanel.this.contactList.getSelectedContact();
+					if (selectedContact != null)
+					{
+						MessagingPanel.this.displayMessagesForContact(selectedContact);
+					}
+				} catch (Exception e)
+				{
+					Log.error("Unexpected error in updating message pane after gathering messages: ", e);
+					MessagingPanel.this.errorReporter.reportError(e);
+				}
+			}
+		});
 	}
 	
 }

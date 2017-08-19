@@ -235,12 +235,21 @@ public class MessagingStorage
 					continue naming_loop;
 				}
 			}
+			break naming_loop;
 		}
 		
 		newID.setNickname(nickName);
 		newID.setFirstname(senderIDAdderss.substring(0, 10) + "...");
 		newID.setSenderidaddress(senderIDAdderss);
 		newID.setSendreceiveaddress(""); // Empty - unknown
+		
+		// All fields need to be filled
+		newID.setMiddlename("");
+		newID.setSurname("");
+		newID.setEmail("");
+		newID.setStreetaddress("");
+		newID.setFacebook("");
+		newID.setTwitter("");
 		
 		this.addContactIdentity(newID);
 		

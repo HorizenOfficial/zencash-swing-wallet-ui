@@ -275,14 +275,14 @@ public class MessagingIdentity
 		MessagingIdentity id = this;
 		String contactString = id.getNickname();
 		
-		// TODO: avoid space if no surname - check for empty strng too
+		// TODO: avoid space if no surname - check for empty string too
 		if ((!Util.stringIsEmpty(id.getFirstname())) || (!Util.stringIsEmpty(id.getMiddlename())) || 
 			(!Util.stringIsEmpty(id.getSurname())))
 		{
 			contactString += " (";
-			contactString += (id.getFirstname() != null)  ? (id.getFirstname() + " ")  : "";
-			contactString += (id.getMiddlename() != null) ? (id.getMiddlename() + " ") : "";
-			contactString += (id.getSurname() != null)    ? (id.getSurname())          : "";
+			contactString += !Util.stringIsEmpty(id.getFirstname())  ? (id.getFirstname()  + " ") : "";
+			contactString += !Util.stringIsEmpty(id.getMiddlename()) ? (id.getMiddlename() + " ") : "";
+			contactString += !Util.stringIsEmpty(id.getSurname())    ? (id.getSurname())          : "";
 			contactString += ")";
 		}
 		
