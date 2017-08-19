@@ -105,9 +105,9 @@ public class MessagingIdentity
 		throws IOException
 	{
 		// Mandatory fields!
-		this.nickname           = obj.getString("nickname",           null);
-		this.sendreceiveaddress = obj.getString("sendreceiveaddress", null);
-		this.senderidaddress    = obj.getString("senderidaddress",    null);
+		this.nickname           = obj.getString("nickname",           "");
+		this.sendreceiveaddress = obj.getString("sendreceiveaddress", "");
+		this.senderidaddress    = obj.getString("senderidaddress",    "");
 	
 		this.firstname          = obj.getString("firstname",          "");
 		this.middlename         = obj.getString("middlename",         "");
@@ -118,7 +118,7 @@ public class MessagingIdentity
 		this.twitter            = obj.getString("twitter",            "");		
 		
 		// Make sure the mandatory fields are there
-		if ((this.nickname == null) || (this.sendreceiveaddress == null) || (this.senderidaddress == null))
+		if (Util.stringIsEmpty(this.nickname) || Util.stringIsEmpty(this.senderidaddress))
 		{
 			throw new IOException("Mandatory field is missing in creating messaging identity!");
 		}

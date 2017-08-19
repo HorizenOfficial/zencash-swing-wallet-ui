@@ -67,6 +67,7 @@ import javax.swing.border.EtchedBorder;
 
 import com.eclipsesource.json.Json;
 import com.eclipsesource.json.JsonObject;
+import com.eclipsesource.json.JsonValue;
 import com.eclipsesource.json.WriterConfig;
 import com.vaklinov.zcashui.DataGatheringThread;
 import com.vaklinov.zcashui.Log;
@@ -78,6 +79,7 @@ import com.vaklinov.zcashui.WalletTabPanel;
 import com.vaklinov.zcashui.ZCashClientCaller;
 import com.vaklinov.zcashui.ZCashClientCaller.WalletCallException;
 import com.vaklinov.zcashui.msg.Message.DIRECTION_TYPE;
+import com.vaklinov.zcashui.msg.Message.VERIFICATION_TYPE;
 
 
 /**
@@ -152,10 +154,10 @@ public class MessagingPanel
 		conversationPanel.add(upperPanel, BorderLayout.NORTH);		
 		
 		textAndContactsPane.setLeftComponent(conversationPanel);
-		SwingUtilities.invokeLater(new Runnable() { // TODO: does not work... or maybe it does
+		SwingUtilities.invokeLater(new Runnable() { 
 			@Override
 			public void run() {
-				textAndContactsPane.setDividerLocation(570);			
+				textAndContactsPane.setDividerLocation(590);			
 				}
 		});
 		
@@ -183,12 +185,12 @@ public class MessagingPanel
 		writePanel.add(new JLabel(""), BorderLayout.EAST); // dummy
 		writeAndSendPanel.add(writePanel, BorderLayout.CENTER);
 		
-		JPanel sendPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+		JPanel sendPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 4, 0));
 		JPanel sendButtonPanel = new JPanel();
 		sendButtonPanel.setLayout(new BoxLayout(sendButtonPanel, BoxLayout.Y_AXIS));
 		JLabel filler = new JLabel(" ");
 		filler.setBorder(BorderFactory.createEmptyBorder(3, 3, 3, 3));
-		sendButtonPanel.add(filler); // TODO: filler
+		sendButtonPanel.add(filler); // filler
 		sendButton = new JButton("Send message  \u27A4\u27A4\u27A4");
 		JPanel tempPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
 		tempPanel.add(sendButton);
@@ -272,6 +274,11 @@ public class MessagingPanel
 				}
 			}
 			
+			String preparedMessage = Util.escapeHTMLValue(msg.getMessage());
+			
+			// Replace line end characters, for multi-line messages
+			preparedMessage = preparedMessage.replace("\n", "<br/>");
+			
 			text.append("<span style=\"color:" + color +";\">");
 			text.append("<span style=\"font-weight:bold;font-size:1.5em;\">");
 			text.append(msg.getDirection() == DIRECTION_TYPE.SENT ? "\u21E8 " : "\u21E6 ");
@@ -279,6 +286,20 @@ public class MessagingPanel
 			text.append("(");
 			text.append(stamp); 
 			text.append(") ");
+			if ((msg.getDirection() == DIRECTION_TYPE.RECEIVED) && 
+				(msg.getVerification() == VERIFICATION_TYPE.UNVERIFIED))
+			{
+				text.append("<span style=\"font-weight:bold;\">");
+				text.append("[WARNING: Message signature is unverified.] ");
+				text.append("</span>");
+
+			} else if ((msg.getDirection() == DIRECTION_TYPE.RECEIVED) && 
+					   (msg.getVerification() == VERIFICATION_TYPE.VERIFICATION_FAILED))
+			{
+				text.append("<span style=\"font-weight:bold;font-size:1.25em;\">");
+				text.append("[ERROR: Message signature is invalid! Message may be forged!] ");
+				text.append("</span>");
+			}
 			text.append("<span style=\"font-weight:bold;\">");
 			text.append(msg.getDirection() == DIRECTION_TYPE.SENT ? 
 					    Util.escapeHTMLValue(ownIdentity.getNickname()) : 
@@ -286,7 +307,7 @@ public class MessagingPanel
 			text.append("</span>");
 			text.append(": ");
 			text.append("</span>");
-			text.append(Util.escapeHTMLValue(msg.getMessage()));
+			text.append(preparedMessage);
 			text.append("<br/>");
 		}
 		
@@ -509,28 +530,86 @@ public class MessagingPanel
 				}
 			}
 			
-			// TODO: validate the fields inside the objects, make sure this is indeed an identity
+			// Validate the fields inside the objects, make sure this is indeed an identity
 			// verify mandatory etc.
+			JsonValue innerValue = topIdentityObject.get("zenmessagingidentity");
+			JsonObject innerIdentity = (innerValue != null) ? innerValue.asObject() : null;
 			
-			JsonObject innerIdentity = topIdentityObject.get("zenmessagingidentity").asObject();
+			if ((innerValue == null) || (innerIdentity == null) ||
+				(innerIdentity.get("nickname") == null) ||
+				(innerIdentity.get("sendreceiveaddress") == null) ||
+				(innerIdentity.get("senderidaddress") == null))
+			{
+				JOptionPane.showMessageDialog(
+					this.parentFrame, 
+					"The selected JSON file has a wrong format or is not a messaging identity file!", 
+					"Messaging identity has wrong format!", JOptionPane.ERROR_MESSAGE);
+				return;
+			}
+			
 			MessagingIdentity contactIdentity = new MessagingIdentity(innerIdentity);
 			
 			// Search through the existing contact identities, to make sure we are not adding it a second time
 			for (MessagingIdentity mi : this.messagingStorage.getContactIdentities())
 			{
 				if (mi.isIdenticalTo(contactIdentity))
-				{
-					// TODO: maybe allow updating the partner identity fields that are different  
-			        JOptionPane.showMessageDialog(
+				{  
+			        int choice = JOptionPane.showConfirmDialog(
 		        		this.parentFrame,
-		        		"There is already a contact in your contact list with the same identity. \n" +
+		        		"There is already a contact in your contact list with the same identity. \n\n" +
+		        		"Existing contact identity: " + mi.getDiplayString() + "\n" +
+		        		"Contact identity being imported: " + contactIdentity.getDiplayString() + "\n\n" +
 		        		"Two identities are consiered the same if their T/Z addresses are the same. \n" +
-		        		"Import is cancelled!", 
-		        		"The same contact identity is already available", JOptionPane.ERROR_MESSAGE);					
-					return;
+		        		"Do you want to replace the details of the existing messaging identity, with\n" +
+		        		"the one being imported?", 
+		        		"The same contact identity is already available", JOptionPane.YES_NO_OPTION);
+			        
+			        if (choice == JOptionPane.YES_OPTION) 
+			        {
+			        	this.messagingStorage.updateContactIdentityForSenderIDAddress(
+			        		contactIdentity.getSenderidaddress(), contactIdentity);
+						JOptionPane.showMessageDialog(
+							this.parentFrame, 
+							"Your contact's messaging identity has been successfully updated.\n", 
+							"Messaging identity is successfully updated", JOptionPane.INFORMATION_MESSAGE);
+			        }
+			        
+			        // In any case - not a new identity to add
+			        return;
 				}
 			}
+			
+			// Check for the existence of an "Unknown" type of identity already - that could be
+			// updated. Search can be done by T address only.
+			MessagingIdentity existingUnknownID = 
+				this.messagingStorage.getContactIdentityForSenderIDAddress(contactIdentity.getSenderidaddress());
+			if (existingUnknownID != null)
+			{
+		        int choice = JOptionPane.showConfirmDialog(
+		        	this.parentFrame,
+		        	"There is a contact in your contact list with the same sender identification address \n" +
+		        	"but with yet unknwon/not yet imported full identity:\n\n" +
+		        	"Existing contact identity: " + existingUnknownID.getDiplayString() + "\n" +
+		        	"Contact identity being imported: " + contactIdentity.getDiplayString() + "\n\n" +
+		        	"Please confirm that you want to update the details of the existing contact identity\n" +
+		        	"with the one being imported?", 
+		        	"Contact with the same sender identification address is already available.", 
+		        	JOptionPane.YES_NO_OPTION);
+			        
+			    if (choice == JOptionPane.YES_OPTION) 
+			    {
+			       	this.messagingStorage.updateContactIdentityForSenderIDAddress(
+			       		contactIdentity.getSenderidaddress(), contactIdentity);
+					JOptionPane.showMessageDialog(
+						this.parentFrame, 
+						"Your contact's messaging identity has been successfully updated.\n", 
+						"Messaging identity is successfully updated", JOptionPane.INFORMATION_MESSAGE);
+			    }
+				
+				return;
+			}
 		
+			// Add the new identity normally!
 			this.messagingStorage.addContactIdentity(contactIdentity);
 			
 			JOptionPane.showMessageDialog(
@@ -567,7 +646,7 @@ public class MessagingPanel
 		throws IOException, WalletCallException, InterruptedException
 	{
 		// Make sure contacts are available
-		if (this.contactList.getNumberOfCOntacts() <= 0)
+		if (this.contactList.getNumberOfContacts() <= 0)
 		{
 	        JOptionPane.showMessageDialog(
         		this.parentFrame,
@@ -589,6 +668,19 @@ public class MessagingPanel
         		"In order to send an outgoing message you need to select a contact to send it to!",
 	        	"No messaging contact is selected...", JOptionPane.ERROR_MESSAGE);					
 			return;			
+		}
+		
+		// Make sure contact identity is full (not Unknown with no address to send to)
+		if (Util.stringIsEmpty(contactIdentity.getSendreceiveaddress()))
+		{
+	        JOptionPane.showMessageDialog(
+        		this.parentFrame,
+        		"The messaging contact selected: " + contactIdentity.getDiplayString() + "\n" +
+        		"seems to have no valid Z address for sending and receiving messages. \n" +
+        		"Most likely the reaosn is that this contact's messaging identity is \n" +
+        		"not imported yet. Message cannot be sent!",
+	        	"Selected contact has to Z address to send message to!", JOptionPane.ERROR_MESSAGE);					
+			return;
 		}
 		
 		// Get the text to send as a message
@@ -614,11 +706,13 @@ public class MessagingPanel
 		final double minimumBalance = 0.0002d; // TODO: for now hard coded - must be configurable
 		Double balance = Double.valueOf(
 			this.clientCaller.getBalanceForAddress(ownIdentity.getSendreceiveaddress()));
-		Double unconfirmedBalance = (balance > 0d) ? -1d : Double.valueOf(
+		Double unconfirmedBalance = Double.valueOf(
 			this.clientCaller.getUnconfirmedBalanceForAddress(ownIdentity.getSendreceiveaddress()));
 		
 		if ((balance < minimumBalance) && (unconfirmedBalance < minimumBalance))
 		{
+			Log.warning("Sending address has balance: {0} and unconfirmed balance: {1}",
+					    balance, unconfirmedBalance);
 	        JOptionPane.showMessageDialog(
 	        	this.parentFrame,
 	        	"The Z address used to send/receive messages has insufficient balance: \n" +
@@ -641,6 +735,8 @@ public class MessagingPanel
 		
 		if ((balance < minimumBalance) && (unconfirmedBalance >= minimumBalance))
 		{
+			Log.warning("Sending address has balance: {0} and unconfirmed balance: {1}",
+				        balance, unconfirmedBalance);
 	        JOptionPane.showMessageDialog(
 	        	this.parentFrame,
 	        	"The Z address used to send/receive messages has insufficient confirmed balance: \n" +
@@ -673,14 +769,22 @@ public class MessagingPanel
 		String memoString = jsonOuterMessage.toString();
 		
 		// Check the size of the message to be sent, error if it exceeds.
-		if (memoString.getBytes("UTF-8").length > 512)
+		final int maxSendingLength = 512;
+		int overallSendingLength = memoString.getBytes("UTF-8").length; 
+		if (overallSendingLength > maxSendingLength)
 		{
-			// TODO: gove exact size and advice on reduction...
+			Log.warning("Text length of exceeding message: {0}", textToSend.length());
+			int difference = Math.abs(maxSendingLength - overallSendingLength);
+			// We give exact size and advice on reduction...
 	        JOptionPane.showMessageDialog(
         		this.parentFrame,
-        		"The text of the message you have written is too long to be sent. The current\n" +
-        		"version of the ZEN messaging protocol supports approximately 330 characters\n" +
-        		"per message (number is not exact - depends on character encoding specifics).", 
+        		"The text of the message you have written is too long to be sent. When\n" +
+        		"packaged as a memo it comes up to " + overallSendingLength + 
+        		" bytes (maximum is " + maxSendingLength + " bytes)\n\n" + 
+        		"Advice: try to reduce the message length by " + difference + " characters. The current\n" +
+        		"version of the ZEN messaging protocol supports approximately 330\n" +
+        		"characters per message (number is not exact - depends on character\n" + 
+        		"encoding specifics).", 
 	        	"Message size exceeds currently supported limits...", JOptionPane.ERROR_MESSAGE);
 	        // Restore controls and exit
 	        this.sendButton.setEnabled(true);
@@ -763,7 +867,6 @@ public class MessagingPanel
 						messagingStorage.writeNewSentMessageForContact(contactIdentity, msg);
 					    
 					    // Update conversation text pane
-						// TODO: full reload may be inefficient - do it better
 						displayMessagesForContact(contactIdentity);
 								
 					} else
@@ -828,8 +931,6 @@ public class MessagingPanel
 			}
 		}
 		
-		// Get all known transactions received from the wallet
-		// TODO: there seems to be no way to limit the number of transactions returned!
 		MessagingIdentity ownIdentity = this.messagingStorage.getOwnIdentity(); 
 		if (ownIdentity == null)
 		{
@@ -838,6 +939,8 @@ public class MessagingPanel
 		}
 
 		String ZAddress = ownIdentity.getSendreceiveaddress();
+		// Get all known transactions received from the wallet
+		// TODO: there seems to be no way to limit the number of transactions returned!
 		JsonObject[] walletTransactions = this.clientCaller.getTransactionMessagingDataForZaddress(ZAddress);
 		
 		// Filter the transactions to obtain only those that have memos parsable as JSON
@@ -870,7 +973,7 @@ public class MessagingPanel
 						// Finally test that the message has all attributes required
 						// TODO: handle anonymous messages differently
 						Message message = new Message(jsonMessage.get("zenmsg").asObject());
-						// Set additional mesage attributes not available over the wire
+						// Set additional message attributes not available over the wire
 						message.setDirection(DIRECTION_TYPE.RECEIVED);
 						message.setTransactionID(transactionID);
 						String UNIXDate = this.clientCaller.getWalletTransactionTime(transactionID);
@@ -883,7 +986,9 @@ public class MessagingPanel
 							filteredMessages.add(message);
 						} else
 						{
-							// TODO: maybe warn of unexpected message content
+							// Warn of unexpected message content
+							Log.warning("Ignoring received mesage with invalid or incomplete content: {0}",
+									    jsonMessage.toString());
 						}
 					}
 				}
@@ -898,23 +1003,27 @@ public class MessagingPanel
 				this.messagingStorage.getContactIdentityForSenderIDAddress(message.getFrom());
 			if (contactID == null)
 			{
-				// TODO: for now warn user, later update list of contacts with an unknown
-				Log.error("Message is from unknown contact: {0}", message.toJSONObject(false).toString());
-				Log.error("TODO: create unknown contact - show message etc.");
+				// Update list of contacts with an unknown remote user ... to be updated later
+				Log.warning("Message is from unknown contact: {0} . " + 
+						    "A new Unknown_xxx contact will be created!", 
+						    message.toJSONObject(false).toString());
+				contactID = this.messagingStorage.createAndStoreUnknownContactIdentity(message.getFrom());
+			}
+			
+			// Verify the message signature
+			if (this.clientCaller.verifyMessage(message.getFrom(), message.getSign(), 
+				                                Util.encodeHexString(message.getMessage()).toUpperCase()))
+			{
+				message.setVerification(VERIFICATION_TYPE.VERIFICATION_OK);
 			} else
 			{
-			    // Verify the message signature
-				if (this.clientCaller.verifyMessage(message.getFrom(), message.getSign(), 
-					                                Util.encodeHexString(message.getMessage()).toUpperCase()))
-				{
-				    // TODO: set verification status permanently - display even invalid messages perhaps
-				    this.messagingStorage.writeNewReceivedMessageForContact(contactID, message);
-				} else
-				{
-					Log.error("Message signature is invalid {0}", message.toJSONObject(false).toString());
-					Log.error("TODO: Store it anyway - show it to the user as invalid etc.");
-				}
+				//Set verification status permanently - store even invalid messages
+				Log.error("Message signature is invalid {0} . Message will be stored as invalid!", 
+						   message.toJSONObject(false).toString());
+				message.setVerification(VERIFICATION_TYPE.VERIFICATION_FAILED);
 			}
+			
+		    this.messagingStorage.writeNewReceivedMessageForContact(contactID, message);
 		}
 		
 		// Reload the messages for the currently selected user

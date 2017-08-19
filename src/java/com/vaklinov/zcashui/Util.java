@@ -28,6 +28,7 @@
  **********************************************************************************/
 package com.vaklinov.zcashui;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.LineNumberReader;
 import java.io.Reader;
@@ -119,6 +120,14 @@ public class Util
 	}
 	
 	
+	/**
+	 * Escapes a text value to a form suitable to be displayed in HTML content. Important control
+	 * characters are replaced with entities.
+	 * 
+	 * @param inputValue th value to escape
+	 * 
+	 * @return the "safe" value to display.
+	 */
 	public static String escapeHTMLValue(String inputValue) 
 	{
 	    StringBuilder outputValue = new StringBuilder();
@@ -196,5 +205,45 @@ public class Util
 		
 		return encoded.toString();
 	}
+	
+	
+	/**
+	 * Maintains a set of old copies for a file.
+	 * For a file dir/file, the old versions are dir/file.1, dir/file.2 etc. up to 9.
+	 * 
+	 * @param dir base directory
+	 * 
+	 * @param file name of the original file
+	 */
+	public static void renameFileForMultiVersionBackup(File dir, String file)
+	{
+		final int VERSION_COUNT = 9;
+		
+		// Delete last one if it exists
+		File last = new File(dir, file + "." + VERSION_COUNT);
+		if (last.exists())
+		{
+			last.delete();
+		}
+		
+		// Iterate and rename
+		for (int i = VERSION_COUNT - 1; i >= 1; i--)
+		{
+			File f = new File(dir, file + "." + i);
+			int newIndex = i + 1;
+			if (f.exists())
+			{
+				f.renameTo(new File(dir, file + "." + newIndex));
+			}
+		}
+		
+		// Rename last one
+		File orig = new File(dir, file);
+		if (orig.exists())
+		{
+			orig.renameTo(new File(dir, file + ".1"));
+		}
+	}
+	
 	
 }

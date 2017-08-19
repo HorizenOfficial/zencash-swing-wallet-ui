@@ -38,6 +38,7 @@ import java.util.List;
 
 import com.vaklinov.zcashui.Log;
 import com.vaklinov.zcashui.OSUtil;
+import com.vaklinov.zcashui.Util;
 
 
 /**
@@ -63,11 +64,15 @@ public class MessagingStorage
 	private File rootDir;
 	
 	private List<SingleContactStorage> contactsList = new ArrayList<SingleContactStorage>();
+	
+	MessagingIdentity cachedOwnIdentity;
 		
 	
 	public MessagingStorage()
 		throws IOException
 	{
+		this.cachedOwnIdentity = null;
+		
 		this.rootDir = new File(OSUtil.getSettingsDirectory() + File.separator + "messaging");
 		
 		if (!rootDir.exists())
@@ -97,7 +102,11 @@ public class MessagingStorage
 	public MessagingIdentity getOwnIdentity()
 		throws IOException
 	{
-		// TODO: cache in memory
+		if (this.cachedOwnIdentity != null)
+		{
+			return this.cachedOwnIdentity;
+		}
+		
 		File identityFile = new File(rootDir, "ownidentity.json");
 		
 		if (!identityFile.exists())
@@ -105,17 +114,23 @@ public class MessagingStorage
 			return null;
 		}
 			
-		return new MessagingIdentity(identityFile);
+		this.cachedOwnIdentity = new MessagingIdentity(identityFile);
+		return this.cachedOwnIdentity;
 	}
 		
 		
 	public void updateOwnIdentity(MessagingIdentity newIdentity)
 		throws IOException
 	{
-		File identityFile = new File(rootDir, "ownidentity.json");	
+		final String OWN_IDENTITY = "ownidentity.json";
+		
+		File identityFile = new File(rootDir, OWN_IDENTITY);	
 			
-		// TODO: save up to 9 backups etc.
+		Util.renameFileForMultiVersionBackup(rootDir, OWN_IDENTITY);
+		
 		newIdentity.writeToFile(identityFile);
+		
+		this.cachedOwnIdentity = newIdentity;
 	}
 	
 	
@@ -152,6 +167,22 @@ public class MessagingStorage
 	}
 	
 	
+	public void updateContactIdentityForSenderIDAddress(String senderIDAddress, MessagingIdentity newID)
+		throws IOException
+	{
+		for (SingleContactStorage contact : this.contactsList)
+		{
+			MessagingIdentity tempID = contact.getIdentity();
+			
+			if (tempID.getSenderidaddress().equals(senderIDAddress))
+			{
+				tempID.copyFromJSONObject(newID.toJSONObject());
+				contact.updateIdentity(tempID);
+			}
+		}			
+	}
+
+		
 	public void addContactIdentity(MessagingIdentity identity)
 		throws IOException
 	{
@@ -177,6 +208,45 @@ public class MessagingStorage
 		this.contactsList.add(contactStorage);
 	}
 	
+	
+	/**
+	 * Creates and stores permanently an anonymous contact identity for a user who is yet unknown.
+	 * 
+	 * @param senderIDAdderss the known sender ID address
+	 * 
+	 * @return the identity created and stored
+	 * 
+	 * @throws IOException
+	 */
+	public MessagingIdentity createAndStoreUnknownContactIdentity(String senderIDAdderss)
+		throws IOException
+	{
+		MessagingIdentity newID = new MessagingIdentity();
+		
+		String nickName = null;
+		naming_loop:
+		for (int i = 1; i <= 1000; i++) // TODO: more reliable naming scheme
+		{
+			nickName = "Unknown_" + i;
+			for (MessagingIdentity existignID : this.getContactIdentities())
+			{
+				if (nickName.equalsIgnoreCase(existignID.getNickname()))
+				{
+					continue naming_loop;
+				}
+			}
+		}
+		
+		newID.setNickname(nickName);
+		newID.setFirstname(senderIDAdderss.substring(0, 10) + "...");
+		newID.setSenderidaddress(senderIDAdderss);
+		newID.setSendreceiveaddress(""); // Empty - unknown
+		
+		this.addContactIdentity(newID);
+		
+		return newID;
+	}
+
 	
 	/**
 	 * Returns all known messages for a certain contact in ascending date order. 
@@ -262,13 +332,12 @@ public class MessagingStorage
 	}
 	
 	
-	// TODO more Get all messages by identity or by T adderss we shall see what is needed
-	
-	
 	///////////////////////////////////////////////////////////////////////////////////////////////////
 	
 	
 	// Stores the details of a single contact
+	// Root dir may be like:
+	// ~/.ZENCashSwingWalletUI/messaging/contact_XXXX
 	static class SingleContactStorage
 	{
 		private File rootDir;
@@ -276,10 +345,13 @@ public class MessagingStorage
 		private SentOrReceivedMessagesStore sentMessages;
 		private SentOrReceivedMessagesStore receivedMessages;
 		
+		private MessagingIdentity cachedIdentity;
+		
 		
 		public SingleContactStorage(File rootDir)
 			throws IOException
 		{
+			this.cachedIdentity = null;
 			this.rootDir = rootDir;
 			
 			if (!rootDir.exists())
@@ -298,20 +370,30 @@ public class MessagingStorage
 		public MessagingIdentity getIdentity()
 			throws IOException
 		{
-			// TODO: todo cache identity in memory
+			if (this.cachedIdentity != null)
+			{
+				return this.cachedIdentity;
+			}
+			
 			File identityFile = new File(rootDir, "identity.json");
 			
-			return new MessagingIdentity(identityFile);
+			this.cachedIdentity = new MessagingIdentity(identityFile);
+			
+			return this.cachedIdentity;
 		}
 		
 		
 		public void updateIdentity(MessagingIdentity newIdentity)
 			throws IOException
 		{
-			File identityFile = new File(rootDir, "identity.json");	
+			final String IDENTITY = "identity.json";
+			File identityFile = new File(rootDir, IDENTITY);	
 			
-			// TODO: save up to 9 backups etc.
+			Util.renameFileForMultiVersionBackup(rootDir, IDENTITY);
+			
 			newIdentity.writeToFile(identityFile);
+			
+			this.cachedIdentity = newIdentity;
 		}
 		
 		
@@ -346,9 +428,12 @@ public class MessagingStorage
 	
 	
 	// Stores messages of one type - sent/received for one contact
+	// Root directory may be like:
+	// ~/.ZENCashSwingWalletUI/messaging/contact_XXXX/sent
 	static class SentOrReceivedMessagesStore
 	{
 		private File rootDir;
+		
 		private int currentOutputDirForWrite;
 		
 		public SentOrReceivedMessagesStore(File rootDir)
@@ -425,6 +510,7 @@ public class MessagingStorage
 			File dir = this.getCurrentDirForWrite();
 			
 			// See how many message files currently exist (000 -> 999)
+			// TODO: This could be avoided - cache current number of files
 			File messages[] = dir.listFiles(new FileFilter() 
 			{	
 				@Override
@@ -484,7 +570,7 @@ public class MessagingStorage
 			} else
 			{
 				// Make sure there are not too many messages
-				// TODO: This could be avoided
+				// TODO: This could be avoided - cache current number of files
 				File messages[] = dir.listFiles(new FileFilter() 
 				{	
 					@Override

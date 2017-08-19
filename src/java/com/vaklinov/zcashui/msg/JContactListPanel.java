@@ -130,7 +130,7 @@ public class JContactListPanel
 	}
 	
 	
-	public int getNumberOfCOntacts()
+	public int getNumberOfContacts()
 	{
 		return list.getModel().getSize();
 	}

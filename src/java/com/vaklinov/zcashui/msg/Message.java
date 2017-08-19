@@ -57,6 +57,11 @@ public class Message
 		SENT, RECEIVED
 	};
 	
+	public static enum VERIFICATION_TYPE
+	{
+		UNVERIFIED, VERIFICATION_OK, VERIFICATION_FAILED 
+	};
+	
 	// Wire protocol fields
 	private Integer version;
 	private String  from;
@@ -64,9 +69,10 @@ public class Message
 	private String  sign;
 	
 	// Additional internal fields - not to be used when transmitted over the wire
-	private String         transactionID;
-	private Date           time;
-	private DIRECTION_TYPE direction;
+	private String            transactionID;
+	private Date              time;
+	private DIRECTION_TYPE    direction;
+	private VERIFICATION_TYPE verification;
 	
 	
 	public Message()
@@ -89,7 +95,6 @@ public class Message
 		try
 		{
 			// TODO: Repackage ParseException as IOEx!!! - 
-			
 			r = new BufferedReader(new InputStreamReader(new FileInputStream(f), "UTF-8"));
 			JsonObject obj = Json.parse(r).asObject();
 			
@@ -117,6 +122,8 @@ public class Message
 		this.time          = new Date(obj.getLong("time",   0));
 		this.direction     = DIRECTION_TYPE.valueOf(
 				                 obj.getString("direction", DIRECTION_TYPE.RECEIVED.toString()));
+		this.verification  = VERIFICATION_TYPE.valueOf(
+				                 obj.getString("verification", VERIFICATION_TYPE.UNVERIFIED.toString()));
 	}
 	
 	
@@ -134,6 +141,7 @@ public class Message
 			obj.set("transactionID", transactionID);
 			obj.set("time",          this.time.getTime());
 			obj.set("direction",     this.direction.toString());
+			obj.set("verification",  this.verification.toString());
 		}
 		
 		return obj;
@@ -240,6 +248,18 @@ public class Message
 	public void setDirection(DIRECTION_TYPE direction) 
 	{
 		this.direction = direction;
+	}
+
+
+	public VERIFICATION_TYPE getVerification() 
+	{
+		return verification;
+	}
+
+
+	public void setVerification(VERIFICATION_TYPE verification) 
+	{
+		this.verification = verification;
 	}
 	
 }
