@@ -281,7 +281,8 @@ public class MessagingPanel
 			
 			if (this.isZENIdentityMessage(msg.getMessage()))
 			{
-				MessagingIdentity msgID = new MessagingIdentity(Util.parseJsonObject(msg.getMessage()));
+				MessagingIdentity msgID = new MessagingIdentity(
+					Util.parseJsonObject(msg.getMessage()).get("zenmessagingidentity").asObject());
 				
 				preparedMessage = "<span style=\"color:green;\">" +
 					"Special messaging identity message. Contains details of contact: " +
@@ -637,8 +638,8 @@ public class MessagingPanel
 				"You can now send and receive messages from this contact. Do you wish\n" +
 				"to send a limited sub-set of your contact details to this new contact\n" +
 				"as a special message?\n\n" +
-				"This will allow him to establish contact with you without manaully    \n" +
-				"importing your messaging identity (the way you imported his identoty).",
+				"This will allow him/her to establish contact with you without manaully\n" +
+				"importing your messaging identity (the way you imported his identity).",
 				"Successfully imported. Send your identity over?", JOptionPane.YES_NO_OPTION);
 			
 			this.contactList.reloadMessagingIdentities();
@@ -1188,7 +1189,8 @@ public class MessagingPanel
 	public void updateAndStoreExistingIdentityFromIDMessage(MessagingIdentity existingIdentity, String idMessage)
 		throws IOException
 	{
-		MessagingIdentity newID = new MessagingIdentity(Util.parseJsonObject(idMessage));
+		MessagingIdentity newID = new MessagingIdentity(
+			Util.parseJsonObject(idMessage).get("zenmessagingidentity").asObject());
 
 		if (!Util.stringIsEmpty(newID.getSenderidaddress()))
 		{
