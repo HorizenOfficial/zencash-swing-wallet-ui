@@ -1197,6 +1197,11 @@ public class MessagingPanel
 			existingIdentity.setSenderidaddress(newID.getSenderidaddress());
 		}
 		
+		if (!Util.stringIsEmpty(newID.getSendreceiveaddress()))
+		{
+			existingIdentity.setSendreceiveaddress(newID.getSendreceiveaddress());
+		}
+		
 		if (!Util.stringIsEmpty(newID.getNickname()))
 		{
 			existingIdentity.setNickname(newID.getNickname());
