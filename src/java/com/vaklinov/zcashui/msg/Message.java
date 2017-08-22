@@ -43,6 +43,7 @@ import java.util.Date;
 import com.eclipsesource.json.Json;
 import com.eclipsesource.json.JsonObject;
 import com.eclipsesource.json.WriterConfig;
+import com.vaklinov.zcashui.Util;
 
 
 /**
@@ -96,7 +97,7 @@ public class Message
 		{
 			// TODO: Repackage ParseException as IOEx!!! - 
 			r = new BufferedReader(new InputStreamReader(new FileInputStream(f), "UTF-8"));
-			JsonObject obj = Json.parse(r).asObject();
+			JsonObject obj = Util.parseJsonObject(r);
 			
 			this.copyFromJSONObject(obj);
 		} finally

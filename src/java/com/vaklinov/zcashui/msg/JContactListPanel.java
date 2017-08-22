@@ -31,7 +31,10 @@ package com.vaklinov.zcashui.msg;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.net.URL;
 import java.util.List;
@@ -39,6 +42,7 @@ import java.util.List;
 import javax.swing.BorderFactory;
 import javax.swing.DefaultListModel;
 import javax.swing.ImageIcon;
+import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
@@ -81,10 +85,31 @@ public class JContactListPanel
 		list.setIdentities(this.mesagingStorage.getContactIdentities());
 		this.add(new JScrollPane(list), BorderLayout.CENTER);
 		
-		JPanel upperPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
-		upperPanel.add(new JLabel("Contact list:"));
-		upperPanel.setBorder(BorderFactory.createEmptyBorder(3, 3, 3, 3));
+		JPanel upperPanel = new JPanel(new BorderLayout(0, 0));
+		upperPanel.add(new JLabel(
+			"<html><span style=\"font-size:1.2em;font-style:italic;\">Contact list: &nbsp;</span>"),
+			BorderLayout.WEST);
+		URL iconUrl = this.getClass().getClassLoader().getResource("images/add12.png");
+        ImageIcon addIcon = new ImageIcon(iconUrl);
+        JButton addButton = new JButton(addIcon);
+        addButton.setToolTipText("Add contact...");
+        upperPanel.add(addButton, BorderLayout.EAST);
+        upperPanel.add(new JLabel(
+    			"<html><span style=\"font-size:1.6em;font-style:italic;\">&nbsp;</span>"),
+    			BorderLayout.CENTER);
+		
+		upperPanel.setBorder(BorderFactory.createEmptyBorder(0, 3, 0, 3));
 		this.add(upperPanel, BorderLayout.NORTH);
+		
+		// Add a listener for adding a contact
+		addButton.addActionListener(new ActionListener() 
+		{	
+			@Override
+			public void actionPerformed(ActionEvent e) 
+			{
+				JContactListPanel.this.parent.importContactIdentity();
+			}
+		});
 		
 		// Take care of updating the messages on selection
 		list.addListSelectionListener(new ListSelectionListener() 

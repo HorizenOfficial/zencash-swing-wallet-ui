@@ -149,8 +149,11 @@ public class MessagingPanel
 		this.conversationTextPane.setEditable(false);
 		this.conversationTextPane.setContentType("text/html");
 		JPanel upperPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
-		upperPanel.add(this.conversationLabel = new JLabel("Conversation ..."));
-		upperPanel.setBorder(BorderFactory.createEmptyBorder(3, 3, 3, 3));
+		upperPanel.add(this.conversationLabel = new JLabel(
+			"<html><span style=\"font-size:1.2em;font-style:italic;\">Conversation ...</span>"));
+		upperPanel.add(new JLabel(
+    			"<html><span style=\"font-size:1.6em;font-style:italic;\">&nbsp;</span>"));
+		upperPanel.setBorder(BorderFactory.createEmptyBorder(0, 3, 0, 3));
 		conversationPanel.add(upperPanel, BorderLayout.NORTH);		
 		
 		textAndContactsPane.setLeftComponent(conversationPanel);
@@ -274,10 +277,22 @@ public class MessagingPanel
 				}
 			}
 			
-			String preparedMessage = Util.escapeHTMLValue(msg.getMessage());
+			String preparedMessage = null;
 			
-			// Replace line end characters, for multi-line messages
-			preparedMessage = preparedMessage.replace("\n", "<br/>");
+			if (this.isZENIdentityMessage(msg.getMessage()))
+			{
+				MessagingIdentity msgID = new MessagingIdentity(Util.parseJsonObject(msg.getMessage()));
+				
+				preparedMessage = "<span style=\"color:green;\">" +
+					"Special messaging identity message. Contains details of contact: " +
+					msgID.getDiplayString() +
+					"</span>";
+			} else
+			{
+				// Replace line end characters, for multi-line messages
+				preparedMessage = Util.escapeHTMLValue(msg.getMessage());
+				preparedMessage = preparedMessage.replace("\n", "<br/>");
+			};
 			
 			text.append("<span style=\"color:" + color +";\">");
 			text.append("<span style=\"font-weight:bold;font-size:1.5em;\">");
@@ -312,8 +327,9 @@ public class MessagingPanel
 		}
 		
 		this.conversationTextPane.setText("<html>" + text.toString() + "</html>");
-		
-		this.conversationLabel.setText("Conversation with: " + contact.getDiplayString());
+		this.conversationLabel.setText(
+			"<html><span style=\"font-size:1.25em;font-style:italic;\">Conversation with: " + 
+		    contact.getDiplayString() + "</span>");
 	}
 	
 
@@ -521,7 +537,7 @@ public class MessagingPanel
 			try
 			{
 				r = new InputStreamReader(new FileInputStream(f), "UTF-8");
-				topIdentityObject = Json.parse(r).asObject();
+				topIdentityObject = Util.parseJsonObject(r);
 			} finally
 			{
 				if (r != null)
@@ -614,14 +630,49 @@ public class MessagingPanel
 			// Add the new identity normally!
 			this.messagingStorage.addContactIdentity(contactIdentity);
 			
-			JOptionPane.showMessageDialog(
+			int sendIDChoice = JOptionPane.showConfirmDialog(
 				this.parentFrame, 
 				"Your contact's messaging identity has been successfully imported: \n" + 
 				contactIdentity.getDiplayString() + "\n" +
-				"You can now send and receive messages from this contact.",
-				"Messaging identity is successfully imported...", JOptionPane.INFORMATION_MESSAGE);
+				"You can now send and receive messages from this contact. Do you wish\n" +
+				"to send a limited sub-set of your contact details to this new contact\n" +
+				"as a special message?\n\n" +
+				"This will allow him to establish contact with you without manaully    \n" +
+				"importing your messaging identity (the way you imported his identoty).",
+				"Successfully imported. Send your identity over?", JOptionPane.YES_NO_OPTION);
 			
 			this.contactList.reloadMessagingIdentities();
+			
+			if (sendIDChoice == JOptionPane.YES_OPTION)
+			{
+				// Only a limited set of values is sent over the wire, due tr the limit of 330
+				// characters. // TODO: use protocol versions with larger messages
+				MessagingIdentity ownIdentity = this.messagingStorage.getOwnIdentity();
+				JsonObject innerIDObject = new JsonObject();
+				innerIDObject.set("nickname",           ownIdentity.getNickname());
+				innerIDObject.set("firstname",          ownIdentity.getFirstname());
+				innerIDObject.set("surname",            ownIdentity.getSurname());
+				innerIDObject.set("senderidaddress",    ownIdentity.getSenderidaddress());
+				innerIDObject.set("sendreceiveaddress", ownIdentity.getSendreceiveaddress());
+				JsonObject outerObject = new JsonObject();
+				outerObject.set("zenmessagingidentity", innerIDObject);
+				String identityString = outerObject.toString();
+				
+				// Check and send the messaging identity as a message
+				if (identityString.length() <= 330) // Protocol V1 restriction
+				{
+					this.sendMessage(identityString, contactIdentity);
+				} else
+				{
+					JOptionPane.showMessageDialog(
+						this.parentFrame, 
+						"The size of your messaging identity is unfortunately too large to be sent\n" +
+						"as a message. Your contact will have to import your messaging identity\n" +
+						"manaully from a json file...", 
+						"Messaging identity size is too large!", JOptionPane.ERROR_MESSAGE);
+					return;
+				}
+			}
 			
 		} catch (Exception ex)
 		{
@@ -635,7 +686,7 @@ public class MessagingPanel
 	{
 		try
 		{
-			sendMessage();
+			sendMessage(null, null);
 		} catch (Exception e)
 		{
 			Log.error("Unexpected error in sending message (wrapper): ", e);
@@ -644,7 +695,9 @@ public class MessagingPanel
 	}
 	
 	
-	private void sendMessage()
+	// String textToSend - if null, taken from the text area
+	// MessagingIdentity remoteIdentity - if null selection is taken
+	private void sendMessage(String textToSend, MessagingIdentity remoteIdentity)
 		throws IOException, WalletCallException, InterruptedException
 	{
 		// Make sure contacts are available
@@ -660,7 +713,8 @@ public class MessagingPanel
 			return;			
 		}
 		
-		final MessagingIdentity contactIdentity = this.contactList.getSelectedContact();
+		final MessagingIdentity contactIdentity = 
+			(remoteIdentity != null) ? remoteIdentity : this.contactList.getSelectedContact();
 		// Make sure there is a selection
 		if (contactIdentity == null)
 		{
@@ -686,7 +740,11 @@ public class MessagingPanel
 		}
 		
 		// Get the text to send as a message
-		String textToSend = this.writeMessageTextArea.getText();
+		if (textToSend == null)
+		{
+			textToSend = this.writeMessageTextArea.getText();
+		}
+		
 		if (textToSend.length() <= 0)
 		{
 	        JOptionPane.showMessageDialog(
@@ -960,9 +1018,9 @@ public class MessagingPanel
 				{
 					if (decodedMemo != null)
 					{
-						jsonMessage = Json.parse(decodedMemo).asObject();
+						jsonMessage = Util.parseJsonObject(decodedMemo);
 					}
-				} catch (Exception ex) // TODO: filter parsing exceptions
+				} catch (Exception ex)
 				{
 					// TODO: maybe log unparsable memos 
 				}
@@ -1001,6 +1059,7 @@ public class MessagingPanel
 		// Finally we have all messages that are new and unprocessed. For every message we find out
 		// who the sender is, verify it and store it
 		boolean bNewContactCreated = false;
+		message_loop:
 		for (Message message : filteredMessages)
 		{
 			MessagingIdentity contactID = 
@@ -1019,6 +1078,11 @@ public class MessagingPanel
 			if (this.clientCaller.verifyMessage(message.getFrom(), message.getSign(), 
 				                                Util.encodeHexString(message.getMessage()).toUpperCase()))
 			{
+				// Handle the special case of a messaging identity sent as payload - update identity then
+				if (this.isZENIdentityMessage(message.getMessage()))
+				{
+					this.updateAndStoreExistingIdentityFromIDMessage(contactID, message.getMessage());
+				}
 				message.setVerification(VERIFICATION_TYPE.VERIFICATION_OK);
 			} else
 			{
@@ -1029,7 +1093,7 @@ public class MessagingPanel
 			}
 			
 		    this.messagingStorage.writeNewReceivedMessageForContact(contactID, message);
-		}
+		} // End for (Message message : filteredMessages)
 		
 		if (bNewContactCreated)
 		{
@@ -1070,6 +1134,89 @@ public class MessagingPanel
 				}
 			}
 		});
+	}
+	
+	
+	/**
+	 * Checks if a message contains a ZEN messaging identity in it.
+	 * 
+	 * @param message
+	 * 
+	 * @return true if a ZEN identity is inside
+	 */
+	public boolean isZENIdentityMessage(String message)
+	{
+		if (message == null)
+		{
+			return false;
+		}
+		
+		if (!message.trim().startsWith("{"))
+		{
+			return false;
+		}
+		
+		JsonObject jsonMessage = null;
+		try
+		{
+			jsonMessage = Util.parseJsonObject(message);
+		} catch (Exception ex)
+		{
+			return false;
+		}
+		
+		if (jsonMessage.get("zenmessagingidentity") == null)
+		{
+			return false;
+		}
+		
+		JsonObject innerMessage = jsonMessage.get("zenmessagingidentity").asObject();
+		if ((innerMessage.get("nickname") == null)           ||
+			(innerMessage.get("sendreceiveaddress") == null) ||
+			(innerMessage.get("senderidaddress") == null))
+		{
+			return false;
+		}
+		
+		// All conditions met - return true
+		return true;
+	}
+	
+
+	// Copies the fields sent over the wire - limited set - some day all fields will be sent
+	// Sender ID address is assumed to be the same
+	public void updateAndStoreExistingIdentityFromIDMessage(MessagingIdentity existingIdentity, String idMessage)
+		throws IOException
+	{
+		MessagingIdentity newID = new MessagingIdentity(Util.parseJsonObject(idMessage));
+
+		if (!Util.stringIsEmpty(newID.getSenderidaddress()))
+		{
+			existingIdentity.setSenderidaddress(newID.getSenderidaddress());
+		}
+		
+		if (!Util.stringIsEmpty(newID.getNickname()))
+		{
+			existingIdentity.setNickname(newID.getNickname());
+		}
+		
+		if (!Util.stringIsEmpty(newID.getFirstname()))
+		{
+			existingIdentity.setFirstname(newID.getFirstname());
+		}
+		
+		if (!Util.stringIsEmpty(newID.getMiddlename()))
+		{
+			existingIdentity.setMiddlename(newID.getMiddlename());
+		}
+		
+		if (!Util.stringIsEmpty(newID.getSurname()))
+		{
+			existingIdentity.setSurname(newID.getSurname());
+		}
+		
+		this.messagingStorage.updateContactIdentityForSenderIDAddress(
+			existingIdentity.getSenderidaddress(), existingIdentity);
 	}
 	
 }

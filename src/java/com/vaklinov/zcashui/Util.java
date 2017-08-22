@@ -35,6 +35,7 @@ import java.io.Reader;
 import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
 
+import com.eclipsesource.json.Json;
 import com.eclipsesource.json.JsonObject;
 
 /**
@@ -245,5 +246,31 @@ public class Util
 		}
 	}
 	
+	
+	public static JsonObject parseJsonObject(String json)
+		throws IOException
+	{
+		try
+		{
+			return Json.parse(json).asObject();
+		} catch (RuntimeException rte)
+		{
+			throw new IOException(rte);
+		}
+	}
+	
+	
+	public static JsonObject parseJsonObject(Reader r)
+		throws IOException
+	{
+		try
+		{
+			return Json.parse(r).asObject();
+		} catch (RuntimeException rte)
+		{
+			throw new IOException(rte);
+		}
+	}
+
 	
 }
