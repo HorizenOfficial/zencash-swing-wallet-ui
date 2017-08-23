@@ -29,6 +29,7 @@
 package com.vaklinov.zcashui.msg;
 
 import java.awt.BorderLayout;
+import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
@@ -112,7 +113,7 @@ public class MessagingPanel
 	private Timer operationStatusTimer;
 	
 	private DataGatheringThread<Object> receivedMesagesGatheringThread = null;
-
+	
 	
 	public MessagingPanel(JFrame parentFrame, SendCashPanel sendCashPanel, JTabbedPane parentTabs, 
 			              ZCashClientCaller clientCaller, StatusUpdateErrorReporter errorReporter)
@@ -382,6 +383,35 @@ public class MessagingPanel
 		        {
 		        	this.exportOwnIdentity();
 		        }
+			} else
+			{
+				// Own identity exists, check balance of T address !!! - must be none
+				MessagingIdentity ownIdentity =  this.messagingStorage.getOwnIdentity();
+				Cursor oldCursor = this.getCursor();
+				String balance = null;
+				try
+				{
+     				this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+		    	    balance = this.clientCaller.getBalanceForAddress(ownIdentity.getSenderidaddress());
+				} finally
+				{
+					this.setCursor(oldCursor);
+				}
+				
+		    	if (Double.valueOf(balance) > 0)
+		    	{
+			        JOptionPane.showMessageDialog(
+					    this.parentFrame,
+					    "The T address used to identify you in messaging must have NO ZEN balance: \n" +
+					    ownIdentity.getSendreceiveaddress() + "\n" +
+					    "However it currently has a non-zero balance! This might mean that you \n" +
+					    "accidentally used this T address in non-messaging transactions. It might\n" +
+					    "also mean that someone sent ZEN to it deliberately. To minimize the chance\n" +
+					    "of compromising your privacy you must transfer all ZEN from this T address\n" +
+					    "to some Z address ASAP!", 
+						"Messaging identification address has balance!", 
+						JOptionPane.WARNING_MESSAGE);
+		    	}
 			}
 		} catch (Exception ex)
 		{
@@ -407,23 +437,58 @@ public class MessagingPanel
 				identityIsBeingCreated = true;
 				ownIdentity = new MessagingIdentity();
 				
-				// TODO: maybe set wait cursor here
-				// Create the T/Z addresses to be used for messaging
-				String TAddress = this.clientCaller.createNewAddress(false);
-				String ZAddress = this.clientCaller.createNewAddress(true);
+				Cursor oldCursor = this.getCursor();
+				try
+				{
+     				this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 				
-				// TODO: update address book
-				
-				// TODO: make sure T address has no balance - wallet may return a used adderss!
-				
-				ownIdentity.setSenderidaddress(TAddress);
-				ownIdentity.setSendreceiveaddress(ZAddress);
+				     // Create the T/Z addresses to be used for messaging - sometimes the wallet returns old
+     				 // T addresses, so we iterate
+				     String TAddress = null;
+				     for (int i = 0; i < 10; i++)
+				     {
+				    	 TAddress = this.clientCaller.createNewAddress(false);
+				    	 String balance = this.clientCaller.getBalanceForAddress(TAddress);
+				    	 if (Double.valueOf(balance) <= 0)
+				    	 {
+				    		 break;
+				    	 }
+				     }
+				    
+				     String ZAddress = this.clientCaller.createNewAddress(true);
+				     
+					// TODO: update address book (later on)
+						
+					ownIdentity.setSenderidaddress(TAddress);
+					ownIdentity.setSendreceiveaddress(ZAddress);
+				} finally
+				{
+					this.setCursor(oldCursor);
+				}				
 			}
 			
 			// Dialog will automatically save the identity if the user chooses so 
 			OwnIdentityEditDialog ownIdentityDialog = new OwnIdentityEditDialog(
 				this.parentFrame, ownIdentity, this.messagingStorage, this.errorReporter, identityIsBeingCreated);
 			ownIdentityDialog.setVisible(true);
+			
+			if (identityIsBeingCreated)
+			{
+		        JOptionPane.showMessageDialog(
+			        this.parentFrame,
+			        "The Z address used to send/receive messages needs to be supplied with ZEN: \n" +
+			        ownIdentity.getSendreceiveaddress() + "\n" +
+			        "You will be redirected to the UI tab for sending ZEN to add some balance to it. You need only\n" +
+			        "a small amount e.g. typically 0.1 ZEN is suffucient to send 500 messages. After sending some\n" +
+			        "ZEN you need to wait for the transaciton to be confirmed (typically takes 2.5 minutes). It is\n" +
+			        "recommended to send ZEN to this Z address in two or more separate transactions (though one \n" +
+			        "transaction is sufficient).", 
+				    "Z address to send/receive messages needs to be supplied with ZEN...", 
+				    JOptionPane.INFORMATION_MESSAGE);
+				        
+					sendCashPanel.prepareForSending(ownIdentity.getSendreceiveaddress());
+		            parentTabs.setSelectedIndex(2);				
+			}
 			
 		} catch (Exception ex)
 		{

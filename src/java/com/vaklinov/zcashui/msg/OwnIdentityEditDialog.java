@@ -104,7 +104,7 @@ public class OwnIdentityEditDialog
 				        return;
 					}
 					
-					// TODO: check validity of fields to avoid entering rubbish
+					// TODO: check validity of fields to avoid entering rubbish (e.g. invalid e-mail)
 					
 					// Save all identity fields from the text fields
 					MessagingIdentity id = OwnIdentityEditDialog.this.identity;

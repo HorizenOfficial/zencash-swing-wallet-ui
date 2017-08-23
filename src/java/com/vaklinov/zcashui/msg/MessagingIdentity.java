@@ -273,7 +273,7 @@ public class MessagingIdentity
 		MessagingIdentity id = this;
 		String contactString = id.getNickname();
 		
-		// TODO: avoid space if no surname - check for empty string too
+		// TODO: avoid space if no surname 
 		if ((!Util.stringIsEmpty(id.getFirstname())) || (!Util.stringIsEmpty(id.getMiddlename())) || 
 			(!Util.stringIsEmpty(id.getSurname())))
 		{

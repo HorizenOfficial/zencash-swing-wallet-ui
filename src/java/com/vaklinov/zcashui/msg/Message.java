@@ -95,7 +95,6 @@ public class Message
 			
 		try
 		{
-			// TODO: Repackage ParseException as IOEx!!! - 
 			r = new BufferedReader(new InputStreamReader(new FileInputStream(f), "UTF-8"));
 			JsonObject obj = Util.parseJsonObject(r);
 			
