@@ -370,7 +370,7 @@ public class MessagingPanel
 	                "Welcome to messaging", JOptionPane.INFORMATION_MESSAGE);
 		        	        
 		        // Show the GUI dialog to edit an initially empty messaging identity
-		        this.openOwnIdentityDialog();
+		        boolean identityCreated = this.openOwnIdentityDialog();
 		        
 		        // Offer the user to export his messaging identity
 		        int reply = JOptionPane.showConfirmDialog(
@@ -385,6 +385,26 @@ public class MessagingPanel
 		        {
 		        	this.exportOwnIdentity();
 		        }
+		        
+				if (identityCreated)
+				{
+					MessagingIdentity ownIdentity = this.messagingStorage.getOwnIdentity();
+					
+			        JOptionPane.showMessageDialog(
+				        this.parentFrame,
+				        "The Z address used to send/receive messages needs to be supplied with ZEN: \n" +
+				        ownIdentity.getSendreceiveaddress() + "\n" +
+				        "You will be redirected to the UI tab for sending ZEN to add some balance to it. You need only\n" +
+				        "a small amount e.g. typically 0.1 ZEN is suffucient to send 500 messages. After sending some\n" +
+				        "ZEN you need to wait for the transaciton to be confirmed (typically takes 2.5 minutes). It is\n" +
+				        "recommended to send ZEN to this Z address in two or more separate transactions (though one \n" +
+				        "transaction is sufficient).", 
+					    "Z address to send/receive messages needs to be supplied with ZEN...", 
+					    JOptionPane.INFORMATION_MESSAGE);
+					        
+						sendCashPanel.prepareForSending(ownIdentity.getSendreceiveaddress());
+			            parentTabs.setSelectedIndex(2);				
+				}
 			} else
 			{
 				if ((this.lastTaddressCheckTime == null) ||
@@ -435,8 +455,10 @@ public class MessagingPanel
 	
 	/**
 	 * Shows the UI dialog to edit+save one's own identity.
+	 * 
+	 * @return true if new identity was created.
 	 */
-	public void openOwnIdentityDialog()
+	public boolean openOwnIdentityDialog()
 	{
 		try
 		{
@@ -483,28 +505,14 @@ public class MessagingPanel
 				this.parentFrame, ownIdentity, this.messagingStorage, this.errorReporter, identityIsBeingCreated);
 			ownIdentityDialog.setVisible(true);
 			
-			if (identityIsBeingCreated)
-			{
-		        JOptionPane.showMessageDialog(
-			        this.parentFrame,
-			        "The Z address used to send/receive messages needs to be supplied with ZEN: \n" +
-			        ownIdentity.getSendreceiveaddress() + "\n" +
-			        "You will be redirected to the UI tab for sending ZEN to add some balance to it. You need only\n" +
-			        "a small amount e.g. typically 0.1 ZEN is suffucient to send 500 messages. After sending some\n" +
-			        "ZEN you need to wait for the transaciton to be confirmed (typically takes 2.5 minutes). It is\n" +
-			        "recommended to send ZEN to this Z address in two or more separate transactions (though one \n" +
-			        "transaction is sufficient).", 
-				    "Z address to send/receive messages needs to be supplied with ZEN...", 
-				    JOptionPane.INFORMATION_MESSAGE);
-				        
-					sendCashPanel.prepareForSending(ownIdentity.getSendreceiveaddress());
-		            parentTabs.setSelectedIndex(2);				
-			}
+			return identityIsBeingCreated;
 			
 		} catch (Exception ex)
 		{
 			Log.error("Unexpected error in editing own messaging identity!", ex);
 			this.errorReporter.reportError(ex, false);
+			
+			return false;
 		}
 	}
 	
