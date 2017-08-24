@@ -114,6 +114,8 @@ public class MessagingPanel
 	
 	private DataGatheringThread<Object> receivedMesagesGatheringThread = null;
 	
+	private Long lastTaddressCheckTime = null;
+	
 	
 	public MessagingPanel(JFrame parentFrame, SendCashPanel sendCashPanel, JTabbedPane parentTabs, 
 			              ZCashClientCaller clientCaller, StatusUpdateErrorReporter errorReporter)
@@ -385,6 +387,15 @@ public class MessagingPanel
 		        }
 			} else
 			{
+				if ((this.lastTaddressCheckTime == null) ||
+					((System.currentTimeMillis() - this.lastTaddressCheckTime) > (30 * 60 * 1000)))
+				{
+					this.lastTaddressCheckTime = System.currentTimeMillis();
+				} else
+				{
+					return;
+				}
+				
 				// Own identity exists, check balance of T address !!! - must be none
 				MessagingIdentity ownIdentity =  this.messagingStorage.getOwnIdentity();
 				Cursor oldCursor = this.getCursor();
