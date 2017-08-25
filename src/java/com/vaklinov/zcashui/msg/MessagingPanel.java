@@ -245,7 +245,7 @@ public class MessagingPanel
 					return null;
 				}
 			}, 
-			this.errorReporter, 120 * 1000, true);
+			this.errorReporter, 45 * 1000, true);
 		this.threads.add(receivedMesagesGatheringThread);
 	}
 	
