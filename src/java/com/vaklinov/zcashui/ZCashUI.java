@@ -95,6 +95,7 @@ public class ZCashUI
     private JMenuItem menuItemOwnIdentity;
     private JMenuItem menuItemExportOwnIdentity;
     private JMenuItem menuItemImportContactIdentity;
+    private JMenuItem menuItemMessagingOptions;
 
     private DashboardPanel   dashboard;
     private AddressesPanel   addresses;
@@ -191,12 +192,15 @@ public class ZCashUI
 
         JMenu messaging = new JMenu("Messaging");
         messaging.setMnemonic(KeyEvent.VK_S);
-        messaging.add(menuItemOwnIdentity = new JMenuItem("Own identity...", KeyEvent.VK_O));
-        menuItemOwnIdentity.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, accelaratorKeyMask));        
-        messaging.add(menuItemExportOwnIdentity = new JMenuItem("Export own identity...", KeyEvent.VK_D));
-        menuItemExportOwnIdentity.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_D, accelaratorKeyMask));        
-        messaging.add(menuItemImportContactIdentity = new JMenuItem("Import contact identity...", KeyEvent.VK_C));
-        menuItemImportContactIdentity.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, accelaratorKeyMask));
+        messaging.add(menuItemOwnIdentity = new JMenuItem("Own identity...", KeyEvent.VK_D));
+        menuItemOwnIdentity.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_D, accelaratorKeyMask));        
+        messaging.add(menuItemExportOwnIdentity = new JMenuItem("Export own identity...", KeyEvent.VK_X));
+        menuItemExportOwnIdentity.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_X, accelaratorKeyMask));        
+        messaging.add(menuItemImportContactIdentity = new JMenuItem("Import contact identity...", KeyEvent.VK_Y));
+        menuItemImportContactIdentity.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Y, accelaratorKeyMask));
+        messaging.add(menuItemMessagingOptions = new JMenuItem("Options...", KeyEvent.VK_O));
+        menuItemMessagingOptions.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, accelaratorKeyMask));
+        
         mb.add(messaging);
 
         // TODO: Temporarily disable encryption until further notice - Oct 24 2016
@@ -330,6 +334,17 @@ public class ZCashUI
                    public void actionPerformed(ActionEvent e)
                    {
             			ZCashUI.this.messagingPanel.importContactIdentity();
+                   }
+               }
+        );
+       
+       menuItemMessagingOptions.addActionListener(   
+               new ActionListener()
+               {
+                   @Override
+                   public void actionPerformed(ActionEvent e)
+                   {
+            			ZCashUI.this.messagingPanel.openOptionsDialog();
                    }
                }
         );

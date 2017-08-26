@@ -46,6 +46,7 @@ import com.vaklinov.zcashui.Util;
  * The standard directories are:
  * 
  * ~/.ZENCashSwingWalletUI/messaging - root dir
+ * ~/.ZENCashSwingWalletUI/messaging/messagingoptions.json - options
  * ~/.ZENCashSwingWalletUI/messaging/ownidentity.json - own identity
  * ~/.ZENCashSwingWalletUI/messaging/ownidentity.json.bak.1 - own identity most recent backup
  * ~/.ZENCashSwingWalletUI/messaging/ownidentity.json.bak.9 - own identity oldest backup
@@ -96,6 +97,32 @@ public class MessagingStorage
 		{
 			contactsList.add(new SingleContactStorage(dir));
 		}
+	}
+	
+	
+	public MessagingOptions getMessagingOptions()
+		throws IOException
+	{
+		File optionsFile = new File(rootDir, "messagingoptions.json");
+			
+		if (!optionsFile.exists())
+		{
+			return new MessagingOptions();
+		}
+				
+		// Caching is not required - rarely used
+		return new MessagingOptions(optionsFile);
+	}
+
+	
+	public void updateMessagingOptions(MessagingOptions newOptions)
+		throws IOException
+	{
+		final String OPTIONS_FILE_NAME = "messagingoptions.json";
+			
+		File optionsFile = new File(rootDir, OPTIONS_FILE_NAME);	
+		Util.renameFileForMultiVersionBackup(rootDir, OPTIONS_FILE_NAME);
+		newOptions.writeToFile(optionsFile);
 	}
 	
 	
@@ -195,13 +222,21 @@ public class MessagingStorage
 			}
 		});
 		
-		String contactDirName = String.valueOf(contactDirs.length);
-		while (contactDirName.length() < 4)
-		{
-			contactDirName = "0" + contactDirName;
-		}
+		int contactDirIndex = contactDirs.length;
+		String contactDirName;
 		
-		contactDirName = "contact_" + contactDirName;
+		// We need to make sure the dir does not exist.. if it does maybe users were removed before etc
+		// so we increment!
+		do
+		{
+			contactDirName = String.valueOf(contactDirIndex++);
+			while (contactDirName.length() < 4)
+			{
+				contactDirName = "0" + contactDirName;
+			}
+			
+			contactDirName = "contact_" + contactDirName;
+		} while (new File(this.rootDir, contactDirName).exists());
 		
 		SingleContactStorage contactStorage = new SingleContactStorage(new File(this.rootDir, contactDirName));
 		contactStorage.updateIdentity(identity);

@@ -452,6 +452,22 @@ public class MessagingPanel
 	}
 	
 	
+	public void openOptionsDialog()
+	{
+		try
+		{
+			MessagingOptionsEditDialog optionsDialog = new MessagingOptionsEditDialog(
+				this.parentFrame, this.messagingStorage, this.errorReporter);
+			optionsDialog.setVisible(true);
+			
+		} catch (Exception ex)
+		{
+			Log.error("Unexpected error in editing options!", ex);
+			this.errorReporter.reportError(ex, false);
+		}
+		
+	}
+	
 	
 	/**
 	 * Shows the UI dialog to edit+save one's own identity.

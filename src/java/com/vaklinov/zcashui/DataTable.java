@@ -176,6 +176,15 @@ public class DataTable
 	}
 
 	
+	// Make sure data in the table cannot be edited - by default.
+	// Descendants may change this
+	@Override
+    public boolean isCellEditable(int row, int column) 
+    {                
+        return false;               
+    }
+	
+	
 	// Exports the table data to a CSV file
 	private void exportToCSV()
 		throws IOException
