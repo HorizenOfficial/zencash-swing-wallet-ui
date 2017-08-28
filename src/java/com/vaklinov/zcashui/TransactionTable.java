@@ -33,6 +33,8 @@ import java.awt.Cursor;
 import java.awt.Desktop;
 import java.awt.FlowLayout;
 import java.awt.Toolkit;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -138,7 +140,7 @@ public class TransactionTable
 			}
 		});
 		
-        JMenuItem showMemoField = new JMenuItem("Show transaction memo");
+        JMenuItem showMemoField = new JMenuItem("Get transaction memo");
         showMemoField.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R, accelaratorKeyMask));
 	    popupMenu.add(showMemoField);
     
@@ -183,9 +185,14 @@ public class TransactionTable
  						
  						if (MemoField != null)
  						{
+ 							Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+ 							clipboard.setContents(new StringSelection(MemoField), null);
+ 							
  							JOptionPane.showMessageDialog(
  								parent, 
- 								"The memo contained in the transaction is: \n" + MemoField,  
+ 								"The memo contained in the transaction is: \n" + MemoField +
+ 								"\n\n" +
+ 								"(The memo has also been copied to the clipboard.)",  
  								"Memo", JOptionPane.PLAIN_MESSAGE);
  						} else
  						{

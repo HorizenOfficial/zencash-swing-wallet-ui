@@ -35,6 +35,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.util.Locale;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
@@ -94,7 +96,7 @@ public class MessagingOptionsEditDialog
 				"<html><span style=\"font-size:0.93em;\">" +
 				"The options below pertain to messaging. It is posisble to set the amount of ZEN<br/>" +
 				"to be sent with every messaging transaction and also the transaction fee. It is<br/>" + 
-			    "also possible to decide if users are to be automatically added to the contact list." +
+			    "also possible to decide if users are to be automatically added to the contact list.<br/><br/>" +
 			    "</span>");
 	    tempPanel.add(infoLabel, BorderLayout.CENTER);
 		this.getContentPane().add(tempPanel, BorderLayout.NORTH);
@@ -107,9 +109,10 @@ public class MessagingOptionsEditDialog
 		addFormField(detailsPanel, "ZEN amount to send with every message:",   amountTextField = new JTextField(12));
 		addFormField(detailsPanel, "Transaction fee:",  transactionFeeTextField = new JTextField(12));
 		
+		DecimalFormatSymbols decSymbols = new DecimalFormatSymbols(Locale.ROOT);
 		automaticallyAddUsers.setSelected(options.isAutomaticallyAddUsersIfNotExplicitlyImported());
-		amountTextField.setText(new DecimalFormat("########0.00######").format(options.getAmountToSend()));
-		transactionFeeTextField.setText(new DecimalFormat("########0.00######").format(options.getTransactionFee()));
+		amountTextField.setText(new DecimalFormat("########0.00######", decSymbols).format(options.getAmountToSend()));
+		transactionFeeTextField.setText(new DecimalFormat("########0.00######", decSymbols).format(options.getTransactionFee()));
 		
 		detailsPanel.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
 		this.getContentPane().add(detailsPanel, BorderLayout.CENTER);

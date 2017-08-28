@@ -953,9 +953,38 @@ public class MessagingPanel
 			return;
 		}
 			
-		// TODO: amount and fee are hard coded for now
-	    final String operationStatusID = this.clientCaller.sendMessage(
-	    	ownIdentity.getSendreceiveaddress(), contactIdentity.getSendreceiveaddress(), "0.0001", memoString);
+		// Finally send the message
+		MessagingOptions msgOptions = this.messagingStorage.getMessagingOptions();
+		
+		String tempOperationID = null;
+		try
+		{
+			tempOperationID = this.clientCaller.sendMessage(
+	    	    ownIdentity.getSendreceiveaddress(), contactIdentity.getSendreceiveaddress(), 
+	    	    msgOptions.getAmountToSend(), msgOptions.getTransactionFee(), memoString);
+		} catch (WalletCallException wce)
+		{
+			Log.error("Wallet call error in sending message: ", wce);
+			
+			sendResultLabel.setText(
+				"<html><span style=\"font-size:0.8em;\">Send status: &nbsp;" +
+				"<span style=\"color:red;font-weight:bold\">ERROR! </span></span></html>");
+			JOptionPane.showMessageDialog(
+				MessagingPanel.this.getRootPane().getParent(), 
+				"An error occurred upon sending message to contact: " + contactIdentity.getDiplayString() + ". \n" +
+				"Error message is: " +	wce.getMessage() + "\n" +
+				"If the problem persists, you may need technical support :( ...\n", 
+				"Error in sending message", JOptionPane.ERROR_MESSAGE);
+			
+			sendMessageProgressBar.setValue(0);						 
+			sendButton.setEnabled(true);
+			writeMessageTextArea.setEnabled(true);
+			
+			// Exit prematurely
+			return;
+		}
+		
+		final String operationStatusID = tempOperationID;
 		
 		// Start a data gathering thread specific to the operation being executed - this is done is a separate 
 		// thread since the server responds more slowly during JoinSPlits and this blocks he GUI somewhat.
@@ -1156,6 +1185,8 @@ public class MessagingPanel
 				}
 			}
 		}
+		
+		MessagingOptions msgOptions = this.messagingStorage.getMessagingOptions();
 
 		// Finally we have all messages that are new and unprocessed. For every message we find out
 		// who the sender is, verify it and store it
@@ -1165,6 +1196,16 @@ public class MessagingPanel
 		{
 			MessagingIdentity contactID = 
 				this.messagingStorage.getContactIdentityForSenderIDAddress(message.getFrom());
+			
+			// Skip message if from an unknown user and options are not set
+			if ((contactID == null) && (!msgOptions.isAutomaticallyAddUsersIfNotExplicitlyImported()))
+			{
+				Log.warningOneTime(
+					"Message is from an unknown user, but options do not allow adding new users: {0}", 
+					message.toJSONObject(false).toString());
+				continue message_loop;
+			}
+			
 			if (contactID == null)
 			{
 				// Update list of contacts with an unknown remote user ... to be updated later

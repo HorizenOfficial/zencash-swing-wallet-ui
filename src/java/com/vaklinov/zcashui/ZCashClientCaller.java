@@ -561,7 +561,7 @@ public class ZCashClientCaller
 	
 	
 	// Returns OPID
-	public synchronized String sendMessage(String from, String to, String amountAndFee, String memo)
+	public synchronized String sendMessage(String from, String to, double amount, double fee, String memo)
 		throws WalletCallException, IOException, InterruptedException
 	{
 		String hexMemo = Util.encodeHexString(memo);
@@ -571,11 +571,13 @@ public class ZCashClientCaller
 		{
 			toArgument.set("memo", hexMemo.toString());
 		}
+		
+		DecimalFormatSymbols decSymbols = new DecimalFormatSymbols(Locale.ROOT);
 
 		// TODO: The JSON Builder has a problem with double values that have no fractional part
 		// it serializes them as integers that ZCash does not accept. This will work with the 
 		// fractional amounts always used for messaging
-		toArgument.set("amount", Double.valueOf(amountAndFee));
+		toArgument.set("amount", new DecimalFormat("########0.00######", decSymbols).format(amount));
 
 		JsonArray toMany = new JsonArray();
 		toMany.add(toArgument);
@@ -588,7 +590,7 @@ public class ZCashClientCaller
 		    // Default min confirmations for the input transactions is 1
 		    "1",
 		    // transaction fee
-		    amountAndFee
+		    new DecimalFormat("########0.00######", decSymbols).format(fee)
 		};
 				
 		// Create caller to send cash

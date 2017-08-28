@@ -35,11 +35,15 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 
 public class Log 
 {
 	private static PrintStream fileOut;
+	
+	private static Set<String> oneTimeMessages = new HashSet<String>();
 
 	static 
 	{
@@ -92,6 +96,12 @@ public class Log
 		printMessage("WARNING", message, t, args);
 	}
 	
+	
+	public static void warningOneTime(String message, Object ... args)
+	{
+		printMessage(true, "WARNING", message, null, args);
+	}
+	
 
 	public static void error(String message, Object ... args)
 	{
@@ -105,8 +115,14 @@ public class Log
 	}
 
 	
-	
 	private static void printMessage(String messageClass, String message,
+                                     Throwable t, Object ... args)
+	{
+		printMessage(false, messageClass, message, t, args);
+	}
+	
+	
+	private static void printMessage(boolean oneTimeOnly, String messageClass, String message,
 			                         Throwable t, Object ... args)
 	{
 		// TODO: Too much garbage collection
@@ -115,6 +131,17 @@ public class Log
 			message = message.replace("{" + i  + "}", args[i].toString());
 		}
 		message += " ";
+		
+		if (oneTimeOnly) // One time messages logged only once!
+		{
+			if (oneTimeMessages.contains(message))
+			{
+				return;
+			} else
+			{
+				oneTimeMessages.add(message);
+			}
+		}
 		
 		String prefix =
 			"[" + Thread.currentThread().getName() + "] " +
