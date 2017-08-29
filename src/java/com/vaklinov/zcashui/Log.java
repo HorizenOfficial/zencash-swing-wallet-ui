@@ -128,7 +128,10 @@ public class Log
 		// TODO: Too much garbage collection
 		for (int i = 0; i < args.length; i++)
 		{
-			message = message.replace("{" + i  + "}", args[i].toString());
+			if (args[i] != null)
+			{
+				message = message.replace("{" + i  + "}", args[i].toString());
+			}
 		}
 		message += " ";
 		

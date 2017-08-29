@@ -1152,7 +1152,9 @@ public class MessagingPanel
 					}
 				} catch (Exception ex)
 				{
-					// TODO: maybe log unparsable memos 
+					Log.warningOneTime(
+						"Decoded memo is not parsable: {0}, due to {1}: {2}", 
+						decodedMemo, ex.getClass().getName(), ex.getMessage());
 				}
 				
 				if (jsonMessage != null)
