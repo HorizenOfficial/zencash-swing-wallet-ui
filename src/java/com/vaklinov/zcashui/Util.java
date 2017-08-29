@@ -196,12 +196,15 @@ public class Util
 		StringBuilder encoded = new StringBuilder();
 		for (byte c : str.getBytes("UTF-8"))
 		{
-			String hexChar = Integer.toHexString((int)c);
-			if (hexChar.length() < 2)
+			String hexByte = Integer.toHexString((int)c);
+			if (hexByte.length() < 2)
 			{
-				hexChar = "0" + hexChar;
+				hexByte = "0" + hexByte;
+			} else if (hexByte.length() > 2)
+			{
+				hexByte = hexByte.substring(hexByte.length() - 2, hexByte.length()); 
 			}
-			encoded.append(hexChar);
+			encoded.append(hexByte);
 		}
 		
 		return encoded.toString();
