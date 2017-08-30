@@ -5,7 +5,7 @@
 This program provides a Graphical User Interface (GUI) for the ZENCash client tools that acts as a wrapper and 
 presents the information in a user-friendly manner.
 
-![Screenshot](https://github.com/vaklinov/zencash-swing-wallet-ui/raw/master/docs/ZENCashWallet.png "Main Window")
+![Screenshot](https://github.com/ZencashOfficial/zencash-swing-wallet-ui/raw/master/docs/ZENCashWallet.png "Main Window")
 
 #### New/Experimental: [ZENCash Desktop GUI Wallet for Mac OS](https://github.com/vaklinov/zencash-swing-wallet-ui/blob/master/docs/Release_0.71.4.md) is available
 
@@ -19,7 +19,7 @@ Before installing the Desktop GUI Wallet you need to have ZENCash up and running
 explains how to set up [ZENCash](https://zensystem.io/). 
 
 **For security reasons it is recommended to always build the GUI wallet program from GitHub**
-**[source](https://github.com/vaklinov/zencash-swing-wallet-ui/archive/master.zip).**
+**[source](https://github.com/ZencashOfficial/zencash-swing-wallet-ui/archive/master.zip).**
 The details of how to build it are described below (easy to follow). 
 
 
@@ -46,7 +46,7 @@ The details of how to build it are described below (easy to follow).
 
    As a start you need to clone the zencash-swing-wallet-ui Git repository:
    ```
-   user@ubuntu:~/build-dir$ git clone https://github.com/vaklinov/zencash-swing-wallet-ui.git
+   user@ubuntu:~/build-dir$ git clone https://github.com/ZencashOfficial/zencash-swing-wallet-ui.git
    ```
    Change the current directory:
    ```
@@ -95,7 +95,7 @@ The details of how to build it are described below (easy to follow).
 
 
 ### License
-This program is distributed under an [MIT License](https://github.com/vaklinov/zencash-swing-wallet-ui/raw/master/LICENSE).
+This program is distributed under an [MIT License](https://github.com/ZencashOfficial/zencash-swing-wallet-ui/raw/master/LICENSE).
 
 ### Disclaimer
 
@@ -128,4 +128,4 @@ Properties >> Compatibility >> Override High DPI scaling behavior >> Scaling Per
 ```
 Example:
 
-![DPI Scaling](https://github.com/vaklinov/zencash-swing-wallet-ui/raw/master/docs/EXEScalingSettings.png "DPI Scaling")
+![DPI Scaling](https://github.com/ZencashOfficial/zencash-swing-wallet-ui/raw/master/docs/EXEScalingSettings.png "DPI Scaling")
