@@ -1,7 +1,7 @@
 ## [ZENCash](https://zensystem.io/) Desktop GUI Wallet binary release 0.73.1 for Windows
 
 This is a [ZENCash](https://zensystem.io/) Desktop GUI Wallet binary release 0.73.1 for Windows. 
-It requires a 64-bit Windows 7 or later version to run. It also been includes [ZENCash 2.0.9-4 binaries](https://github.com/ZencashOfficial/zen/releases/tag/v2.0.9-4) by [@cronicc](https://github.com/cronicc). 
+It requires a 64-bit Windows 7 or later version to run. It also includes [ZENCash 2.0.9-4 binaries](https://github.com/ZencashOfficial/zen/releases/tag/v2.0.9-4) by [@cronicc](https://github.com/cronicc). 
 
 This release includes an initial/early version of the one-to-one ZEN messaging functionality. The messaging 
 UI TAB allows users to securely exchange text messages. This release does not yet include features such as 
