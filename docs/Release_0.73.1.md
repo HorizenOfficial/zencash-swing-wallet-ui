@@ -7,6 +7,8 @@ This release includes an initial/early version of the one-to-one ZEN messaging f
 UI TAB allows users to securely exchange text messages. This release does not yet include features such as 
 group messaging or IPFS integration (will be developed in future releases). 
 
+![Screenshot](ZENChat.png "Main Window")
+
 ### Installing the ZENCash Desktop GUI Wallet on Windows
 
 1. Download the Wallet ZIP file 
