@@ -108,7 +108,7 @@ public class ZCashUI
     public ZCashUI(StartupProgressDialog progressDialog)
         throws IOException, InterruptedException, WalletCallException
     {
-        super("ZENCash Swing Wallet UI 0.73.1");
+        super("ZENCash Swing Wallet UI 0.73.2");
         
         if (progressDialog != null)
         {
@@ -388,7 +388,7 @@ public class ZCashUI
                     ZCashUI.this.getRootPane().getParent(),
                     "The ZENCash GUI Wallet is currently considered experimental. Use of this software\n" +
                     "comes at your own risk! Be sure to read the list of known issues and limitations\n" +
-                    "at this page: https://github.com/vaklinov/zencash-swing-wallet-ui\n\n" +
+                    "at this page: https://github.com/ZencashOfficial/zencash-swing-wallet-ui\n\n" +
                     "THE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR\n" +
                     "IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,\n" +
                     "FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE\n" +

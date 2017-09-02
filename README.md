@@ -9,7 +9,7 @@ presents the information in a user-friendly manner.
 
 #### New/Experimental: [ZENCash Desktop GUI Wallet for Mac OS](https://github.com/vaklinov/zencash-swing-wallet-ui/blob/master/docs/Release_0.71.4.md) is available
 
-#### Experimental: [ZENCash Desktop GUI Wallet for Windows](https://github.com/vaklinov/zencash-swing-wallet-ui/blob/master/docs/Release_0.70.3.md) is available
+#### New/Experimental: [ZENCash Desktop GUI Wallet for Windows](https://github.com/ZencashOfficial/zencash-swing-wallet-ui/blob/master/docs/Release_0.73.1.md) is available
 
 
 ## Building, installing and running the Wallet GUI
@@ -109,6 +109,7 @@ SOFTWARE.
 
 ### Known issues and limitations
 
+1. Limitation: if two users exchange text messages via the messaging UI TAB and one of them has a system clock, substantially running slow or fast by more than 1 minute, it is possible that this user will see text messages appearing out of order. 
 1. Limitation: Wallet encryption has been temporarily disabled in ZENCash due to stability problems. A corresponding issue 
 [#1552](https://github.com/zcash/zcash/issues/1552) has been opened by the ZCash developers. Correspondingly
 wallet encryption has been temporarily disabled in the ZENCash Desktop GUI Wallet.
