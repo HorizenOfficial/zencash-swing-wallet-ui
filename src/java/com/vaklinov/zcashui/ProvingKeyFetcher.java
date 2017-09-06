@@ -148,7 +148,7 @@ public class ProvingKeyFetcher {
         try {
             sha256 = MessageDigest.getInstance("SHA-256");
         } catch (NoSuchAlgorithmException impossible) {
-            throw new RuntimeException(impossible);
+            throw new IOException(impossible);
         }
         try (InputStream is = new BufferedInputStream(new FileInputStream(provingKey))) {
             ProgressMonitorInputStream pmis = new ProgressMonitorInputStream(parent,"Verifying proving key",is);

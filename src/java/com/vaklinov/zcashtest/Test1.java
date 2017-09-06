@@ -8,6 +8,7 @@ import java.util.Date;
 import com.eclipsesource.json.JsonArray;
 import com.eclipsesource.json.JsonObject;
 import com.eclipsesource.json.WriterConfig;
+import com.vaklinov.zcashui.Util;
 
 public class Test1 
 {
@@ -31,8 +32,17 @@ public class Test1
 //		final Date startDate = new Date("04 Oct 2016 00:00:00 GMT");
 //		System.out.println(startDate.toString());
 		
-		System.out.println(hexify("\n"));
+		//System.out.println(hexify("\n"));
 		
+		
+		String phrase = "Z pigs likes to snooze. ZZZZ";
+		System.out.println(phrase + "|=> " + Util.convertGroupPhraseToZPrivateKey(phrase));
+		phrase = "ABCD";
+		System.out.println(phrase + "|=> " + Util.convertGroupPhraseToZPrivateKey(phrase));
+		phrase = "ZEN is great";
+		System.out.println(phrase + "|=> " + Util.convertGroupPhraseToZPrivateKey(phrase));
+		phrase = "Here is a long phrase that we will see ... how it converts to a key";
+		System.out.println(phrase + "|=> " + Util.convertGroupPhraseToZPrivateKey(phrase));
 		
 	}
 	

@@ -30,6 +30,7 @@
 <project name="ZENCashSwingWalletUI" basedir="../.." default="buildit">
 	
     <property name="src.dir"     value="src"/>
+	<property name="lib.dir"     value="lib"/>
     <property name="build.dir"   value="build"/>
     <property name="classes.dir" value="${build.dir}/classes"/>
     <property name="jar.dir"     value="${build.dir}/jars"/>
@@ -66,6 +67,7 @@
         	 excludes="**/tradetest/*.class">
             <manifest>
                 <attribute name="Main-Class" value="${main-class}"/>
+                <attribute name="Class-Path" value="bitcoinj-core-0.14.5.jar"/>
             </manifest>
         </jar>
         <jar destfile="${jar.dir}/${ant.project.name}-src.jar" 
@@ -73,9 +75,12 @@
         </jar>
     </target>
 	
-	
 	<target name="copyothers">
-		
+    	<copy todir="${jar.dir}" >  
+    	    <fileset dir="${lib.dir}">  
+    	        <include name="bitcoinj-core-0.14.5*"/>
+    	    </fileset>
+    	</copy>
 	</target>
 
     <target name="buildit" depends="clean,jar,copyothers">
