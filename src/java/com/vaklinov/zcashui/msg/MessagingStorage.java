@@ -161,14 +161,18 @@ public class MessagingStorage
 	}
 	
 	
-	public List<MessagingIdentity> getContactIdentities()
+	public List<MessagingIdentity> getContactIdentities(boolean includeAnonymous)
 		throws IOException
 	{
 		List<MessagingIdentity> identities = new ArrayList<MessagingIdentity>();
 		
 		for (SingleContactStorage contact : this.contactsList)
 		{
-			identities.add(contact.getIdentity());
+			MessagingIdentity id = contact.getIdentity();
+			if ((!id.isAnonymous()) || includeAnonymous)
+			{
+				identities.add(id);
+			}
 		}
 		
 		return identities;
@@ -178,7 +182,7 @@ public class MessagingStorage
 	public MessagingIdentity getContactIdentityForSenderIDAddress(String senderIDAddress)
 		throws IOException
 	{
-		List<MessagingIdentity> allIdentities = this.getContactIdentities();
+		List<MessagingIdentity> allIdentities = this.getContactIdentities(false);
 		
 		MessagingIdentity id = null;
 		
@@ -201,9 +205,9 @@ public class MessagingStorage
 		{
 			MessagingIdentity tempID = contact.getIdentity();
 			
-			if (tempID.getSenderidaddress().equals(senderIDAddress))
+			if ((!tempID.isAnonymous()) && tempID.getSenderidaddress().equals(senderIDAddress))
 			{
-				tempID.copyFromJSONObject(newID.toJSONObject());
+				tempID.copyFromJSONObject(newID.toJSONObject(false));
 				contact.updateIdentity(tempID);
 			}
 		}			
@@ -263,7 +267,7 @@ public class MessagingStorage
 		for (int i = 1; i <= 1000; i++) // TODO: more reliable naming scheme
 		{
 			nickName = "Unknown_" + i;
-			for (MessagingIdentity existignID : this.getContactIdentities())
+			for (MessagingIdentity existignID : this.getContactIdentities(true))
 			{
 				if (nickName.equalsIgnoreCase(existignID.getNickname()))
 				{
@@ -290,6 +294,9 @@ public class MessagingStorage
 		
 		return newID;
 	}
+	
+	
+	// TODO: create and store anonymous identity
 
 	
 	/**
@@ -319,9 +326,9 @@ public class MessagingStorage
 		if (contactStorage == null)
 		{
 			Log.warning("Could not find messaging identity in the contact list {0}", 
-					    contact.toJSONObject().toString());
+					    contact.toJSONObject(false).toString());
 			throw new IOException("Could not find messaging identity in the contact list " +
-					              contact.toJSONObject().toString());
+					              contact.toJSONObject(false).toString());
 		}
 		
 		messages.addAll(contactStorage.getAllReceivedMessages());

@@ -31,12 +31,13 @@ package com.vaklinov.zcashui.msg;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import javax.swing.BorderFactory;
@@ -82,7 +83,7 @@ public class JContactListPanel
 		this.setLayout(new BorderLayout(0, 0));
 		
 		list = new ContactList();
-		list.setIdentities(this.mesagingStorage.getContactIdentities());
+		list.setIdentities(this.mesagingStorage.getContactIdentities(true));
 		this.add(new JScrollPane(list), BorderLayout.CENTER);
 		
 		JPanel upperPanel = new JPanel(new BorderLayout(0, 0));
@@ -126,16 +127,6 @@ public class JContactListPanel
 						return; // Nothing selected
 					}
 					
-					if (id.getSenderidaddress() == null)
-					{
-						throw new IOException("Invalid selected value!");
-					}
-					
-					if (id.getSendreceiveaddress() == null)
-					{
-						throw new IOException("Invalid selected value!");
-					}
-					
 					JContactListPanel.this.parent.displayMessagesForContact(id);
 				} catch (IOException ioe)
 				{
@@ -150,7 +141,7 @@ public class JContactListPanel
 	public void reloadMessagingIdentities()
 		throws IOException
 	{
-		list.setIdentities(this.mesagingStorage.getContactIdentities());
+		list.setIdentities(this.mesagingStorage.getContactIdentities(true));
 		list.revalidate();
 	}
 	
@@ -190,8 +181,23 @@ public class JContactListPanel
 		
 		public void setIdentities(List<MessagingIdentity> identities)
 		{
+			List<MessagingIdentity> localIdentities = new ArrayList<MessagingIdentity>();
+			localIdentities.addAll(identities);
+			
+			Collections.sort(
+				localIdentities,
+				new Comparator<MessagingIdentity>() 
+				{ 
+					@Override
+					public int compare(MessagingIdentity o1, MessagingIdentity o2) 
+					{
+						return o1.getDiplayString().compareTo(o2.getDiplayString());
+					}
+				}
+			);
+			
 			DefaultListModel<MessagingIdentity> newModel = new DefaultListModel<MessagingIdentity>();
-			for (MessagingIdentity id : identities)
+			for (MessagingIdentity id : localIdentities)
 			{
 				newModel.addElement(id);
 			}

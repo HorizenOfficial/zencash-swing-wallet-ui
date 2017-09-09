@@ -51,6 +51,7 @@ import java.util.Set;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -105,10 +106,12 @@ public class MessagingPanel
 	private JLabel conversationLabel;
 	private JTextPane conversationTextPane;
 	
-	private JTextArea writeMessageTextArea;
-	private JButton sendButton;
-	private JLabel sendResultLabel;
+	private JTextArea    writeMessageTextArea;
+	private JButton      sendButton;
+	private JLabel       sendResultLabel;
 	private JProgressBar sendMessageProgressBar;
+	private JCheckBox    sendAnonymously;
+	private JCheckBox    addReturnAddress;
 	
 	private Timer operationStatusTimer;
 	
@@ -215,6 +218,17 @@ public class MessagingPanel
 		tempPanel.add(sendResultLabel);
 		sendButtonPanel.add(tempPanel);
 		
+		tempPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+		tempPanel.add(this.sendAnonymously = 
+			new JCheckBox("<html><span style=\"font-size:0.8em;\">Send anonymously</span>"));
+		sendButtonPanel.add(tempPanel);
+		tempPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+		tempPanel.add(this.addReturnAddress = 
+			new JCheckBox("<html><span style=\"font-size:0.8em;\">Include return address</span>"));
+		sendButtonPanel.add(tempPanel);
+		this.addReturnAddress.setEnabled(false);
+
+		
 		sendPanel.add(sendButtonPanel);
 		writeAndSendPanel.add(sendPanel, BorderLayout.EAST);
 		
@@ -225,6 +239,22 @@ public class MessagingPanel
 			public void actionPerformed(ActionEvent e) 
 			{
 				MessagingPanel.this.sendMessageAndHandleErrors();
+			}
+		});
+		
+		this.sendAnonymously.addActionListener(new ActionListener() 
+		{
+			@Override
+			public void actionPerformed(ActionEvent e) 
+			{
+				if (MessagingPanel.this.sendAnonymously.isSelected())
+				{
+					MessagingPanel.this.addReturnAddress.setEnabled(true);
+				} else
+				{
+					MessagingPanel.this.addReturnAddress.setSelected(false);
+					MessagingPanel.this.addReturnAddress.setEnabled(false);
+				}
 			}
 		});
 		
@@ -579,7 +609,7 @@ public class MessagingPanel
 			File f = fileChooser.getSelectedFile();
 			
 			JsonObject identityObject = new JsonObject();
-			identityObject.set("zenmessagingidentity", ownIdentity.toJSONObject());
+			identityObject.set("zenmessagingidentity", ownIdentity.toJSONObject(true));
 			String identityString = identityObject.toString(WriterConfig.PRETTY_PRINT);
 			
 			FileOutputStream fos = null;
@@ -667,7 +697,7 @@ public class MessagingPanel
 			MessagingIdentity contactIdentity = new MessagingIdentity(innerIdentity);
 			
 			// Search through the existing contact identities, to make sure we are not adding it a second time
-			for (MessagingIdentity mi : this.messagingStorage.getContactIdentities())
+			for (MessagingIdentity mi : this.messagingStorage.getContactIdentities(false))
 			{
 				if (mi.isIdenticalTo(contactIdentity))
 				{  
@@ -1109,7 +1139,7 @@ public class MessagingPanel
 		// Get the transaction IDs from all received transactions in the local storage
 		// TODO: optimize/cache this
 		Set<String> storedTransactionIDs = new HashSet<String>();
-		for (MessagingIdentity identity : this.messagingStorage.getContactIdentities())
+		for (MessagingIdentity identity : this.messagingStorage.getContactIdentities(true))
 		{
 			for (Message localMessage : this.messagingStorage.getAllMessagesForContact(identity))
 			{
@@ -1157,36 +1187,33 @@ public class MessagingPanel
 						decodedMemo, ex.getClass().getName(), ex.getMessage());
 				}
 				
-				if (jsonMessage != null)
+				if ((jsonMessage != null) &&
+				   ((jsonMessage.get("zenmsg") != null) &&
+				   (!storedTransactionIDs.contains(transactionID))))
 				{
-					if ((jsonMessage.get("zenmsg") != null) &&
-						(!storedTransactionIDs.contains(transactionID)))
+					JsonObject innerZenmsg = jsonMessage.get("zenmsg").asObject();
+					if (Message.isValidZENMessagingProtocolMessage(innerZenmsg))
 					{
 						// Finally test that the message has all attributes required
 						// TODO: handle anonymous messages differently
-						Message message = new Message(jsonMessage.get("zenmsg").asObject());
+						Message message = new Message(innerZenmsg);
 						// Set additional message attributes not available over the wire
 						message.setDirection(DIRECTION_TYPE.RECEIVED);
 						message.setTransactionID(transactionID);
 						String UNIXDate = this.clientCaller.getWalletTransactionTime(transactionID);
-						message.setTime(new Date(Long.valueOf(UNIXDate).longValue() * 1000L));
-						
-						if ((!Util.stringIsEmpty(message.getFrom()))    &&
-							(!Util.stringIsEmpty(message.getMessage())) &&
-							(!Util.stringIsEmpty(message.getSign())))
-						{
-							// TODO: additional sanity check that T/Z addresses are valid etc.
-							filteredMessages.add(message);
-						} else
-						{
-							// Warn of unexpected message content
-							Log.warning("Ignoring received mesage with invalid or incomplete content: {0}",
-									    jsonMessage.toString());
-						}
+						message.setTime(new Date(Long.valueOf(UNIXDate).longValue() * 1000L));						
+						// TODO: additional sanity check that T/Z addresses are valid etc.
+						filteredMessages.add(message);
+					} else
+					{
+						// Warn of unexpected message content
+						Log.warningOneTime(
+							"Ignoring received mesage with invalid or incomplete content: {0}",
+							jsonMessage.toString());
 					}
-				}
-			}
-		}
+				}	
+			} // End if (!memoHex.equals("ERROR"))
+		} // for (JsonObject trans : walletTransactions)
 		
 		MessagingOptions msgOptions = this.messagingStorage.getMessagingOptions();
 

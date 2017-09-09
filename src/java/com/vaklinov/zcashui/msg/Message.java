@@ -68,19 +68,16 @@ public class Message
 	private String  from;
 	private String  message;
 	private String  sign;
+	private String  threadID; // Thread ID for anonymous messages
+	private String  returnAddress; // for anonymous messages
 	
 	// Additional internal fields - not to be used when transmitted over the wire
 	private String            transactionID;
 	private Date              time;
 	private DIRECTION_TYPE    direction;
 	private VERIFICATION_TYPE verification;
-	
-	
-	public Message()
-	{
-		// Empty
-	}
-	
+	private boolean           isAnonymous; // If the message is sent or received anonymously
+		
 	
 	public Message(JsonObject obj)
 	{
@@ -112,10 +109,12 @@ public class Message
 	public void copyFromJSONObject(JsonObject obj)
 	{
 		// Wire protocol fields
-		this.version       = obj.getInt("version",          1);
+		this.version       = obj.getInt("ver",              1);
 		this.from          = obj.getString("from",          "");
 		this.message       = obj.getString("message",       "");
 		this.sign          = obj.getString("sign",          "");
+		this.threadID      = obj.getString("threadid",      "");	
+		this.returnAddress = obj.getString("returnaddress", "");
 		
 		// Additional fields - may be missing, get default values
 		this.transactionID = obj.getString("transactionID", "");
@@ -124,6 +123,15 @@ public class Message
 				                 obj.getString("direction", DIRECTION_TYPE.RECEIVED.toString()));
 		this.verification  = VERIFICATION_TYPE.valueOf(
 				                 obj.getString("verification", VERIFICATION_TYPE.UNVERIFIED.toString()));
+		
+		if (obj.get("isanonymous") != null)
+		{
+			this.isAnonymous = obj.getBoolean("isanonymous", false);
+		} else
+		{
+			// Determine from content if it is anonymous
+			this.isAnonymous = obj.get("threadid") != null; 
+		}
 	}
 	
 	
@@ -131,10 +139,18 @@ public class Message
 	{
 		JsonObject obj = new JsonObject();
 		
-		obj.set("version",       version);
-		obj.set("from",          from);
-		obj.set("message",       message);
-		obj.set("sign",          sign);
+		if (this.isAnonymous())
+		{
+			obj.set("ver",           version);
+			obj.set("message",       message);
+			obj.set("threadid",      threadID);
+		} else
+		{
+			obj.set("ver",           version);
+			obj.set("from",          from);
+			obj.set("message",       message);
+			obj.set("sign",          sign);
+		}
 		
 		if (!forWireProtocol)
 		{
@@ -142,6 +158,7 @@ public class Message
 			obj.set("time",          this.time.getTime());
 			obj.set("direction",     this.direction.toString());
 			obj.set("verification",  this.verification.toString());
+			obj.set("isanonymous",   isAnonymous);
 		}
 		
 		return obj;
@@ -262,4 +279,82 @@ public class Message
 		this.verification = verification;
 	}
 	
+	
+	public boolean isAnonymous() 
+	{
+		return isAnonymous;
+	}
+
+	
+	public void setAnonymous(boolean isAnonymous) 
+	{
+		this.isAnonymous = isAnonymous;
+	}
+
+	
+	public String getThreadID() 
+	{
+		return threadID;
+	}
+
+	
+	public void setThreadID(String threadID) 
+	{
+		this.threadID = threadID;
+	}
+
+
+	public String getReturnAddress() 
+	{
+		return returnAddress;
+	}
+
+
+	public void setReturnAddress(String returnAddress) 
+	{
+		this.returnAddress = returnAddress;
+	}
+
+	
+	/**
+	 * Verifies if a message represented as a JSON object is valid according to the
+	 * ZEN messaging protocol:
+	 * https://github.com/ZencashOfficial/messaging-protocol/blob/master/README.md
+	 * 
+	 * @param message
+	 * 
+	 * @return true if a message represented as a JSON object is valid according to the
+	 * ZEN messaging protocol.
+	 */
+	public static boolean isValidZENMessagingProtocolMessage(JsonObject message)
+	{
+		if ((message == null) || (message.isEmpty()))
+		{
+			return false;
+		}
+		
+		if (message.get("threadid") != null)
+		{
+			// Verify anonymous message
+			int version          = message.getInt("ver",              -1);
+			String msg           = message.getString("message",       "");
+			String threadID      = message.getString("threadid",      "");
+
+			return (version > 0)                   && 
+				   (!Util.stringIsEmpty(threadID)) &&
+				   (!Util.stringIsEmpty(msg));
+		} else
+		{
+			// Verify normal message			
+			int version          = message.getInt("ver",              -1);
+			String from          = message.getString("from",          "");
+			String msg           = message.getString("message",       "");
+			String sign          = message.getString("sign",          "");
+			
+			return (version > 0)               && 
+				   (!Util.stringIsEmpty(from)) &&
+				   (!Util.stringIsEmpty(msg))  && 
+				   (!Util.stringIsEmpty(sign));
+		}
+	}
 }

@@ -39,7 +39,6 @@ import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.Writer;
 
-import com.eclipsesource.json.Json;
 import com.eclipsesource.json.JsonObject;
 import com.eclipsesource.json.WriterConfig;
 import com.vaklinov.zcashui.Util;
@@ -52,6 +51,8 @@ import com.vaklinov.zcashui.Util;
  */
 public class MessagingIdentity
 {
+	// Fields based on the ZEN messaging protocol
+	// https://github.com/ZencashOfficial/messaging-protocol/blob/master/README.md
 	private String nickname;
 	private String sendreceiveaddress;
 	private String senderidaddress;
@@ -63,11 +64,17 @@ public class MessagingIdentity
 	private String facebook;
 	private String twitter;
 	
+	// Additional fields not based on the ZEN messaging protocol
+	private boolean isAnonymous; // If the remote contact sends messages anonymously
+	private String threadID; // Thread ID for anonymous messages
+	
 	// TODO: automatically cut fields to XXX length to avoid issues with accidental big data
 	
 	public MessagingIdentity()
 	{
-		// Empty
+		// By default it is not anonymous - filling the rest is the responsibility of the caller
+		this.isAnonymous = false;
+		this.threadID    = "";	
 	}
 	
 	
@@ -113,17 +120,29 @@ public class MessagingIdentity
 		this.email              = obj.getString("email",              "");
 		this.streetaddress      = obj.getString("streetaddress",      "");
 		this.facebook           = obj.getString("facebook",           "");		
-		this.twitter            = obj.getString("twitter",            "");		
+		this.twitter            = obj.getString("twitter",            "");	
 		
-		// Make sure the mandatory fields are there
-		if (Util.stringIsEmpty(this.nickname) || Util.stringIsEmpty(this.senderidaddress))
+		this.isAnonymous        = obj.getBoolean("isanonymous",       false);
+		this.threadID           = obj.getString("threadid",           "");	
+		
+		if (this.isAnonymous())
 		{
-			throw new IOException("Mandatory field is missing in creating messaging identity!");
+			if (Util.stringIsEmpty(this.nickname) || Util.stringIsEmpty(this.threadID))
+			{
+				throw new IOException("Mandatory field is missing in creating anonymous messaging identity!");
+			}			
+		} else
+		{
+			// Make sure the mandatory fields are there
+			if (Util.stringIsEmpty(this.nickname) || Util.stringIsEmpty(this.senderidaddress))
+			{
+				throw new IOException("Mandatory field is missing in creating messaging identity!");
+			}
 		}
 	}
 	
 	
-	public JsonObject toJSONObject()
+	public JsonObject toJSONObject(boolean bForMesagingProtocol)
 	{
 		JsonObject obj = new JsonObject();
 		
@@ -138,6 +157,12 @@ public class MessagingIdentity
 		obj.set("facebook",           facebook);		
 		obj.set("twitter",            twitter);
 		
+		if (!bForMesagingProtocol)
+		{
+			obj.set("isanonymous",    isAnonymous);
+			obj.set("threadid",       threadID);
+		}
+		
 		return obj;
 	}
 	
@@ -150,7 +175,7 @@ public class MessagingIdentity
 		try
 		{
 			w = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(f), "UTF-8"));
-			w.write(this.toJSONObject().toString(WriterConfig.PRETTY_PRINT));
+			w.write(this.toJSONObject(false).toString(WriterConfig.PRETTY_PRINT));
 		} finally
 		{
 			if (w != null)
@@ -261,7 +286,27 @@ public class MessagingIdentity
 		this.twitter = twitter;
 	}
 	
-	
+	public boolean isAnonymous() 
+	{
+		return isAnonymous;
+	}
+
+	public void setAnonymous(boolean isAnonymous) 
+	{
+		this.isAnonymous = isAnonymous;
+	}
+
+	public String getThreadID() 
+	{
+		return threadID;
+	}
+
+	public void setThreadID(String threadID) 
+	{
+		this.threadID = threadID;
+	}
+
+
 	/**
 	 * Produces a string in the form nick (first middle sur) suitable for display purposes.
 	 * 
@@ -269,22 +314,35 @@ public class MessagingIdentity
 	 */
 	public String getDiplayString()
 	{
-		
-		MessagingIdentity id = this;
-		String contactString = id.getNickname();
-		
-		// TODO: avoid space if no surname 
-		if ((!Util.stringIsEmpty(id.getFirstname())) || (!Util.stringIsEmpty(id.getMiddlename())) || 
-			(!Util.stringIsEmpty(id.getSurname())))
+		if (this.isAnonymous())
 		{
-			contactString += " (";
-			contactString += !Util.stringIsEmpty(id.getFirstname())  ? (id.getFirstname()  + " ") : "";
-			contactString += !Util.stringIsEmpty(id.getMiddlename()) ? (id.getMiddlename() + " ") : "";
-			contactString += !Util.stringIsEmpty(id.getSurname())    ? (id.getSurname())          : "";
-			contactString += ")";
+			String contactString = this.getNickname();
+			if (!Util.stringIsEmpty(this.getThreadID()))
+			{
+			    int minIndex = Math.min(10, this.getThreadID().length());
+			    contactString += this.getThreadID().substring(0, minIndex) + "...";
+			}
+			
+			return contactString;
+			
+		} else
+		{
+			MessagingIdentity id = this;
+			String contactString = id.getNickname();
+			
+			// TODO: avoid space if no surname 
+			if ((!Util.stringIsEmpty(id.getFirstname())) || (!Util.stringIsEmpty(id.getMiddlename())) || 
+				(!Util.stringIsEmpty(id.getSurname())))
+			{
+				contactString += " (";
+				contactString += !Util.stringIsEmpty(id.getFirstname())  ? (id.getFirstname()  + " ") : "";
+				contactString += !Util.stringIsEmpty(id.getMiddlename()) ? (id.getMiddlename() + " ") : "";
+				contactString += !Util.stringIsEmpty(id.getSurname())    ? (id.getSurname())          : "";
+				contactString += ")";
+			}
+			
+			return contactString;
 		}
-		
-		return contactString;
 	}
 	
 	
@@ -298,7 +356,18 @@ public class MessagingIdentity
 	 */
 	public boolean isIdenticalTo(MessagingIdentity other)
 	{
-		return this.senderidaddress.equals(other.senderidaddress) &&
-			   this.sendreceiveaddress.equals(other.sendreceiveaddress);
+		if (this.isAnonymous() != other.isAnonymous())
+		{
+			return false;
+		}
+		
+		if (this.isAnonymous())
+		{
+			return this.getThreadID().equals(other.getThreadID());
+		} else
+		{
+			return this.senderidaddress.equals(other.senderidaddress) &&
+				   this.sendreceiveaddress.equals(other.sendreceiveaddress);
+		}
 	}
 }
