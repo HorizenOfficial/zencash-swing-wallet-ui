@@ -47,6 +47,7 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
@@ -111,7 +112,6 @@ public class MessagingPanel
 	private JLabel       sendResultLabel;
 	private JProgressBar sendMessageProgressBar;
 	private JCheckBox    sendAnonymously;
-	private JCheckBox    addReturnAddress;
 	
 	private Timer operationStatusTimer;
 	
@@ -222,12 +222,6 @@ public class MessagingPanel
 		tempPanel.add(this.sendAnonymously = 
 			new JCheckBox("<html><span style=\"font-size:0.8em;\">Send anonymously</span>"));
 		sendButtonPanel.add(tempPanel);
-		tempPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
-		tempPanel.add(this.addReturnAddress = 
-			new JCheckBox("<html><span style=\"font-size:0.8em;\">Include return address</span>"));
-		sendButtonPanel.add(tempPanel);
-		this.addReturnAddress.setEnabled(false);
-
 		
 		sendPanel.add(sendButtonPanel);
 		writeAndSendPanel.add(sendPanel, BorderLayout.EAST);
@@ -241,23 +235,7 @@ public class MessagingPanel
 				MessagingPanel.this.sendMessageAndHandleErrors();
 			}
 		});
-		
-		this.sendAnonymously.addActionListener(new ActionListener() 
-		{
-			@Override
-			public void actionPerformed(ActionEvent e) 
-			{
-				if (MessagingPanel.this.sendAnonymously.isSelected())
-				{
-					MessagingPanel.this.addReturnAddress.setEnabled(true);
-				} else
-				{
-					MessagingPanel.this.addReturnAddress.setSelected(false);
-					MessagingPanel.this.addReturnAddress.setEnabled(false);
-				}
-			}
-		});
-		
+				
 		// Start the thread to periodically gather messages
 		this.receivedMesagesGatheringThread = new DataGatheringThread<Object>(
 			new DataGatheringThread.DataGatherer<Object>() 
@@ -335,25 +313,37 @@ public class MessagingPanel
 			text.append("(");
 			text.append(stamp); 
 			text.append(") ");
-			if ((msg.getDirection() == DIRECTION_TYPE.RECEIVED) && 
-				(msg.getVerification() == VERIFICATION_TYPE.UNVERIFIED))
+			
+			if (!msg.isAnonymous())
+			{
+				if ((msg.getDirection() == DIRECTION_TYPE.RECEIVED) && 
+					(msg.getVerification() == VERIFICATION_TYPE.UNVERIFIED))
+				{
+					text.append("<span style=\"font-weight:bold;\">");
+					text.append("[WARNING: Message signature is unverified.] ");
+					text.append("</span>");	
+				} else if ((msg.getDirection() == DIRECTION_TYPE.RECEIVED) && 
+						   (msg.getVerification() == VERIFICATION_TYPE.VERIFICATION_FAILED))
+				{
+					text.append("<span style=\"font-weight:bold;font-size:1.25em;\">");
+					text.append("[ERROR: Message signature is invalid! Message may be forged!] ");
+					text.append("</span>");
+				}
+			} else
 			{
 				text.append("<span style=\"font-weight:bold;\">");
-				text.append("[WARNING: Message signature is unverified.] ");
-				text.append("</span>");
-
-			} else if ((msg.getDirection() == DIRECTION_TYPE.RECEIVED) && 
-					   (msg.getVerification() == VERIFICATION_TYPE.VERIFICATION_FAILED))
-			{
-				text.append("<span style=\"font-weight:bold;font-size:1.25em;\">");
-				text.append("[ERROR: Message signature is invalid! Message may be forged!] ");
+				text.append("[Anonymous] ");
 				text.append("</span>");
 			}
-			text.append("<span style=\"font-weight:bold;\">");
-			text.append(msg.getDirection() == DIRECTION_TYPE.SENT ? 
-					    Util.escapeHTMLValue(ownIdentity.getNickname()) : 
-					    Util.escapeHTMLValue(contact.getNickname()));
-			text.append("</span>");
+			
+			if ((!msg.isAnonymous()) || (msg.getDirection() == DIRECTION_TYPE.SENT))
+			{
+				text.append("<span style=\"font-weight:bold;\">");
+				text.append(msg.getDirection() == DIRECTION_TYPE.SENT ? 
+						    Util.escapeHTMLValue(ownIdentity.getNickname()) : 
+						    Util.escapeHTMLValue(contact.getNickname()));
+				text.append("</span>");
+			}
 			text.append(": ");
 			text.append("</span>");
 			text.append(preparedMessage);
@@ -831,6 +821,9 @@ public class MessagingPanel
 	private void sendMessage(String textToSend, MessagingIdentity remoteIdentity)
 		throws IOException, WalletCallException, InterruptedException
 	{
+		boolean sendAnonymously = this.sendAnonymously.isSelected();
+		boolean sendReturnAddress = false;
+				
 		// Make sure contacts are available
 		if (this.contactList.getNumberOfContacts() <= 0)
 		{
@@ -870,6 +863,48 @@ public class MessagingPanel
 			return;
 		}
 		
+		// If the message is being sent anonymously, make sure there is already a thread ID
+		// set for the recipient. Also ask the user if he wishes to send a return address.
+		if (sendAnonymously)
+		{
+			if (Util.stringIsEmpty(contactIdentity.getThreadID()))
+			{
+		        // Offer the user to send a return address
+		        int reply = JOptionPane.showConfirmDialog(
+		        	this.parentFrame, 
+		        	"This is the first anomymous message you are sending to contact: \n" +
+		        	contactIdentity.getDiplayString() + "\n" +
+		        	"Do you wish to send him your send/receive messaging Z address so\n" +
+		        	"that the contact may be able to answer your anonymous messages?", 
+		        	"Send return address?", 
+		        	JOptionPane.YES_NO_OPTION);
+		        
+		        if (reply == JOptionPane.YES_OPTION) 
+		        {
+		        	sendReturnAddress = true;
+		        }
+
+		        String threadID = UUID.randomUUID().toString();
+		        contactIdentity.setThreadID(threadID);
+		        // If there is no thread ID, this must be a "normal" identity. An anonymous one
+		        // will have a thread ID set on the first arriving message!
+		        if (!Util.stringIsEmpty(contactIdentity.getSenderidaddress()))
+		        {
+		        	this.messagingStorage.updateContactIdentityForSenderIDAddress(
+		        	contactIdentity.getSenderidaddress(), contactIdentity);
+		        } else
+		        {
+			        JOptionPane.showMessageDialog(
+		        		this.parentFrame,
+		        		"The contact: " + contactIdentity.getDiplayString() + "\n" +
+		        		"has no message identification T address. It is not possible to \n" +
+		        		"send a message!", 
+			        	"Contact has no message identification T address", JOptionPane.ERROR_MESSAGE);					
+					return;
+		        }
+			}
+		}
+		
 		// Get the text to send as a message
 		if (textToSend == null)
 		{
@@ -893,8 +928,10 @@ public class MessagingPanel
 		// Form the JSON message to be sent
 		MessagingIdentity ownIdentity = this.messagingStorage.getOwnIdentity(); 
 		
+		MessagingOptions msgOptions = this.messagingStorage.getMessagingOptions();
+		
 		// Check to make sure the sending address has some funds!!!
-		final double minimumBalance = 0.0002d; // TODO: for now hard coded - must be configurable
+		final double minimumBalance = msgOptions.getAmountToSend() + msgOptions.getTransactionFee();
 		Double balance = Double.valueOf(
 			this.clientCaller.getBalanceForAddress(ownIdentity.getSendreceiveaddress()));
 		Double unconfirmedBalance = Double.valueOf(
@@ -945,19 +982,42 @@ public class MessagingPanel
 				return;
 		}
 		
-		// Sign a HEX encoded message ... to avoid possibl UNICODE issues
-		String signature = this.clientCaller.signMessage(
-			ownIdentity.getSenderidaddress(), Util.encodeHexString(textToSend).toUpperCase());
 		
-		final JsonObject jsonInnerMessage = new JsonObject();
-		jsonInnerMessage.set("ver", 1d);
-		jsonInnerMessage.set("from", ownIdentity.getSenderidaddress());
-		jsonInnerMessage.set("message", textToSend);
-		jsonInnerMessage.set("sign", signature);
-		JsonObject jsonOuterMessage = new JsonObject();
-		jsonOuterMessage.set("zenmsg", jsonInnerMessage);
+		String memoString = null;
+		JsonObject jsonInnerMessage = null;
 		
-		String memoString = jsonOuterMessage.toString();
+		if (sendAnonymously)
+		{
+			// Form an anonymous message
+			jsonInnerMessage = new JsonObject();
+			jsonInnerMessage.set("ver", 1d);
+			jsonInnerMessage.set("message", textToSend);
+			jsonInnerMessage.set("threadid", contactIdentity.getThreadID());
+			if (sendReturnAddress)
+			{
+				jsonInnerMessage.set("returnaddress", ownIdentity.getSendreceiveaddress());
+			}
+			
+			JsonObject jsonOuterMessage = new JsonObject();
+			jsonOuterMessage.set("zenmsg", jsonInnerMessage);
+			memoString = jsonOuterMessage.toString();			
+		} else
+		{
+			// Sign a HEX encoded message ... to avoid possible UNICODE issues
+			String signature = this.clientCaller.signMessage(
+				ownIdentity.getSenderidaddress(), Util.encodeHexString(textToSend).toUpperCase());
+			
+			jsonInnerMessage = new JsonObject();
+			jsonInnerMessage.set("ver", 1d);
+			jsonInnerMessage.set("from", ownIdentity.getSenderidaddress());
+			jsonInnerMessage.set("message", textToSend);
+			jsonInnerMessage.set("sign", signature);
+			JsonObject jsonOuterMessage = new JsonObject();
+			jsonOuterMessage.set("zenmsg", jsonInnerMessage);
+			memoString = jsonOuterMessage.toString();
+		}
+		
+		final JsonObject jsonInnerMessageForFurtherUse = jsonInnerMessage;
 		
 		// Check the size of the message to be sent, error if it exceeds.
 		final int maxSendingLength = 512;
@@ -983,9 +1043,7 @@ public class MessagingPanel
 			return;
 		}
 			
-		// Finally send the message
-		MessagingOptions msgOptions = this.messagingStorage.getMessagingOptions();
-		
+		// Finally send the message		
 		String tempOperationID = null;
 		try
 		{
@@ -1079,7 +1137,7 @@ public class MessagingPanel
 						writeMessageTextArea.setText(""); // clear message from text area
 					    
 					    // Save message as outgoing
-						Message msg = new Message(jsonInnerMessage);
+						Message msg = new Message(jsonInnerMessageForFurtherUse);
 						msg.setTime(new Date());
 						msg.setDirection(DIRECTION_TYPE.SENT);
 						// TODO: We can get the transaction ID for outgoing messages but is is probably unnecessary
@@ -1220,9 +1278,16 @@ public class MessagingPanel
 		// Finally we have all messages that are new and unprocessed. For every message we find out
 		// who the sender is, verify it and store it
 		boolean bNewContactCreated = false;
-		message_loop:
+		
+		// Loop for processing standard (not anonymous messages)
+		standard_message_loop:
 		for (Message message : filteredMessages)
 		{
+			if (message.isAnonymous())
+			{
+				continue standard_message_loop;
+			}
+			
 			MessagingIdentity contactID = 
 				this.messagingStorage.getContactIdentityForSenderIDAddress(message.getFrom());
 			
@@ -1232,7 +1297,7 @@ public class MessagingPanel
 				Log.warningOneTime(
 					"Message is from an unknown user, but options do not allow adding new users: {0}", 
 					message.toJSONObject(false).toString());
-				continue message_loop;
+				continue standard_message_loop;
 			}
 			
 			if (contactID == null)
@@ -1265,6 +1330,29 @@ public class MessagingPanel
 			
 		    this.messagingStorage.writeNewReceivedMessageForContact(contactID, message);
 		} // End for (Message message : filteredMessages)
+
+		// Loop for processing anonymous messages
+		anonymus_message_loop:
+		for (Message message : filteredMessages)
+		{
+			if (!message.isAnonymous())
+			{
+				continue anonymus_message_loop;
+			}
+			
+			MessagingIdentity anonContctID = this.messagingStorage.findAnonymousContactIdentityByThreadID(
+				message.getThreadID());
+					
+			if (anonContctID == null)
+			{
+				// Return address may be empty but we pass it
+				anonContctID = this.messagingStorage.createAndStoreAnonumousContactIdentity(
+					message.getThreadID(), message.getReturnAddress());
+				bNewContactCreated = true;
+			}
+
+			this.messagingStorage.writeNewReceivedMessageForContact(anonContctID, message);
+		}
 		
 		if (bNewContactCreated)
 		{
@@ -1285,6 +1373,7 @@ public class MessagingPanel
 			});
 		}		
 		
+		// TODO: Call this only if anything was changed - e.g. new messages saved
 		SwingUtilities.invokeLater(new Runnable() 
 		{	
 			@Override

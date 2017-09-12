@@ -188,7 +188,7 @@ public class MessagingStorage
 		
 		for (MessagingIdentity tempID : allIdentities)
 		{
-			if (tempID.getSenderidaddress().equals(senderIDAddress))
+			if ((!tempID.isAnonymous()) && tempID.getSenderidaddress().equals(senderIDAddress))
 			{
 				id = tempID;
 			}
@@ -296,9 +296,65 @@ public class MessagingStorage
 	}
 	
 	
-	// TODO: create and store anonymous identity
-
+	public MessagingIdentity findAnonymousContactIdentityByThreadID(String threadID)
+		throws IOException
+	{
+		List<MessagingIdentity> allIdentities = this.getContactIdentities(true);
+		
+		MessagingIdentity id = null;
+		
+		for (MessagingIdentity tempID : allIdentities)
+		{
+			if (tempID.isAnonymous() && tempID.getThreadID().equals(threadID))
+			{
+				id = tempID;
+			}
+		}
+		
+		return id;	
+	}
 	
+	
+	public MessagingIdentity createAndStoreAnonumousContactIdentity(String threadID, String returnAddress)
+		throws IOException
+	{
+		MessagingIdentity newID = new MessagingIdentity();
+		newID.setAnonymous(true);
+		newID.setThreadID(threadID);
+			
+		String nickName = null;
+		naming_loop:
+		for (int i = 1; i <= 1000; i++) // TODO: more reliable naming scheme
+		{
+			nickName = "Anonymous_" + i;
+			for (MessagingIdentity existignID : this.getContactIdentities(true))
+			{
+				if (nickName.equalsIgnoreCase(existignID.getNickname()))
+				{
+					continue naming_loop;
+				}
+			}
+			break naming_loop;
+		}
+			
+		newID.setNickname(nickName);
+		newID.setFirstname(threadID.substring(0, 10) + "...");
+		newID.setSendreceiveaddress(returnAddress);
+			
+		// All fields need to be filled
+		newID.setMiddlename("");
+		newID.setSurname("");
+		newID.setEmail("");
+		newID.setStreetaddress("");
+		newID.setFacebook("");
+		newID.setTwitter("");
+		
+		this.addContactIdentity(newID);
+			
+		return newID;
+	}
+
+
 	/**
 	 * Returns all known messages for a certain contact in ascending date order. 
 	 * If identity not found etc. thorws an exception
