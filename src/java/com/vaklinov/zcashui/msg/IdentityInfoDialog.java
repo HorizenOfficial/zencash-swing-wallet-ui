@@ -37,10 +37,12 @@ import java.awt.event.ActionListener;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.border.EtchedBorder;
 
@@ -61,7 +63,7 @@ public class IdentityInfoDialog
 	protected JPanel buttonPanel;
 	
 	protected JTextField nicknameTextField;
-	protected JTextField sendreceiveaddressTextField;
+	protected JTextArea sendreceiveaddressTextField;
 	protected JTextField senderidaddressTextField;
 	protected JTextField firstnameTextField;
 	protected JTextField middlenameTextField;
@@ -106,7 +108,8 @@ public class IdentityInfoDialog
 		addFormField(detailsPanel, "Twitter page:",   twitterTextField = new JTextField(40));
 		
 		addFormField(detailsPanel, "Sender identiication T address:", senderidaddressTextField = new JTextField(40));
-		addFormField(detailsPanel, "Send/receive Z address:", sendreceiveaddressTextField = new JTextField(40));
+		addFormField(detailsPanel, "Send/receive Z address:", sendreceiveaddressTextField = new JTextArea(2, 40));
+		sendreceiveaddressTextField.setLineWrap(true);
 		
 
 		nicknameTextField.setText(this.identity.getNickname());
@@ -158,7 +161,7 @@ public class IdentityInfoDialog
 
 	
 	
-	private void addFormField(JPanel detailsPanel, String name, JTextField field)
+	private void addFormField(JPanel detailsPanel, String name, JComponent field)
 	{
 		JPanel tempPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 4, 2));
 		JLabel tempLabel = new JLabel(name, JLabel.RIGHT);

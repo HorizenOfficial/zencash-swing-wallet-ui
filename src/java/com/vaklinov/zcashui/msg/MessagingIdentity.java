@@ -146,21 +146,21 @@ public class MessagingIdentity
 	{
 		JsonObject obj = new JsonObject();
 		
-		obj.set("nickname",           nickname);
-		obj.set("sendreceiveaddress", sendreceiveaddress);
-		obj.set("senderidaddress",    senderidaddress);
-		obj.set("firstname",          firstname);
-		obj.set("middlename",         middlename);
-		obj.set("surname",            surname);
-		obj.set("email",              email);
-		obj.set("streetaddress",      streetaddress);
-		obj.set("facebook",           facebook);		
-		obj.set("twitter",            twitter);
+		obj.set("nickname",           nonNull(nickname));
+		obj.set("sendreceiveaddress", nonNull(sendreceiveaddress));
+		obj.set("senderidaddress",    nonNull(senderidaddress));
+		obj.set("firstname",          nonNull(firstname));
+		obj.set("middlename",         nonNull(middlename));
+		obj.set("surname",            nonNull(surname));
+		obj.set("email",              nonNull(email));
+		obj.set("streetaddress",      nonNull(streetaddress));
+		obj.set("facebook",           nonNull(facebook));		
+		obj.set("twitter",            nonNull(twitter));
 		
 		if (!bForMesagingProtocol)
 		{
 			obj.set("isanonymous",    isAnonymous);
-			obj.set("threadid",       threadID);
+			obj.set("threadid",       nonNull(threadID));
 		}
 		
 		return obj;
@@ -369,5 +369,11 @@ public class MessagingIdentity
 			return this.senderidaddress.equals(other.senderidaddress) &&
 				   this.sendreceiveaddress.equals(other.sendreceiveaddress);
 		}
+	}
+	
+	
+	public String nonNull(String s)
+	{
+		return (s != null) ? s : "";
 	}
 }

@@ -340,6 +340,7 @@ public class MessagingStorage
 		newID.setNickname(nickName);
 		newID.setFirstname(threadID.substring(0, 10) + "...");
 		newID.setSendreceiveaddress(returnAddress);
+		newID.setSenderidaddress("");
 			
 		// All fields need to be filled
 		newID.setMiddlename("");

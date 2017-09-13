@@ -903,6 +903,25 @@ public class MessagingPanel
 					return;
 		        }
 			}
+		} else
+		{
+			// Check to make sure a normal message is not being sent to an anonymous identity
+			if (contactIdentity.isAnonymous())
+			{
+		        int reply = JOptionPane.showConfirmDialog(
+			      	this.parentFrame, 
+			       	"The contact: " + contactIdentity.getDiplayString() + "\n" +
+			       	"is anonymous. However you are about to send a message to him\n" +
+			       	"that includes your sender identification T address. Are you sure\n" +
+			       	"you wish to send him the message?", 
+			       	"Send message releavling your sender identification T address?", 
+			       	JOptionPane.YES_NO_OPTION);
+			        
+			    if (reply == JOptionPane.NO_OPTION) 
+			    {
+			       	return;
+			    }
+			}
 		}
 		
 		// Get the text to send as a message
@@ -1253,7 +1272,6 @@ public class MessagingPanel
 					if (Message.isValidZENMessagingProtocolMessage(innerZenmsg))
 					{
 						// Finally test that the message has all attributes required
-						// TODO: handle anonymous messages differently
 						Message message = new Message(innerZenmsg);
 						// Set additional message attributes not available over the wire
 						message.setDirection(DIRECTION_TYPE.RECEIVED);

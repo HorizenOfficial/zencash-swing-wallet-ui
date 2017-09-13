@@ -142,19 +142,19 @@ public class Message
 		if (this.isAnonymous())
 		{
 			obj.set("ver",           version);
-			obj.set("message",       message);
-			obj.set("threadid",      threadID);
+			obj.set("message",       nonNull(message));
+			obj.set("threadid",      nonNull(threadID));
 		} else
 		{
 			obj.set("ver",           version);
-			obj.set("from",          from);
-			obj.set("message",       message);
-			obj.set("sign",          sign);
+			obj.set("from",          nonNull(from));
+			obj.set("message",       nonNull(message));
+			obj.set("sign",          nonNull(sign));
 		}
 		
 		if (!forWireProtocol)
 		{
-			obj.set("transactionID", transactionID);
+			obj.set("transactionID", nonNull(transactionID));
 			obj.set("time",          this.time.getTime());
 			obj.set("direction",     this.direction.toString());
 			obj.set("verification",  this.verification.toString());
@@ -356,5 +356,11 @@ public class Message
 				   (!Util.stringIsEmpty(msg))  && 
 				   (!Util.stringIsEmpty(sign));
 		}
+	}
+	
+	
+	public String nonNull(String s)
+	{
+		return (s != null) ? s : "";
 	}
 }
