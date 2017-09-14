@@ -296,7 +296,18 @@ public class MessagingStorage
 	}
 	
 	
-	public MessagingIdentity findAnonymousContactIdentityByThreadID(String threadID)
+	/**
+	 * Finds a messaging identity that corresponds to a particular thread id. It may be a normal
+	 * identity with anonymous messages sent to it (outgoing case) or an anonymous identity 
+	 * (incoming case).
+	 * 
+	 * @param threadID
+	 * 
+	 * @return a messaging identity that corresponds to a particular thread id
+	 * 
+	 * @throws IOException
+	 */
+	public MessagingIdentity findAnonymousOrNormalContactIdentityByThreadID(String threadID)
 		throws IOException
 	{
 		List<MessagingIdentity> allIdentities = this.getContactIdentities(true);
@@ -305,7 +316,7 @@ public class MessagingStorage
 		
 		for (MessagingIdentity tempID : allIdentities)
 		{
-			if (tempID.isAnonymous() && tempID.getThreadID().equals(threadID))
+			if ((!Util.stringIsEmpty(tempID.getThreadID())) && tempID.getThreadID().equals(threadID))
 			{
 				id = tempID;
 			}

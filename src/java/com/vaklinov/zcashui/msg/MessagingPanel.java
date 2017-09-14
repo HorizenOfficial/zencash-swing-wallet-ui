@@ -1358,8 +1358,11 @@ public class MessagingPanel
 				continue anonymus_message_loop;
 			}
 			
-			MessagingIdentity anonContctID = this.messagingStorage.findAnonymousContactIdentityByThreadID(
-				message.getThreadID());
+			// It is posisble tat it will find a normal identity to which we previously sent the first
+			// anonymou smessage (sedn scenario) or maybe an enonumouys identity created by incming
+			// message etc.
+			MessagingIdentity anonContctID = this.messagingStorage.
+				findAnonymousOrNormalContactIdentityByThreadID(message.getThreadID());
 					
 			if (anonContctID == null)
 			{
