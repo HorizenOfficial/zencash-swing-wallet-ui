@@ -15,7 +15,7 @@ One notable new feature is the ability to send encrypted text messages between u
 such as [http://quickhash-gui.org/](http://quickhash-gui.org/) you may calculate the its SHA256 checksum. The 
 result should be:
 ```
-148152571ca14fa054742918dfae0be76875cf74658221b00fe23cf712db1ae4  ZENCashWallet-0.71.4a.dmg
+148152571ca14fa054742918dfae0be76875cf74658221b00fe23cf712db1ae4  ZENCashWallet-0.73.4.dmg
 ```
 **If the resulting checksum is not `148152571ca14fa054742918dfae0be76875cf74658221b00fe23cf712db1ae4` then**
 **something is wrong and you should discard the downloaded wallet!**
