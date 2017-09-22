@@ -379,8 +379,7 @@ public class WalletOperations
 				this.clientCaller.unlockWallet(pd.getPassword());
 			}
 			
-			// TODO: We need a much more precise criterion to distinguish T/Z adresses;
-			boolean isZAddress = address.startsWith("zc") && address.length() > 40;
+			boolean isZAddress = Util.isZAddress(address);
 			
 			String privateKey = isZAddress ?
 				this.clientCaller.getZPrivateKey(address) : this.clientCaller.getTPrivateKey(address);

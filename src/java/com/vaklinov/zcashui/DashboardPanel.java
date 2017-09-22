@@ -365,6 +365,10 @@ public class DashboardPanel
 
 		// TODO: what if ZCash directory is non-default...
 		File walletDAT = new File(OSUtil.getBlockchainDirectory() + "/wallet.dat");
+		if (this.installationObserver.isOnTestNet())
+		{
+			walletDAT = new File(OSUtil.getBlockchainDirectory() + "/testnet3" + "/wallet.dat");
+		}
 		
 		if (this.OSInfo == null)
 		{
@@ -577,7 +581,7 @@ public class DashboardPanel
 	{
 		String columnNames[] = { "Type", "Direction", "Confirmed?", "Amount", "Date", "Destination Address"};
         JTable table = new TransactionTable(
-        	rowData, columnNames, this.parentFrame, this.clientCaller); 
+        	rowData, columnNames, this.parentFrame, this.clientCaller, this.installationObserver); 
         table.setAutoResizeMode(JTable.AUTO_RESIZE_SUBSEQUENT_COLUMNS);
         table.getColumnModel().getColumn(0).setPreferredWidth(190);
         table.getColumnModel().getColumn(1).setPreferredWidth(145);

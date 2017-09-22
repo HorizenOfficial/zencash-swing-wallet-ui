@@ -108,7 +108,7 @@ public class ZCashUI
     public ZCashUI(StartupProgressDialog progressDialog)
         throws IOException, InterruptedException, WalletCallException
     {
-        super("ZENCash Swing Wallet UI 0.73.4");
+        super("ZENCash Swing Wallet UI 0.73.5");
         
         if (progressDialog != null)
         {
@@ -124,6 +124,11 @@ public class ZCashUI
         errorReporter = new StatusUpdateErrorReporter(this);
         installationObserver = new ZCashInstallationObserver(OSUtil.getProgramDirectory());
         clientCaller = new ZCashClientCaller(OSUtil.getProgramDirectory());
+        
+        if (installationObserver.isOnTestNet())
+        {
+        	this.setTitle(this.getTitle() + " [using TESTNET]");
+        }
 
         // Build content
         tabs = new JTabbedPane();
@@ -505,7 +510,7 @@ public class ZCashUI
             		// If more than 20 minutes behind in the blockchain - startup in progress
             		if ((System.currentTimeMillis() - info.lastBlockDate.getTime()) > (20 * 60 * 1000))
             		{
-            			Log.info("Current blockchain synchronization date is"  + 
+            			Log.info("Current blockchain synchronization date is "  + 
             		                       new Date(info.lastBlockDate.getTime()));
             			daemonStartInProgress = true;
             		}

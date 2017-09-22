@@ -346,4 +346,14 @@ public class Util
 			    "Make sure the bitcoinj-core-0.14.5.jar is available!", e);
 		}
 	}
+	
+	
+	// zc/zt - mainnet and testnet
+	// TODO: We need a much more precise criterion to distinguish T/Z adresses;
+	public static boolean isZAddress(String address)
+	{
+		return (address != null) && 
+			   (address.startsWith("zc") || address.startsWith("zt")) && 
+			   (address.length() > 40);
+	}
 }

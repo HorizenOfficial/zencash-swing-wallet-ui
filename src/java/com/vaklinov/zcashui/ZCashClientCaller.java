@@ -388,7 +388,14 @@ public class ZCashClientCaller
             	}
             	
                 String memoHex = jsonTransactions.get(i).asObject().getString("memo", "ERROR!");
-                return Util.decodeHexMemo(memoHex);
+                String decodedMemo = Util.decodeHexMemo(memoHex);
+                
+                // Return only if not null - sometimes multiple incoming transactions have the same ID
+                // if we have loopback send etc.
+                if (decodedMemo != null)
+                {
+                	return decodedMemo;
+                }
             }
         }
 

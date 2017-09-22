@@ -68,7 +68,8 @@ public class TransactionTable
 	extends DataTable 
 {	
 	public TransactionTable(final Object[][] rowData, final Object[] columnNames, 
-			                final JFrame parent, final ZCashClientCaller caller)
+			                final JFrame parent, final ZCashClientCaller caller,
+			                final ZCashInstallationObserver installationObserver)
 	{
 		super(rowData, columnNames);
 		int accelaratorKeyMask = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
@@ -126,8 +127,13 @@ public class TransactionTable
 						
 						Log.info("Transaction ID for block explorer is: " + txID);
 						// https://explorer.zcha.in/transactions/<ID>
-						Desktop.getDesktop().browse(
-							new URL("https://explorer.zensystem.io/tx/" + txID).toURI());
+						String urlPrefix = "https://explorer.zensystem.io/tx/";
+						if (installationObserver.isOnTestNet())
+						{
+							urlPrefix = "https://explorer-testnet.zen-solutions.io/tx/";
+						}
+						
+						Desktop.getDesktop().browse(new URL(urlPrefix + txID).toURI());
 					} catch (Exception ex)
 					{
 						Log.error("Unexpected error: ", ex);
@@ -160,8 +166,7 @@ public class TransactionTable
 						String acc = TransactionTable.this.getModel().getValueAt(lastRow, 5).toString();
 						acc = acc.replaceAll("\"", ""); // In case it has quotes
 						
-						// TODO: We need a much more precise criterion to distinguish T/Z adresses;
-						boolean isZAddress = acc.startsWith("zc") && acc.length() > 40;
+						boolean isZAddress = Util.isZAddress(acc);
 						if (!isZAddress)
 						{
 					        JOptionPane.showMessageDialog(

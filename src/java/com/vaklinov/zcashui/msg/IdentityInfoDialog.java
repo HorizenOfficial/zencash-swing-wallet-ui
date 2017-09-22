@@ -103,11 +103,11 @@ public class IdentityInfoDialog
 		addFormField(detailsPanel, "Surname:",    surnameTextField = new JTextField(40));
 		
 		addFormField(detailsPanel, "E-mail:",         emailTextField = new JTextField(40));
-		addFormField(detailsPanel, "Atreet address:", streetaddressTextField = new JTextField(40));
+		addFormField(detailsPanel, "Street address:", streetaddressTextField = new JTextField(40));
 		addFormField(detailsPanel, "Facebook page:",  facebookTextField = new JTextField(40));
 		addFormField(detailsPanel, "Twitter page:",   twitterTextField = new JTextField(40));
 		
-		addFormField(detailsPanel, "Sender identiication T address:", senderidaddressTextField = new JTextField(40));
+		addFormField(detailsPanel, "Sender identification T address:", senderidaddressTextField = new JTextField(40));
 		addFormField(detailsPanel, "Send/receive Z address:", sendreceiveaddressTextField = new JTextArea(2, 40));
 		sendreceiveaddressTextField.setLineWrap(true);
 		

@@ -119,6 +119,8 @@ public class MessagingPanel
 	
 	private Long lastTaddressCheckTime = null;
 	
+	private boolean identityZAddressValidityChecked = false;
+	
 	
 	public MessagingPanel(JFrame parentFrame, SendCashPanel sendCashPanel, JTabbedPane parentTabs, 
 			              ZCashClientCaller clientCaller, StatusUpdateErrorReporter errorReporter)
@@ -1213,6 +1215,43 @@ public class MessagingPanel
 	private void collectAndStoreNewReceivedMessages()
 		throws IOException, WalletCallException, InterruptedException
 	{
+		MessagingIdentity ownIdentity = this.messagingStorage.getOwnIdentity();
+		
+		// Check to make sure the Z address of the messaging identity is valid
+		if ((ownIdentity != null) && (!this.identityZAddressValidityChecked))
+		{
+			String ownZAddress = ownIdentity.getSendreceiveaddress();
+			String[] walletZaddresses = this.clientCaller.getWalletZAddresses();
+
+			boolean bFound = false;
+			for (String address : walletZaddresses)
+			{
+				if (ownZAddress.equals(address))
+				{
+					bFound = true;
+				}
+			}
+			
+			if (!bFound)
+			{
+				JOptionPane.showMessageDialog(
+					MessagingPanel.this.getRootPane().getParent(), 
+					"The messaging identity send/receive address: \n" +
+					ownZAddress + "\n" +
+					"is not found in the wallet.dat. The reaosn may be that after a mesaging identity\n" +
+					"was created the wallet.dat was changed or the ZEN node configuration was changed\n" +
+					"(e.g. mainnet -> testnet). If such a change was made, the messaging identity can no\n" +
+					"longer be used. To avoid this error mesage, you may rename the directory:\n" +
+					OSUtil.getSettingsDirectory() + File.separator + "messaging" + "\n" +
+					"until the configuration or wallet.dat is restored! Directory may only be renamed when\n" +
+					"the wallet is stopped!", 
+					"Messaging identity address is not found in walet!", JOptionPane.ERROR_MESSAGE);
+				return;
+			}
+			
+			this.identityZAddressValidityChecked = true;
+		}
+		
 		// Get the transaction IDs from all received transactions in the local storage
 		// TODO: optimize/cache this
 		Set<String> storedTransactionIDs = new HashSet<String>();
@@ -1227,8 +1266,7 @@ public class MessagingPanel
 				}
 			}
 		}
-		
-		MessagingIdentity ownIdentity = this.messagingStorage.getOwnIdentity(); 
+	 
 		if (ownIdentity == null)
 		{
 			Log.warning("Own messaging identity does not exist yet. No received messages collected!");

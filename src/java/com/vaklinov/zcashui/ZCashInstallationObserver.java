@@ -30,9 +30,11 @@ package com.vaklinov.zcashui;
 
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.LineNumberReader;
 import java.io.StringReader;
+import java.util.Properties;
 import java.util.StringTokenizer;
 
 import com.vaklinov.zcashui.OSUtil.OS_TYPE;
@@ -61,6 +63,8 @@ public class ZCashInstallationObserver
 	}
 
 	private String args[];
+	
+	private Boolean isOnTestNet = null;
 
 	public ZCashInstallationObserver(String installDir)
 		throws IOException
@@ -268,6 +272,45 @@ public class ZCashInstallationObserver
 		}
 
 		return info;
+	}
+	
+	
+	
+	public boolean isOnTestNet()
+		throws IOException
+	{
+		if (this.isOnTestNet != null)
+		{
+			return this.isOnTestNet.booleanValue();
+		}
+		
+		String blockChainDir = OSUtil.getBlockchainDirectory();
+		File zenConf = new File(blockChainDir + File.separator + "zen.conf");
+		if (zenConf.exists())
+		{
+			Properties confProps = new Properties();
+			FileInputStream fis = null;
+			try
+			{
+				fis = new FileInputStream(zenConf);
+				confProps.load(fis);
+				String testNetStr = confProps.getProperty("testnet");
+				
+				this.isOnTestNet = (testNetStr != null) && (testNetStr.trim().equalsIgnoreCase("1"));
+				
+				return this.isOnTestNet.booleanValue();
+			} finally
+			{
+				if (fis != null)
+				{
+					fis.close();
+				}
+			}
+		} else
+		{
+			Log.warning("Could not find file: {0} to check configuration!", zenConf.getAbsolutePath());
+			return false;
+		}
 	}
 	
 
