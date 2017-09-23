@@ -456,7 +456,7 @@ public class MessagingPanel
 			        JOptionPane.showMessageDialog(
 					    this.parentFrame,
 					    "The T address used to identify you in messaging must have NO ZEN balance: \n" +
-					    ownIdentity.getSendreceiveaddress() + "\n" +
+					    ownIdentity.getSenderidaddress() + "\n" +
 					    "However it currently has a non-zero balance! This might mean that you \n" +
 					    "accidentally used this T address in non-messaging transactions. It might\n" +
 					    "also mean that someone sent ZEN to it deliberately. To minimize the chance\n" +
@@ -825,6 +825,7 @@ public class MessagingPanel
 	{
 		boolean sendAnonymously = this.sendAnonymously.isSelected();
 		boolean sendReturnAddress = false;
+		boolean updateMessagingIdentityJustBeforeSend = false;
 				
 		// Make sure contacts are available
 		if (this.contactList.getNumberOfContacts() <= 0)
@@ -838,9 +839,13 @@ public class MessagingPanel
 	        	"No messaging contacts available...", JOptionPane.ERROR_MESSAGE);					
 			return;			
 		}
-		
+
+		// Create a copy of the identity to make sure changes made temporarily to do get reflected until
+		// storage s updated (such a change may be setting a Z address)
 		final MessagingIdentity contactIdentity = 
-			(remoteIdentity != null) ? remoteIdentity : this.contactList.getSelectedContact();
+			(remoteIdentity != null) ? remoteIdentity.getCloneCopy() : 
+				                       this.contactList.getSelectedContact().getCloneCopy();
+		
 		// Make sure there is a selection
 		if (contactIdentity == null)
 		{
@@ -855,12 +860,18 @@ public class MessagingPanel
 		// Make sure contact identity is full (not Unknown with no address to send to)
 		if (Util.stringIsEmpty(contactIdentity.getSendreceiveaddress()))
 		{
+			String errroMessage = 
+				"The messaging contact selected: " + contactIdentity.getDiplayString() + "\n" +
+				"seems to have no valid Z address for sending and receiving messages. \n";			
+			errroMessage += contactIdentity.isAnonymous() ?
+				("Since the contact is anonymous this means that the contact intentionally did\n" +
+				"not send his Z address (for replies to be psosible). Message cannot be sent!")
+				:
+				("Most likely the reason is that this contact's messaging identity is not \n" +
+				"imported yet. Message cannot be sent!");
 	        JOptionPane.showMessageDialog(
         		this.parentFrame,
-        		"The messaging contact selected: " + contactIdentity.getDiplayString() + "\n" +
-        		"seems to have no valid Z address for sending and receiving messages. \n" +
-        		"Most likely the reason is that this contact's messaging identity is not \n" +
-        		"imported yet. Message cannot be sent!",
+        		errroMessage,
 	        	"Selected contact has to Z address to send message to!", JOptionPane.ERROR_MESSAGE);					
 			return;
 		}
@@ -892,8 +903,7 @@ public class MessagingPanel
 		        // will have a thread ID set on the first arriving message!
 		        if (!Util.stringIsEmpty(contactIdentity.getSenderidaddress()))
 		        {
-		        	this.messagingStorage.updateContactIdentityForSenderIDAddress(
-		        	contactIdentity.getSenderidaddress(), contactIdentity);
+		        	updateMessagingIdentityJustBeforeSend = true;
 		        } else
 		        {
 			        JOptionPane.showMessageDialog(
@@ -1064,6 +1074,12 @@ public class MessagingPanel
 			return;
 		}
 			
+		if (updateMessagingIdentityJustBeforeSend)
+		{
+        	this.messagingStorage.updateContactIdentityForSenderIDAddress(
+		        contactIdentity.getSenderidaddress(), contactIdentity);
+		}
+		
 		// Finally send the message		
 		String tempOperationID = null;
 		try
@@ -1396,18 +1412,37 @@ public class MessagingPanel
 				continue anonymus_message_loop;
 			}
 			
-			// It is posisble tat it will find a normal identity to which we previously sent the first
-			// anonymou smessage (sedn scenario) or maybe an enonumouys identity created by incming
+			// It is possible that it will find a normal identity to which we previously sent the first
+			// anonymous message (send scenario) or maybe an anonymous identity created by incoming
 			// message etc.
 			MessagingIdentity anonContctID = this.messagingStorage.
 				findAnonymousOrNormalContactIdentityByThreadID(message.getThreadID());
+			
+			// Skip message if from an unknown user and options are not set
+			if ((anonContctID == null) && (!msgOptions.isAutomaticallyAddUsersIfNotExplicitlyImported()))
+			{
+				Log.warningOneTime(
+					"Anonymous message is from an unknown user, but options do not allow adding new users: {0}", 
+					message.toJSONObject(false).toString());
+				continue anonymus_message_loop;
+			}
 					
 			if (anonContctID == null)
 			{
 				// Return address may be empty but we pass it
 				anonContctID = this.messagingStorage.createAndStoreAnonumousContactIdentity(
 					message.getThreadID(), message.getReturnAddress());
+				Log.info("Created new anonymous contact identity: ", anonContctID.toJSONObject(false).toString());
 				bNewContactCreated = true;
+			} else if (Util.stringIsEmpty(anonContctID.getSendreceiveaddress()))
+			{
+				if (!Util.stringIsEmpty(message.getReturnAddress()))
+				{
+					anonContctID.setSendreceiveaddress(message.getReturnAddress());
+					this.messagingStorage.updateAnonumousContactIdentityForThreadID(
+						anonContctID.getThreadID(), anonContctID);
+					Log.info("Updated anonymous contact identity: ", anonContctID.toJSONObject(false).toString());
+				}
 			}
 
 			this.messagingStorage.writeNewReceivedMessageForContact(anonContctID, message);
@@ -1544,4 +1579,29 @@ public class MessagingPanel
 			existingIdentity.getSenderidaddress(), existingIdentity);
 	}
 	
+	
+	// TODO: this is not very efficient
+//	private boolean ZAddressHasBeenSentToAnonContact(MessagingIdentity contact)
+//		throws IOException
+//	{
+//		if (!contact.isAnonymous())
+//		{
+//			return false;
+//		}
+//		
+//		List<Message> messages = this.messagingStorage.getAllMessagesForContact(contact);
+//		for (Message msg : messages)
+//		{
+//			if (msg.isAnonymous() && (msg.getDirection() == DIRECTION_TYPE.SENT))
+//			{
+//				if ((!Util.stringIsEmpty(msg.getReturnAddress())) &&
+//					Util.isZAddress(msg.getReturnAddress()))
+//				{
+//					return true;
+//				}
+//			}
+//		}
+//			
+//		return false;
+//	}
 }

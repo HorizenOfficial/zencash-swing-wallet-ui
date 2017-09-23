@@ -376,4 +376,11 @@ public class MessagingIdentity
 	{
 		return (s != null) ? s : "";
 	}
+	
+	
+	public MessagingIdentity getCloneCopy()
+		throws IOException
+	{
+		return new MessagingIdentity(this.toJSONObject(false));
+	}
 }

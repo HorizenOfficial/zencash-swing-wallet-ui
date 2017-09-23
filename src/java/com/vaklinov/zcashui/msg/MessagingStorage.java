@@ -365,7 +365,24 @@ public class MessagingStorage
 			
 		return newID;
 	}
-
+	
+	
+	public void updateAnonumousContactIdentityForThreadID(String threadID, MessagingIdentity newID)
+		throws IOException
+	{
+		for (SingleContactStorage contact : this.contactsList)
+		{
+			MessagingIdentity tempID = contact.getIdentity();
+			
+			if ((tempID.isAnonymous()) && tempID.getThreadID().equals(threadID))
+			{
+				tempID.copyFromJSONObject(newID.toJSONObject(false));
+				contact.updateIdentity(tempID);
+				break;
+			}
+		}			
+	}
+	
 
 	/**
 	 * Returns all known messages for a certain contact in ascending date order. 
