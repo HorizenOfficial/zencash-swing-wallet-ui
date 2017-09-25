@@ -34,12 +34,18 @@
     <property name="build.dir"   value="build"/>
     <property name="classes.dir" value="${build.dir}/classes"/>
     <property name="jar.dir"     value="${build.dir}/jars"/>
+	<property name="ubuntu.package.dir" value="${build.dir}/ubuntu-package"/>
 
     <property name="main-class"  value="com.vaklinov.zcashui.ZCashUI"/>
 
 	<path id="main-classpath">
 	</path>
-		
+	
+	<path id="jdeb.jar">
+	    <pathelement path="${basedir}/lib/jdeb-1.5.jar" />
+	</path>
+	<taskdef name="deb" classpathref="jdeb.jar" classname="org.vafer.jdeb.ant.DebAntTask"/>
+	
     <target name="clean">
         <delete dir="${build.dir}"/>
     </target>
@@ -75,6 +81,22 @@
         </jar>
     </target>
 	
+    <target name="ubuntuPackage" depends="jar">	
+    	<mkdir dir="${ubuntu.package.dir}"/>
+	    <deb destfile="${ubuntu.package.dir}/zencash-desktop-gui-wallet_0.73.6_amd64.deb" 
+	    	 control="${src.dir}/resources/ubuntu-package" 
+	    	 verbose="true">
+	    	
+	      <data src="${jar.dir}/${ant.project.name}.jar" type="file">
+	        <mapper type="perm" filemode="755" prefix="/usr/lib/zencash-gui-wallet"/>
+	      </data>
+	      <data src="${src.dir}/resources/ubuntu-package/zencash-desktop-gui-wallet" type="file">
+	        <mapper type="perm" filemode="755" prefix="/usr/bin"/>
+	      </data>	    	
+	    </deb>
+	</target>
+	
+	
 	<target name="copyothers">
     	<copy todir="${jar.dir}" >  
     	    <fileset dir="${lib.dir}">  
@@ -83,7 +105,7 @@
     	</copy>
 	</target>
 
-    <target name="buildit" depends="clean,jar,copyothers">
+    <target name="buildit" depends="clean,jar,copyothers,ubuntuPackage">
     	<!-- Final cleanup -->
     	<delete dir="${classes.dir}"/>
 	</target>
