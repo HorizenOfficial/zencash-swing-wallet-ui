@@ -356,4 +356,29 @@ public class Util
 			   (address.startsWith("zc") || address.startsWith("zt")) && 
 			   (address.length() > 40);
 	}
+	
+	
+	public static void deleteDirectory(File dir)
+		throws IOException
+	{
+		for (File f : dir.listFiles())
+		{
+			if (f.isDirectory())
+			{
+				deleteDirectory(f);
+			} else
+			{
+				if (!f.delete())
+				{
+					throw new IOException("Could not delete file: " + f.getAbsolutePath());
+				}
+			}
+		}
+		
+		if (!dir.delete())
+		{
+			throw new IOException("Could not delete directory: " + dir.getAbsolutePath());
+		}
+	}
+	
 }
