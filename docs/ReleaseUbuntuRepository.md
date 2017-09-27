@@ -21,6 +21,7 @@ sudo apt-get install zen zencash-desktop-gui-wallet
 ```
 Then you need to set up the `zen.conf` configuration file:
 ```
+mkdir -p ~/.zen
 echo "rpcuser=username" >> ~/.zen/zen.conf
 echo "rpcpassword=$(head -c 32 /dev/urandom | base64)" >> ~/.zen/zen.conf
 ```
