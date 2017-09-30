@@ -549,7 +549,7 @@ public class MessagingStorage
 			for (File dir : contactDirs)
 			{
 				this.contactsList.add(new SingleContactStorage(dir));
-		}
+		    }
 	}
 		
 		
