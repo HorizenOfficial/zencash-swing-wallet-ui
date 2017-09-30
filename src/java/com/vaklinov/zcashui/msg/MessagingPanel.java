@@ -840,13 +840,17 @@ public class MessagingPanel
 			}
 			
 	        // Offer the user a final warning on removing the contact
+			String contactTAddress = Util.stringIsEmpty(id.getSenderidaddress()) ? 
+					                 "<NONE>" : id.getSenderidaddress();
+			String contactZAddress = Util.stringIsEmpty(id.getSendreceiveaddress()) ? 
+	                                 "<NONE>" : id.getSendreceiveaddress();			
 	        int reply = JOptionPane.showConfirmDialog(
 	        	this.parentFrame, 
 	        	"The contact " + id.getDiplayString() + "\n" +
 	        	"with messaging identification T address:\n" +
-	        	id.getSenderidaddress() + "\n" +
+	        	contactTAddress + "\n" +
 	        	"and send/receive Z address:\n" +
-	        	id.getSendreceiveaddress() + "\n" +
+	        	contactZAddress + "\n" +
 	        	"will be permanently deleted from your contact list! All existing incoming messages\n" +
 	        	"from this contact will subsequently be ignored. Are you sure you want to remove the\n" +
 	        	"selected contact?", 
@@ -866,35 +870,20 @@ public class MessagingPanel
 	        	{
 	        		this.messagingStorage.deleteContact(id);
 	        		this.messagingStorage.addIgnoredContact(id);
+	        		
+					MessagingPanel.this.contactList.reloadMessagingIdentities();
+					
+					// Reload the messages for the currently selected user - in the AWT event thread in the mutex!
+					final MessagingIdentity selectedContact = MessagingPanel.this.contactList.getSelectedContact();
+					if (selectedContact != null)
+					{
+						MessagingPanel.this.displayMessagesForContact(selectedContact);
+					}
 	        	}
 	        } finally
 	        {
 	        	this.parentFrame.setCursor(oldCursor);
-	        }
-	        
-			SwingUtilities.invokeLater(new Runnable() 
-			{	
-				@Override
-				public void run() 
-				{
-					try
-					{
-						MessagingPanel.this.contactList.reloadMessagingIdentities();
-						
-						// Reload the messages for the currently selected user
-						final MessagingIdentity selectedContact = MessagingPanel.this.contactList.getSelectedContact();
-						if (selectedContact != null)
-						{
-							MessagingPanel.this.displayMessagesForContact(selectedContact);
-						}
-					} catch (Exception e)
-					{
-						Log.error("Unexpected error in reloading contacts after removal of one: ", e);
-						MessagingPanel.this.errorReporter.reportError(e);
-					}
-				}
-			});
-			
+	        }			
 		} catch (Exception ex)
 		{
 			Log.error("Unexpected error in removing contact!", ex);
@@ -938,23 +927,22 @@ public class MessagingPanel
 			return;			
 		}
 
+		if ((remoteIdentity == null) && (this.contactList.getSelectedContact() == null))
+		{
+	        JOptionPane.showMessageDialog(
+	        	this.parentFrame,
+	        	"No messaging contact is selected in the contact list (on the right side of the UI).\n" +
+	        	"In order to send an outgoing message you need to select a contact to send it to!",
+		        "No messaging contact is selected...", JOptionPane.ERROR_MESSAGE);					
+			return;		
+		}
+		
 		// Create a copy of the identity to make sure changes made temporarily to do get reflected until
 		// storage s updated (such a change may be setting a Z address)
 		final MessagingIdentity contactIdentity = 
 			(remoteIdentity != null) ? remoteIdentity.getCloneCopy() : 
 				                       this.contactList.getSelectedContact().getCloneCopy();
-		
-		// Make sure there is a selection
-		if (contactIdentity == null)
-		{
-	        JOptionPane.showMessageDialog(
-        		this.parentFrame,
-        		"No messaging contact is selected in the contact list (on the right side of the UI).\n" +
-        		"In order to send an outgoing message you need to select a contact to send it to!",
-	        	"No messaging contact is selected...", JOptionPane.ERROR_MESSAGE);					
-			return;			
-		}
-		
+			
 		// Make sure contact identity is full (not Unknown with no address to send to)
 		if (Util.stringIsEmpty(contactIdentity.getSendreceiveaddress()))
 		{
