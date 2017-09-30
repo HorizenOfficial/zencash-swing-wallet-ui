@@ -68,7 +68,6 @@ import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 import javax.swing.border.EtchedBorder;
 
-import com.eclipsesource.json.Json;
 import com.eclipsesource.json.JsonObject;
 import com.eclipsesource.json.JsonValue;
 import com.eclipsesource.json.WriterConfig;
@@ -80,6 +79,7 @@ import com.vaklinov.zcashui.StatusUpdateErrorReporter;
 import com.vaklinov.zcashui.Util;
 import com.vaklinov.zcashui.WalletTabPanel;
 import com.vaklinov.zcashui.ZCashClientCaller;
+import com.vaklinov.zcashui.ZCashClientCaller.NetworkAndBlockchainInfo;
 import com.vaklinov.zcashui.ZCashClientCaller.WalletCallException;
 import com.vaklinov.zcashui.msg.Message.DIRECTION_TYPE;
 import com.vaklinov.zcashui.msg.Message.VERIFICATION_TYPE;
@@ -120,6 +120,8 @@ public class MessagingPanel
 	private Long lastTaddressCheckTime = null;
 	
 	private boolean identityZAddressValidityChecked = false;
+	
+	private Object messageCollectionMutex = new Object();
 	
 	
 	public MessagingPanel(JFrame parentFrame, SendCashPanel sendCashPanel, JTabbedPane parentTabs, 
@@ -803,6 +805,91 @@ public class MessagingPanel
 			this.errorReporter.reportError(ex, false);
 		}
 	}
+	
+	
+	/**
+	 * GUI initiated removal
+	 */
+	public void removeSelectedContact()
+	{
+		try
+		{
+			// Make sure contacts are available
+			if (this.contactList.getNumberOfContacts() <= 0)
+			{
+		        JOptionPane.showMessageDialog(
+	        		this.parentFrame,
+	        		"You have no messaging contacts in your contact list. To use messaging\n" +
+	        		"you need to add at least one contact. You can add a contact by importing\n" +
+	        		"their messaging identity using the menu item Messaging >> Import contact \n" +
+	                "identity.",
+		        	"No messaging contacts available...", JOptionPane.ERROR_MESSAGE);					
+				return;			
+			}
+			
+			MessagingIdentity id = this.contactList.getSelectedContact();
+			
+			if (id == null)
+			{
+		        JOptionPane.showMessageDialog(
+		        	this.parentFrame,
+		        	"No messaging contact is selected in the contact list (on the right side of the UI).\n" +
+		        	"In order to remove a contact you need to select a contact first!",
+			        "No messaging contact is selected...", JOptionPane.ERROR_MESSAGE);					
+				return;
+			}
+			
+	        // Offer the user a final warning on removing the contact
+			String contactTAddress = Util.stringIsEmpty(id.getSenderidaddress()) ? 
+					                 "<NONE>" : id.getSenderidaddress();
+			String contactZAddress = Util.stringIsEmpty(id.getSendreceiveaddress()) ? 
+	                                 "<NONE>" : id.getSendreceiveaddress();			
+	        int reply = JOptionPane.showConfirmDialog(
+	        	this.parentFrame, 
+	        	"The contact " + id.getDiplayString() + "\n" +
+	        	"with messaging identification T address:\n" +
+	        	contactTAddress + "\n" +
+	        	"and send/receive Z address:\n" +
+	        	contactZAddress + "\n" +
+	        	"will be permanently deleted from your contact list! All incoming messages from\n" +
+	        	"this contact will subsequently be ignored. Are you sure you want to remove the\n" +
+	        	"selected contact?", 
+	        	"Are you sure you wish to remove the contant?", 
+	        	JOptionPane.YES_NO_OPTION);
+	        
+	        if (reply == JOptionPane.NO_OPTION) 
+	        {
+	        	return;
+	        }
+
+	        Cursor oldCursor = this.parentFrame.getCursor();
+	        try
+	        {
+	        	this.parentFrame.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+	        	synchronized (this.messageCollectionMutex)
+	        	{
+	        		this.messagingStorage.deleteContact(id);
+	        		this.messagingStorage.addIgnoredContact(id);
+	        		
+					MessagingPanel.this.contactList.reloadMessagingIdentities();
+					
+					// Reload the messages for the currently selected user - in the AWT event thread in the mutex!
+					final MessagingIdentity selectedContact = MessagingPanel.this.contactList.getSelectedContact();
+					if (selectedContact != null)
+					{
+						MessagingPanel.this.displayMessagesForContact(selectedContact);
+					}
+	        	}
+	        } finally
+	        {
+	        	this.parentFrame.setCursor(oldCursor);
+	        }			
+		} catch (Exception ex)
+		{
+			Log.error("Unexpected error in removing contact!", ex);
+			this.errorReporter.reportError(ex, false);
+		}
+	}
 
 	
 	private void sendMessageAndHandleErrors()
@@ -840,23 +927,22 @@ public class MessagingPanel
 			return;			
 		}
 
+		if ((remoteIdentity == null) && (this.contactList.getSelectedContact() == null))
+		{
+	        JOptionPane.showMessageDialog(
+	        	this.parentFrame,
+	        	"No messaging contact is selected in the contact list (on the right side of the UI).\n" +
+	        	"In order to send an outgoing message you need to select a contact to send it to!",
+		        "No messaging contact is selected...", JOptionPane.ERROR_MESSAGE);					
+			return;		
+		}
+		
 		// Create a copy of the identity to make sure changes made temporarily to do get reflected until
 		// storage s updated (such a change may be setting a Z address)
 		final MessagingIdentity contactIdentity = 
 			(remoteIdentity != null) ? remoteIdentity.getCloneCopy() : 
 				                       this.contactList.getSelectedContact().getCloneCopy();
-		
-		// Make sure there is a selection
-		if (contactIdentity == null)
-		{
-	        JOptionPane.showMessageDialog(
-        		this.parentFrame,
-        		"No messaging contact is selected in the contact list (on the right side of the UI).\n" +
-        		"In order to send an outgoing message you need to select a contact to send it to!",
-	        	"No messaging contact is selected...", JOptionPane.ERROR_MESSAGE);					
-			return;			
-		}
-		
+			
 		// Make sure contact identity is full (not Unknown with no address to send to)
 		if (Util.stringIsEmpty(contactIdentity.getSendreceiveaddress()))
 		{
@@ -1219,7 +1305,10 @@ public class MessagingPanel
 	{
 		try
 		{
-			collectAndStoreNewReceivedMessages();
+			synchronized (this.messageCollectionMutex)
+			{
+				collectAndStoreNewReceivedMessages();
+			}
 		} catch (Exception e)
 		{
 			Log.error("Unexpected error in gathering received messages (wrapper): ", e);
@@ -1231,6 +1320,18 @@ public class MessagingPanel
 	private void collectAndStoreNewReceivedMessages()
 		throws IOException, WalletCallException, InterruptedException
 	{
+		// When a large number of messages has been accumulated, this operation partly
+		// slows down blockchain synchronization. So messages are collected only when
+		// sync is full.
+		NetworkAndBlockchainInfo info = this.clientCaller.getNetworkAndBlockchainInfo();
+		// If more than 60 minutes behind in the blockchain - skip collection
+		if ((System.currentTimeMillis() - info.lastBlockDate.getTime()) > (60 * 60 * 1000))
+		{
+			Log.warning("Current blockchain synchronization date is {0}. Message collection skipped for now!",
+		                new Date(info.lastBlockDate.getTime()));
+			return;
+		}
+		
 		MessagingIdentity ownIdentity = this.messagingStorage.getOwnIdentity();
 		
 		// Check to make sure the Z address of the messaging identity is valid
@@ -1363,6 +1464,20 @@ public class MessagingPanel
 			MessagingIdentity contactID = 
 				this.messagingStorage.getContactIdentityForSenderIDAddress(message.getFrom());
 			
+			// Check for ignored contact messages
+			if (contactID == null)
+			{
+				MessagingIdentity ignoredContact = this.messagingStorage.getIgnoredContactForMessage(message);
+				if (ignoredContact != null)
+				{
+					Log.warningOneTime("Message detected from an ignored contact. Message will be ignored. " +
+				                       "Message: {0}, Ignored contact: {1}",
+				                       message.toJSONObject(false).toString(), 
+				                       ignoredContact.toJSONObject(false).toString());
+					continue standard_message_loop;
+				}
+			}
+			
 			// Skip message if from an unknown user and options are not set
 			if ((contactID == null) && (!msgOptions.isAutomaticallyAddUsersIfNotExplicitlyImported()))
 			{
@@ -1417,6 +1532,20 @@ public class MessagingPanel
 			// message etc.
 			MessagingIdentity anonContctID = this.messagingStorage.
 				findAnonymousOrNormalContactIdentityByThreadID(message.getThreadID());
+			
+			// Check for ignored contact messages
+			if (anonContctID == null)
+			{
+				MessagingIdentity ignoredContact = this.messagingStorage.getIgnoredContactForMessage(message);
+				if (ignoredContact != null)
+				{
+					Log.warningOneTime("Message detected from an ignored contact. Message will be ignored. " +
+				                       "Message: {0}, Ignored contact: {1}",
+				                       message.toJSONObject(false).toString(), 
+				                       ignoredContact.toJSONObject(false).toString());
+					continue anonymus_message_loop;
+				}
+			}
 			
 			// Skip message if from an unknown user and options are not set
 			if ((anonContctID == null) && (!msgOptions.isAutomaticallyAddUsersIfNotExplicitlyImported()))

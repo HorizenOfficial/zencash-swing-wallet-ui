@@ -31,6 +31,7 @@ package com.vaklinov.zcashui.msg;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
@@ -90,15 +91,22 @@ public class JContactListPanel
 		upperPanel.add(new JLabel(
 			"<html><span style=\"font-size:1.2em;font-style:italic;\">Contact list: &nbsp;</span>"),
 			BorderLayout.WEST);
-		URL iconUrl = this.getClass().getClassLoader().getResource("images/add12.png");
-        ImageIcon addIcon = new ImageIcon(iconUrl);
+		URL addIconUrl = this.getClass().getClassLoader().getResource("images/add12.png");
+        ImageIcon addIcon = new ImageIcon(addIconUrl);
+        URL removeIconUrl = this.getClass().getClassLoader().getResource("images/remove12.png");
+        ImageIcon removeIcon = new ImageIcon(removeIconUrl);
         JButton addButton = new JButton(addIcon);
         addButton.setToolTipText("Add contact...");
-        upperPanel.add(addButton, BorderLayout.EAST);
+        JButton removeButton = new JButton(removeIcon);
+        removeButton.setToolTipText("Remove contact...");
+        JPanel tempPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 3, 0));
+        tempPanel.add(removeButton);
+        tempPanel.add(addButton);
+        upperPanel.add(tempPanel, BorderLayout.EAST);
+        
         upperPanel.add(new JLabel(
     			"<html><span style=\"font-size:1.6em;font-style:italic;\">&nbsp;</span>"),
     			BorderLayout.CENTER);
-		
 		upperPanel.setBorder(BorderFactory.createEmptyBorder(0, 3, 0, 3));
 		this.add(upperPanel, BorderLayout.NORTH);
 		
@@ -109,6 +117,16 @@ public class JContactListPanel
 			public void actionPerformed(ActionEvent e) 
 			{
 				JContactListPanel.this.parent.importContactIdentity();
+			}
+		});
+		
+		// Add a listener for removing a contact
+		removeButton.addActionListener(new ActionListener() 
+		{	
+			@Override
+			public void actionPerformed(ActionEvent e) 
+			{
+				JContactListPanel.this.parent.removeSelectedContact();
 			}
 		});
 		

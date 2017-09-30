@@ -35,6 +35,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.UUID;
 
 import com.vaklinov.zcashui.Log;
 import com.vaklinov.zcashui.OSUtil;
@@ -54,6 +55,8 @@ import com.vaklinov.zcashui.Util;
  * ~/.ZENCashSwingWalletUI/messaging/contact_XXXX/identity.json - contact's identity
  * ~/.ZENCashSwingWalletUI/messaging/contact_XXXX/sent - sent messages dir
  * ~/.ZENCashSwingWalletUI/messaging/contact_XXXX/received - received messages dir
+ * ~/.ZENCashSwingWalletUI/messaging/ignored_contacts - dir where ignored msg identities reside
+ * ~/.ZENCashSwingWalletUI/messaging/ignored_contacts/UUID.json - single ignored identity.
  * 
  * The sent/received directories have a substructure of type:
  * sent/XXXX/message_xxx.json - where XXXX is between 0000 and 9999, xxx is between 000 and 999 
@@ -63,8 +66,11 @@ import com.vaklinov.zcashui.Util;
 public class MessagingStorage
 {
 	private File rootDir;
+	private File ignoredContactsDir;
 	
-	private List<SingleContactStorage> contactsList = new ArrayList<SingleContactStorage>();
+	private List<SingleContactStorage> contactsList;
+	
+	private List<MessagingIdentity> ignoredContacts;
 	
 	MessagingIdentity cachedOwnIdentity;
 		
@@ -84,19 +90,61 @@ public class MessagingStorage
 			}
 		}
 		
-		File contactDirs[] = rootDir.listFiles(new FileFilter() 
-		{	
-			@Override
-			public boolean accept(File pathname) 
-			{
-				return pathname.isDirectory() && pathname.getName().matches("contact_[0-9]{4}");
-			}
-		});
+		this.ignoredContactsDir = new File(this.rootDir, "ignored_contacts");
 		
-		for (File dir : contactDirs)
+		if (!ignoredContactsDir.exists())
 		{
-			contactsList.add(new SingleContactStorage(dir));
+			if (!ignoredContactsDir.mkdirs())
+			{
+				throw new IOException("Could not create directory: " + ignoredContactsDir.getAbsolutePath());
+			}
 		}
+		
+		this.reloadContactListFromStorage();
+		
+		this.reloadIgnoredContactsFromStorage();
+	}
+	
+	
+	public void addIgnoredContact(MessagingIdentity contact)
+		throws IOException
+	{
+		String fileName = UUID.randomUUID().toString() + ".json";
+		File contactFile = new File(this.ignoredContactsDir, fileName);
+		
+		contact.writeToFile(contactFile);
+		
+		this.reloadIgnoredContactsFromStorage(); // Acceptable since it will be rare
+	}
+	
+	
+	// If a message is from an igonred contact - returns it, else null
+	public MessagingIdentity getIgnoredContactForMessage(Message msg)
+	{
+		MessagingIdentity contact = null;
+		
+		for (MessagingIdentity id : this.ignoredContacts)
+		{
+			if (id.isAnonymous())
+			{
+				if (msg.isAnonymous() && (!Util.stringIsEmpty(id.getThreadID())) && 
+					id.getThreadID().equals(msg.getThreadID()))
+				{
+					contact = id;
+					break;
+				}
+			} else
+			{
+				if ((!msg.isAnonymous()) && (!Util.stringIsEmpty(id.getSenderidaddress())) && 
+					id.getSenderidaddress().equals(msg.getFrom()))
+				{
+					contact = id;
+					break;					
+				}
+			}
+		}
+		
+		return contact;
 	}
 	
 	
@@ -468,6 +516,64 @@ public class MessagingStorage
 	}
 	
 	
+	// Deletes a certain contact and reloads the contact list
+	public void deleteContact(MessagingIdentity contact)
+		throws IOException
+	{
+		for (SingleContactStorage scs : this.contactsList)
+		{
+			if (scs.getIdentity().isIdenticalTo(contact))
+			{
+				Util.deleteDirectory(scs.getRootDir());
+				this.reloadContactListFromStorage();
+				break;
+			}
+		}
+	}
+	
+	
+	private void reloadContactListFromStorage()
+		throws IOException
+	{
+			this.contactsList = new ArrayList<SingleContactStorage>();
+			
+			File contactDirs[] = this.rootDir.listFiles(new FileFilter() 
+			{	
+				@Override
+				public boolean accept(File pathname) 
+				{
+					return pathname.isDirectory() && pathname.getName().matches("contact_[0-9]{4}");
+				}
+			});
+			
+			for (File dir : contactDirs)
+			{
+				this.contactsList.add(new SingleContactStorage(dir));
+		    }
+	}
+		
+		
+	private void reloadIgnoredContactsFromStorage()
+		throws IOException
+	{
+			this.ignoredContacts = new ArrayList<MessagingIdentity>();
+			
+			File ignoredContacts[] = this.ignoredContactsDir.listFiles(new FileFilter() 
+			{	
+				@Override
+				public boolean accept(File pathname) 
+				{
+					return pathname.isFile() && pathname.getName().endsWith(".json");
+				}
+			});
+			
+			for (File contactFile : ignoredContacts)
+			{
+				this.ignoredContacts.add(new MessagingIdentity(contactFile));
+			}
+	}
+	
+	
 	///////////////////////////////////////////////////////////////////////////////////////////////////
 	
 	
@@ -560,6 +666,11 @@ public class MessagingStorage
 			this.receivedMessages.writeNewMessage(msg);
 		}
 
+		
+		public File getRootDir()
+		{
+			return this.rootDir;
+		}
 	}
 	
 	
