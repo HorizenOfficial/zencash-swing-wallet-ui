@@ -851,8 +851,8 @@ public class MessagingPanel
 	        	contactTAddress + "\n" +
 	        	"and send/receive Z address:\n" +
 	        	contactZAddress + "\n" +
-	        	"will be permanently deleted from your contact list! All existing incoming messages\n" +
-	        	"from this contact will subsequently be ignored. Are you sure you want to remove the\n" +
+	        	"will be permanently deleted from your contact list! All incoming messages from\n" +
+	        	"this contact will subsequently be ignored. Are you sure you want to remove the\n" +
 	        	"selected contact?", 
 	        	"Are you sure you wish to remove the contant?", 
 	        	JOptionPane.YES_NO_OPTION);

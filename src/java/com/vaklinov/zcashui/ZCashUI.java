@@ -95,6 +95,7 @@ public class ZCashUI
     private JMenuItem menuItemOwnIdentity;
     private JMenuItem menuItemExportOwnIdentity;
     private JMenuItem menuItemImportContactIdentity;
+    private JMenuItem menuItemRemoveContactIdentity;
     private JMenuItem menuItemMessagingOptions;
 
     private DashboardPanel   dashboard;
@@ -203,6 +204,8 @@ public class ZCashUI
         menuItemExportOwnIdentity.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_X, accelaratorKeyMask));        
         messaging.add(menuItemImportContactIdentity = new JMenuItem("Import contact identity...", KeyEvent.VK_Y));
         menuItemImportContactIdentity.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Y, accelaratorKeyMask));
+        messaging.add(menuItemRemoveContactIdentity = new JMenuItem("Remove contact...", KeyEvent.VK_R));
+        menuItemRemoveContactIdentity.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R, accelaratorKeyMask));
         messaging.add(menuItemMessagingOptions = new JMenuItem("Options...", KeyEvent.VK_O));
         menuItemMessagingOptions.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, accelaratorKeyMask));
         
@@ -339,6 +342,17 @@ public class ZCashUI
                    public void actionPerformed(ActionEvent e)
                    {
             			ZCashUI.this.messagingPanel.importContactIdentity();
+                   }
+               }
+        );
+       
+       menuItemRemoveContactIdentity.addActionListener(   
+               new ActionListener()
+               {
+                   @Override
+                   public void actionPerformed(ActionEvent e)
+                   {
+            			ZCashUI.this.messagingPanel.removeSelectedContact();
                    }
                }
         );
