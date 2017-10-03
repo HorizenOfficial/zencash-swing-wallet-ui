@@ -358,6 +358,13 @@ public class Util
 	}
 	
 	
+	/**
+	 * Delets a directory and all of its subdirectories.
+	 * 
+	 * @param dir directory to delete.
+	 * 
+	 * @throws IOException if not successful
+	 */
 	public static void deleteDirectory(File dir)
 		throws IOException
 	{
@@ -379,6 +386,31 @@ public class Util
 		{
 			throw new IOException("Could not delete directory: " + dir.getAbsolutePath());
 		}
+	}
+	
+	
+	/**
+	 * Wraps an input string in a block form with the specified width. LF is used to end each line.
+	 * 
+	 * @param inStr
+	 * @param width
+	 * 
+	 * @return input wrapped
+	 */
+	public static String blockWrapString(String inStr, int width)
+	{
+		StringBuilder block = new StringBuilder();
+		
+		int position = 0;
+		while (position < inStr.length())
+		{
+			int endPosition = Math.min(position + width, inStr.length());
+			block.append(inStr.substring(position, endPosition));
+			block.append("\n");
+			position += width;
+		}
+		
+		return block.toString();
 	}
 	
 }

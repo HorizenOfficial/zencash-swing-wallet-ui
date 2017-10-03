@@ -193,6 +193,7 @@ public class TransactionTable
  							Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
  							clipboard.setContents(new StringSelection(MemoField), null);
  							
+ 							MemoField = Util.blockWrapString(MemoField, 80);
  							JOptionPane.showMessageDialog(
  								parent, 
  								"The memo contained in the transaction is: \n" + MemoField +

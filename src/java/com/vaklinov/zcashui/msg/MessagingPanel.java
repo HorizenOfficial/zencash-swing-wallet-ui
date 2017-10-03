@@ -1302,6 +1302,7 @@ public class MessagingPanel
 	
 	
 	private void collectAndStoreNewReceivedMessagesAndHandleErrors()
+		throws Exception
 	{
 		try
 		{
@@ -1311,6 +1312,15 @@ public class MessagingPanel
 			}
 		} catch (Exception e)
 		{
+			if (Thread.currentThread() instanceof DataGatheringThread)
+			{
+				if (((DataGatheringThread)Thread.currentThread()).isSuspended())
+				{
+					// Just rethrow the exception
+					throw e;
+				}
+			}
+			
 			Log.error("Unexpected error in gathering received messages (wrapper): ", e);
 			this.errorReporter.reportError(e);
 		}

@@ -115,6 +115,17 @@ public class DataGatheringThread<T>
 	
 	
 	/**
+	 * Returns the current state of the suspension flag.
+	 * 
+	 * @return the current state of the suspension flag.
+	 */
+	public synchronized boolean isSuspended()
+	{
+		return this.suspended;
+	}
+	
+	
+	/**
 	 * Obtains the last gathered data
 	 * 
 	 * @return the last gathered data
