@@ -95,6 +95,7 @@ public class ZCashUI
     private JMenuItem menuItemOwnIdentity;
     private JMenuItem menuItemExportOwnIdentity;
     private JMenuItem menuItemImportContactIdentity;
+    private JMenuItem menuItemAddMessagingGroup;
     private JMenuItem menuItemRemoveContactIdentity;
     private JMenuItem menuItemMessagingOptions;
 
@@ -109,7 +110,7 @@ public class ZCashUI
     public ZCashUI(StartupProgressDialog progressDialog)
         throws IOException, InterruptedException, WalletCallException
     {
-        super("ZENCash Swing Wallet UI 0.73.8");
+        super("ZENCash Desktop Wallet UI 0.74.1");
         
         if (progressDialog != null)
         {
@@ -202,6 +203,8 @@ public class ZCashUI
         menuItemOwnIdentity.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_D, accelaratorKeyMask));        
         messaging.add(menuItemExportOwnIdentity = new JMenuItem("Export own identity...", KeyEvent.VK_X));
         menuItemExportOwnIdentity.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_X, accelaratorKeyMask));        
+        messaging.add(menuItemAddMessagingGroup = new JMenuItem("Add messaging group...", KeyEvent.VK_G));
+        menuItemAddMessagingGroup.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_G, accelaratorKeyMask));
         messaging.add(menuItemImportContactIdentity = new JMenuItem("Import contact identity...", KeyEvent.VK_Y));
         menuItemImportContactIdentity.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Y, accelaratorKeyMask));
         messaging.add(menuItemRemoveContactIdentity = new JMenuItem("Remove contact...", KeyEvent.VK_R));
@@ -345,6 +348,18 @@ public class ZCashUI
                    }
                }
         );
+              
+       menuItemAddMessagingGroup.addActionListener(   
+               new ActionListener()
+               {
+                   @Override
+                   public void actionPerformed(ActionEvent e)
+                   {
+            			ZCashUI.this.messagingPanel.addMessagingGroup();
+                   }
+               }
+        );
+
        
        menuItemRemoveContactIdentity.addActionListener(   
                new ActionListener()

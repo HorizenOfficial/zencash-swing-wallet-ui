@@ -1719,28 +1719,25 @@ public class MessagingPanel
 	}
 	
 	
-	// TODO: this is not very efficient
-//	private boolean ZAddressHasBeenSentToAnonContact(MessagingIdentity contact)
-//		throws IOException
-//	{
-//		if (!contact.isAnonymous())
-//		{
-//			return false;
-//		}
-//		
-//		List<Message> messages = this.messagingStorage.getAllMessagesForContact(contact);
-//		for (Message msg : messages)
-//		{
-//			if (msg.isAnonymous() && (msg.getDirection() == DIRECTION_TYPE.SENT))
-//			{
-//				if ((!Util.stringIsEmpty(msg.getReturnAddress())) &&
-//					Util.isZAddress(msg.getReturnAddress()))
-//				{
-//					return true;
-//				}
-//			}
-//		}
-//			
-//		return false;
-//	}
+	public void addMessagingGroup()
+	{
+		try
+		{
+			CreateGroupDialog cgd = new CreateGroupDialog(
+				this, this.parentFrame, this.messagingStorage, this.errorReporter, this.clientCaller);
+			cgd.setVisible(true);
+			
+			
+			
+		} catch (Exception ex)
+		{
+			this.errorReporter.reportError(ex, false);
+		}
+	}
+	
+	
+	public JContactListPanel getContactList()
+	{
+		return this.contactList;
+	}
 }

@@ -67,6 +67,7 @@ public class MessagingIdentity
 	// Additional fields not based on the ZEN messaging protocol
 	private boolean isAnonymous; // If the remote contact sends messages anonymously
 	private String threadID; // Thread ID for anonymous messages
+	private boolean isGroup; // If it represents a messaging group
 	
 	// TODO: automatically cut fields to XXX length to avoid issues with accidental big data
 	
@@ -74,6 +75,7 @@ public class MessagingIdentity
 	{
 		// By default it is not anonymous - filling the rest is the responsibility of the caller
 		this.isAnonymous = false;
+		this.isGroup     = false;
 		this.threadID    = "";	
 	}
 	
@@ -123,9 +125,16 @@ public class MessagingIdentity
 		this.twitter            = obj.getString("twitter",            "");	
 		
 		this.isAnonymous        = obj.getBoolean("isanonymous",       false);
+		this.isGroup            = obj.getBoolean("isgroup",           false);
 		this.threadID           = obj.getString("threadid",           "");	
 		
-		if (this.isAnonymous())
+		if (this.isGroup())
+		{
+			if (Util.stringIsEmpty(this.nickname) || Util.stringIsEmpty(this.sendreceiveaddress))
+			{
+				throw new IOException("Mandatory field is missing in creating group messaging identity!");
+			}
+		} else if (this.isAnonymous())
 		{
 			if (Util.stringIsEmpty(this.nickname) || Util.stringIsEmpty(this.threadID))
 			{
@@ -160,6 +169,7 @@ public class MessagingIdentity
 		if (!bForMesagingProtocol)
 		{
 			obj.set("isanonymous",    isAnonymous);
+			obj.set("isgroup",        isGroup);
 			obj.set("threadid",       nonNull(threadID));
 		}
 		
@@ -304,6 +314,16 @@ public class MessagingIdentity
 	public void setThreadID(String threadID) 
 	{
 		this.threadID = threadID;
+	}	
+
+	public boolean isGroup() 
+	{
+		return isGroup;
+	}
+
+	public void setGroup(boolean isGroup) 
+	{
+		this.isGroup = isGroup;
 	}
 
 
@@ -327,6 +347,7 @@ public class MessagingIdentity
 			
 		} else
 		{
+			// Normal and group identities
 			MessagingIdentity id = this;
 			String contactString = id.getNickname();
 			
@@ -361,9 +382,17 @@ public class MessagingIdentity
 			return false;
 		}
 		
+		if (this.isGroup() != other.isGroup())
+		{
+			return false;
+		}
+		
 		if (this.isAnonymous())
 		{
 			return this.getThreadID().equals(other.getThreadID());
+		} else if (this.isGroup()) 
+		{
+			return this.sendreceiveaddress.equals(other.sendreceiveaddress);
 		} else
 		{
 			return this.senderidaddress.equals(other.senderidaddress) &&
@@ -372,7 +401,7 @@ public class MessagingIdentity
 	}
 	
 	
-	public String nonNull(String s)
+	private String nonNull(String s)
 	{
 		return (s != null) ? s : "";
 	}

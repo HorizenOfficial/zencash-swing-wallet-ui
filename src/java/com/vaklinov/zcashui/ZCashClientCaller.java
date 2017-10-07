@@ -889,7 +889,13 @@ public class ZCashClientCaller
 		throws WalletCallException, IOException, InterruptedException
 	{
 		// First try a Z key
-		String[] params = new String[] { this.zcashcli.getCanonicalPath(), "z_importkey", wrapStringParameter(key) };
+		String[] params = new String[] 
+		{ 
+			this.zcashcli.getCanonicalPath(),
+			"-rpcclienttimeout=5000",
+			"z_importkey", 
+			wrapStringParameter(key) 
+		};
 		CommandExecutor caller = new CommandExecutor(params);
     	String strResult = caller.execute();
 		
@@ -899,7 +905,8 @@ public class ZCashClientCaller
 		}
 		
 		// Obviously we have an error trying to import a Z key
-		if (strResult.trim().toLowerCase(Locale.ROOT).startsWith("error:"))
+		if (strResult.trim().toLowerCase(Locale.ROOT).startsWith("error:") &&
+			(strResult.indexOf("{") != -1))
 		{
    		 	 // Expecting an error of a T address key
    		 	 String jsonPart = strResult.substring(strResult.indexOf("{"));
