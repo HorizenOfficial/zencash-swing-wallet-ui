@@ -70,9 +70,9 @@ The details of how to build it are described below (easy to follow).
 
    3.1. If you have built ZENCash from source code:
 
-     Assuming you have already built from source code [ZENCash](https://zensystem.io/) in directory `/home/user/zen/src` (for example - this is the typical build dir. for ZENCash v1.0.9) which contains the command line tools `zen-cli` and `zend` you need to take the created file `./build/jars/ZENCashSwingWalletUI.jar` and copy it to directory `/home/user/zen/src` (the same dir. that contains `zen-cli` and `zend`). Example copy command:
+     Assuming you have already built from source code [ZENCash](https://zensystem.io/) in directory `/home/user/zen/src` (for example - this is the typical build dir. for ZENCash v1.0.9) which contains the command line tools `zen-cli` and `zend` you need to take the created JAR files and copy them to directory `/home/user/zen/src` (the same dir. that contains `zen-cli` and `zend`). Example copy command:
       ```
-      user@ubuntu:~/build-dir/zencash-swing-wallet-ui$ cp ./build/jars/ZENCashSwingWalletUI.jar /home/user/zen/src    
+      user@ubuntu:~/build-dir/zencash-swing-wallet-ui$ cp ./build/jars/*.jar /home/user/zen/src    
       ```
 
 4. Running the installed ZENCash GUI wallet

@@ -300,7 +300,7 @@ public class MessagingPanel
 					Util.parseJsonObject(msg.getMessage()).get("zenmessagingidentity").asObject());
 				
 				preparedMessage = "<span style=\"color:green;\">" +
-					"Special messaging identity message. Contains details of contact: " +
+					"Special identity carrying message; Contains details of contact: " +
 					msgID.getDiplayString() +
 					"</span>";
 			} else
@@ -311,9 +311,12 @@ public class MessagingPanel
 			};
 			
 			text.append("<span style=\"color:" + color +";\">");
-			text.append("<span style=\"font-weight:bold;font-size:1.5em;\">");
-			text.append(msg.getDirection() == DIRECTION_TYPE.SENT ? "\u21E8 " : "\u21E6 ");
-			text.append("</span>");
+			if (!contact.isGroup())
+			{
+				text.append("<span style=\"font-weight:bold;font-size:1.5em;\">");
+				text.append(msg.getDirection() == DIRECTION_TYPE.SENT ? "\u21E8 " : "\u21E6 ");
+				text.append("</span>");
+			}
 			text.append("(");
 			text.append(stamp); 
 			text.append(") ");
@@ -340,12 +343,16 @@ public class MessagingPanel
 				text.append("</span>");
 			}
 			
+			// TODO: Resolve identity of sender...
+			String senderNickname = contact.isGroup() ?
+				Util.escapeHTMLValue("<" + msg.getFrom() + ">") :
+		        Util.escapeHTMLValue(contact.getNickname());
+			
 			if ((!msg.isAnonymous()) || (msg.getDirection() == DIRECTION_TYPE.SENT))
 			{
 				text.append("<span style=\"font-weight:bold;\">");
 				text.append(msg.getDirection() == DIRECTION_TYPE.SENT ? 
-						    Util.escapeHTMLValue(ownIdentity.getNickname()) : 
-						    Util.escapeHTMLValue(contact.getNickname()));
+						    Util.escapeHTMLValue(ownIdentity.getNickname()) : senderNickname);
 				text.append("</span>");
 			}
 			text.append(": ");
@@ -355,9 +362,18 @@ public class MessagingPanel
 		}
 		
 		this.conversationTextPane.setText("<html>" + text.toString() + "</html>");
-		this.conversationLabel.setText(
-			"<html><span style=\"font-size:1.25em;font-style:italic;\">Conversation with: " + 
-		    contact.getDiplayString() + "</span>");
+		
+		if (contact.isGroup())
+		{
+			this.conversationLabel.setText(
+				"<html><span style=\"font-size:1.25em;font-style:italic;\">Conversation in group: " + 
+			    contact.getDiplayString() + "</span>");			
+		} else
+		{
+			this.conversationLabel.setText(
+				"<html><span style=\"font-size:1.25em;font-style:italic;\">Conversation with: " + 
+		        contact.getDiplayString() + "</span>");
+		}
 	}
 	
 
@@ -1308,7 +1324,29 @@ public class MessagingPanel
 		{
 			synchronized (this.messageCollectionMutex)
 			{
-				collectAndStoreNewReceivedMessages();
+				// When a large number of messages has been accumulated, this operation partly
+				// slows down blockchain synchronization. So messages are collected only when
+				// sync is full.
+				NetworkAndBlockchainInfo info = this.clientCaller.getNetworkAndBlockchainInfo();
+				// If more than 60 minutes behind in the blockchain - skip collection
+				if ((System.currentTimeMillis() - info.lastBlockDate.getTime()) > (60 * 60 * 1000))
+				{
+					Log.warning("Current blockchain synchronization date is {0}. Message collection skipped for now!",
+				                new Date(info.lastBlockDate.getTime()));
+					return;
+				}
+				
+				// Call it for the own identity
+				collectAndStoreNewReceivedMessages(null);
+				
+				// Call it for all existing groups
+				for (MessagingIdentity id : this.messagingStorage.getContactIdentities(false))
+				{
+					if (id.isGroup())
+					{
+						collectAndStoreNewReceivedMessages(id);
+					}
+				}
 			}
 		} catch (Exception e)
 		{
@@ -1327,21 +1365,9 @@ public class MessagingPanel
 	}
 	
 	
-	private void collectAndStoreNewReceivedMessages()
+	private void collectAndStoreNewReceivedMessages(MessagingIdentity groupIdentity)
 		throws IOException, WalletCallException, InterruptedException
 	{
-		// When a large number of messages has been accumulated, this operation partly
-		// slows down blockchain synchronization. So messages are collected only when
-		// sync is full.
-		NetworkAndBlockchainInfo info = this.clientCaller.getNetworkAndBlockchainInfo();
-		// If more than 60 minutes behind in the blockchain - skip collection
-		if ((System.currentTimeMillis() - info.lastBlockDate.getTime()) > (60 * 60 * 1000))
-		{
-			Log.warning("Current blockchain synchronization date is {0}. Message collection skipped for now!",
-		                new Date(info.lastBlockDate.getTime()));
-			return;
-		}
-		
 		MessagingIdentity ownIdentity = this.messagingStorage.getOwnIdentity();
 		
 		// Check to make sure the Z address of the messaging identity is valid
@@ -1365,7 +1391,7 @@ public class MessagingPanel
 					MessagingPanel.this.getRootPane().getParent(), 
 					"The messaging identity send/receive address: \n" +
 					ownZAddress + "\n" +
-					"is not found in the wallet.dat. The reaosn may be that after a mesaging identity\n" +
+					"is not found in the wallet.dat. The reason may be that after a mesaging identity\n" +
 					"was created the wallet.dat was changed or the ZEN node configuration was changed\n" +
 					"(e.g. mainnet -> testnet). If such a change was made, the messaging identity can no\n" +
 					"longer be used. To avoid this error mesage, you may rename the directory:\n" +
@@ -1400,7 +1426,8 @@ public class MessagingPanel
 			return;
 		}
 
-		String ZAddress = ownIdentity.getSendreceiveaddress();
+		String ZAddress = (groupIdentity != null) ? 
+		    groupIdentity.getSendreceiveaddress() : ownIdentity.getSendreceiveaddress(); 
 		// Get all known transactions received from the wallet
 		// TODO: there seems to be no way to limit the number of transactions returned!
 		JsonObject[] walletTransactions = this.clientCaller.getTransactionMessagingDataForZaddress(ZAddress);
@@ -1475,7 +1502,7 @@ public class MessagingPanel
 				this.messagingStorage.getContactIdentityForSenderIDAddress(message.getFrom());
 			
 			// Check for ignored contact messages
-			if (contactID == null)
+			if ((groupIdentity == null) && (contactID == null))
 			{
 				MessagingIdentity ignoredContact = this.messagingStorage.getIgnoredContactForMessage(message);
 				if (ignoredContact != null)
@@ -1489,7 +1516,8 @@ public class MessagingPanel
 			}
 			
 			// Skip message if from an unknown user and options are not set
-			if ((contactID == null) && (!msgOptions.isAutomaticallyAddUsersIfNotExplicitlyImported()))
+			if ((groupIdentity == null) && (contactID == null) && 
+				(!msgOptions.isAutomaticallyAddUsersIfNotExplicitlyImported()))
 			{
 				Log.warningOneTime(
 					"Message is from an unknown user, but options do not allow adding new users: {0}", 
@@ -1497,7 +1525,7 @@ public class MessagingPanel
 				continue standard_message_loop;
 			}
 			
-			if (contactID == null)
+			if ((groupIdentity == null) && (contactID == null))
 			{
 				// Update list of contacts with an unknown remote user ... to be updated later
 				Log.warning("Message is from unknown contact: {0} . " + 
@@ -1512,7 +1540,7 @@ public class MessagingPanel
 				                                Util.encodeHexString(message.getMessage()).toUpperCase()))
 			{
 				// Handle the special case of a messaging identity sent as payload - update identity then
-				if (this.isZENIdentityMessage(message.getMessage()))
+				if ((groupIdentity == null) && this.isZENIdentityMessage(message.getMessage()))
 				{
 					this.updateAndStoreExistingIdentityFromIDMessage(contactID, message.getMessage());
 				}
@@ -1525,7 +1553,8 @@ public class MessagingPanel
 				message.setVerification(VERIFICATION_TYPE.VERIFICATION_FAILED);
 			}
 			
-		    this.messagingStorage.writeNewReceivedMessageForContact(contactID, message);
+		    this.messagingStorage.writeNewReceivedMessageForContact(
+		    		(groupIdentity == null) ? contactID : groupIdentity, message);
 		} // End for (Message message : filteredMessages)
 
 		// Loop for processing anonymous messages
@@ -1544,7 +1573,7 @@ public class MessagingPanel
 				findAnonymousOrNormalContactIdentityByThreadID(message.getThreadID());
 			
 			// Check for ignored contact messages
-			if (anonContctID == null)
+			if ((groupIdentity == null) && (anonContctID == null))
 			{
 				MessagingIdentity ignoredContact = this.messagingStorage.getIgnoredContactForMessage(message);
 				if (ignoredContact != null)
@@ -1558,7 +1587,8 @@ public class MessagingPanel
 			}
 			
 			// Skip message if from an unknown user and options are not set
-			if ((anonContctID == null) && (!msgOptions.isAutomaticallyAddUsersIfNotExplicitlyImported()))
+			if ((groupIdentity == null) && (anonContctID == null) && 
+				(!msgOptions.isAutomaticallyAddUsersIfNotExplicitlyImported()))
 			{
 				Log.warningOneTime(
 					"Anonymous message is from an unknown user, but options do not allow adding new users: {0}", 
@@ -1566,14 +1596,14 @@ public class MessagingPanel
 				continue anonymus_message_loop;
 			}
 					
-			if (anonContctID == null)
+			if ((groupIdentity == null) && (anonContctID == null))
 			{
 				// Return address may be empty but we pass it
 				anonContctID = this.messagingStorage.createAndStoreAnonumousContactIdentity(
 					message.getThreadID(), message.getReturnAddress());
 				Log.info("Created new anonymous contact identity: ", anonContctID.toJSONObject(false).toString());
 				bNewContactCreated = true;
-			} else if (Util.stringIsEmpty(anonContctID.getSendreceiveaddress()))
+			} else if ((groupIdentity == null) && Util.stringIsEmpty(anonContctID.getSendreceiveaddress()))
 			{
 				if (!Util.stringIsEmpty(message.getReturnAddress()))
 				{
@@ -1584,7 +1614,8 @@ public class MessagingPanel
 				}
 			}
 
-			this.messagingStorage.writeNewReceivedMessageForContact(anonContctID, message);
+			this.messagingStorage.writeNewReceivedMessageForContact(
+				(groupIdentity == null) ? anonContctID : groupIdentity, message);
 		}
 		
 		if (bNewContactCreated)
@@ -1727,8 +1758,51 @@ public class MessagingPanel
 				this, this.parentFrame, this.messagingStorage, this.errorReporter, this.clientCaller);
 			cgd.setVisible(true);
 			
+			if (!cgd.isOKPressed())
+			{
+				return;
+			}
 			
+			// So a group is created - we need to ask the user if he wishes to send an identity message 
+			MessagingIdentity createdGroup = cgd.getCreatedGroup();
 			
+			int sendIDChoice = JOptionPane.showConfirmDialog(
+				this.parentFrame, 
+				"Do you wish to send a limited sub-set of your contact details to group\n" + 
+				createdGroup.getDiplayString() + "\n" +
+				"This will allow other group members to know your messaging identity.",
+				"Send contact details?", JOptionPane.YES_NO_OPTION);
+				
+			// TODO: code duplication with import
+			if (sendIDChoice == JOptionPane.YES_OPTION)
+			{
+				// Only a limited set of values is sent over the wire, due tr the limit of 330
+				// characters. // TODO: use protocol versions with larger messages
+				MessagingIdentity ownIdentity = this.messagingStorage.getOwnIdentity();
+				JsonObject innerIDObject = new JsonObject();
+				innerIDObject.set("nickname",           ownIdentity.getNickname());
+				innerIDObject.set("firstname",          ownIdentity.getFirstname());
+				innerIDObject.set("surname",            ownIdentity.getSurname());
+				innerIDObject.set("senderidaddress",    ownIdentity.getSenderidaddress());
+				innerIDObject.set("sendreceiveaddress", ownIdentity.getSendreceiveaddress());
+				JsonObject outerObject = new JsonObject();
+				outerObject.set("zenmessagingidentity", innerIDObject);
+				String identityString = outerObject.toString();
+				
+				// Check and send the messaging identity as a message
+				if (identityString.length() <= 330) // Protocol V1 restriction
+				{
+					this.sendMessage(identityString, createdGroup);
+				} else
+				{
+					JOptionPane.showMessageDialog(
+						this.parentFrame, 
+						"The size of your messaging identity is unfortunately too large to be sent\n" +
+						"as a message.", 
+						"Messaging identity size is too large!", JOptionPane.ERROR_MESSAGE);
+					return;
+				}
+			}
 		} catch (Exception ex)
 		{
 			this.errorReporter.reportError(ex, false);

@@ -68,6 +68,7 @@ public class CreateGroupDialog
 	protected JFrame parentFrame;
 	protected MessagingStorage storage;
 	protected StatusUpdateErrorReporter errorReporter;
+	protected ZCashClientCaller caller;
 	
 	protected boolean isOKPressed = false;
 	protected String  key    = null;
@@ -80,10 +81,10 @@ public class CreateGroupDialog
 	
 	protected JProgressBar progress = null;
 	
-	protected ZCashClientCaller caller;
-	
 	JButton okButon;
 	JButton cancelButon;
+	
+	protected MessagingIdentity createdGroup = null;
 	
 	public CreateGroupDialog(MessagingPanel msgPanel, JFrame parentFrame, MessagingStorage storage, StatusUpdateErrorReporter errorReporter, ZCashClientCaller caller)
 		throws IOException
@@ -248,6 +249,12 @@ public class CreateGroupDialog
 	}
 	
 	
+	public MessagingIdentity getCreatedGroup()
+	{
+		return this.createdGroup;
+	}
+	
+	
 	private void createGroupForKeyPhrase(String keyPhrase)
 		throws IOException, InterruptedException, WalletCallException
 	{
@@ -292,6 +299,8 @@ public class CreateGroupDialog
 			newID.setTwitter("");
 			
 			this.storage.addContactIdentity(newID);
+			
+			CreateGroupDialog.this.createdGroup = newID;
 			
 			JOptionPane.showMessageDialog(
 					CreateGroupDialog.this,  
