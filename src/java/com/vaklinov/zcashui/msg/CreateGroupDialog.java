@@ -279,10 +279,13 @@ public class CreateGroupDialog
 
 		addressesAfterAddition.removeAll(addressesBeforeAddition);
 		
-		if (addressesAfterAddition.size() > 0)
+		String ZAddress = (addressesAfterAddition.size() > 0) ?
+			addressesAfterAddition.iterator().next() :
+			this.findZAddressForImportKey(key);
+		MessagingIdentity existingIdentity = this.findExistingGroupBySendReceiveAddress(ZAddress);
+		
+		if (existingIdentity == null)
 		{
-			String ZAddress = addressesAfterAddition.iterator().next(); 
-			
 			Log.info("Newly added messaging group \"{0}\" address is: {1}", keyPhrase, ZAddress);
 			// Add a group personality etc.
 			MessagingIdentity newID = new MessagingIdentity();
@@ -336,5 +339,59 @@ public class CreateGroupDialog
 				}
 			}
 		});
+	}
+	
+	
+	/**
+	 * Finds a group identity for a send/receive address.
+	 *  
+	 * @param address
+	 * 
+	 * @return identity for the address or null
+	 */
+	private MessagingIdentity findExistingGroupBySendReceiveAddress(String address)
+		 throws IOException
+	{
+		MessagingIdentity identity = null;
+		
+		for (MessagingIdentity id : this.storage.getContactIdentities(false))
+		{
+			if (id.isGroup())
+			{
+				if (id.getSendreceiveaddress().equals(address))
+				{
+					identity = id;
+					break;
+				}
+			}
+		}
+		
+		return identity;
+	}
+	
+	
+	/**
+	 * Checks the wallet's private keys to find what address corresponds to a key.
+	 * 
+	 * @param key to search for
+	 * 
+	 * @return address for the key or null;
+	 */
+	private String findZAddressForImportKey(String key)
+		throws InterruptedException, WalletCallException, IOException
+	{
+		String address = null;
+		
+		for (String zAddr : this.caller.getWalletZAddresses())
+		{
+			String privKey = this.caller.getZPrivateKey(zAddr);
+			if (privKey.equals(key))
+			{
+				address = zAddr;
+				break;
+			}
+		}
+		
+		return address;
 	}
 } 

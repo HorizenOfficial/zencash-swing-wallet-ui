@@ -44,8 +44,10 @@ import java.io.Reader;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
@@ -273,15 +275,36 @@ public class MessagingPanel
 		MessagingIdentity ownIdentity = this.messagingStorage.getOwnIdentity();
 		List<Message> messages = this.messagingStorage.getAllMessagesForContact(contact);
 		
+		// Analyze the received messages to extract from them messaging identities (if there are any)
+		// TODO: This could be cached to optimize performance
+		Map<String, MessagingIdentity> knownSenders = new HashMap<String, MessagingIdentity>();
+		for (Message msg : messages)
+		{
+			if (isZENIdentityMessage(msg.getMessage()))
+			{
+				MessagingIdentity senderIdentity = new MessagingIdentity(
+						Util.parseJsonObject(msg.getMessage()).get("zenmessagingidentity").asObject());
+				knownSenders.put(senderIdentity.getSenderidaddress(), senderIdentity);
+			}
+		}
+		
 		Date now = new Date();
 		StringBuilder text = new StringBuilder();
 
 		final SimpleDateFormat defaultFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		final SimpleDateFormat shortFormat = new SimpleDateFormat("HH:mm:ss");
 		
+		message_loop:
 		for (Message msg : messages)
 		{
-			String color = msg.getDirection() ==  DIRECTION_TYPE.SENT ? "blue" : "red";
+			// Skip message if sent from own id to group
+			if (contact.isGroup() && (!msg.isAnonymous()) && (msg.getDirection() == DIRECTION_TYPE.RECEIVED) && 
+				msg.getFrom().equals(ownIdentity.getSenderidaddress()))
+			{
+				continue message_loop;
+			}
+			
+			String color = msg.getDirection() == DIRECTION_TYPE.SENT ? "blue" : "red";
 
 			String stamp = defaultFormat.format(msg.getTime()); // TODO: correct date further
 			if (Math.abs(now.getTime() - msg.getTime().getTime()) < (24L * 3600 * 1000)) // 24 h
@@ -340,12 +363,17 @@ public class MessagingPanel
 			{
 				text.append("<span style=\"font-weight:bold;\">");
 				text.append("[Anonymous] ");
+				text.append(contact.isGroup() ? "[" + msg.getThreadID().substring(0, 15) + "...] " : "");
 				text.append("</span>");
 			}
 			
-			// TODO: Resolve identity of sender...
+			// Try to resolve the identity of the sender
+			MessagingIdentity groupSenderIdentity = knownSenders.containsKey(msg.getFrom()) ?
+				knownSenders.get(msg.getFrom()) : null;
+			String groupSenderNickName = (groupSenderIdentity != null) ?
+				groupSenderIdentity.getDiplayString() : ("<" + msg.getFrom() + ">");
 			String senderNickname = contact.isGroup() ?
-				Util.escapeHTMLValue("<" + msg.getFrom() + ">") :
+				Util.escapeHTMLValue(groupSenderNickName) :
 		        Util.escapeHTMLValue(contact.getNickname());
 			
 			if ((!msg.isAnonymous()) || (msg.getDirection() == DIRECTION_TYPE.SENT))
@@ -982,28 +1010,32 @@ public class MessagingPanel
 		// set for the recipient. Also ask the user if he wishes to send a return address.
 		if (sendAnonymously)
 		{
+			// If also no thread ID is set yet...
 			if (Util.stringIsEmpty(contactIdentity.getThreadID()))
 			{
-		        // Offer the user to send a return address
-		        int reply = JOptionPane.showConfirmDialog(
-		        	this.parentFrame, 
-		        	"This is the first anomymous message you are sending to contact: \n" +
-		        	contactIdentity.getDiplayString() + "\n" +
-		        	"Do you wish to send him your send/receive messaging Z address so\n" +
-		        	"that the contact may be able to answer your anonymous messages?", 
-		        	"Send return address?", 
-		        	JOptionPane.YES_NO_OPTION);
-		        
-		        if (reply == JOptionPane.YES_OPTION) 
-		        {
-		        	sendReturnAddress = true;
-		        }
+				if (!contactIdentity.isGroup())
+				{
+			        // Offer the user to send a return address
+			        int reply = JOptionPane.showConfirmDialog(
+			        	this.parentFrame, 
+			        	"This is the first anomymous message you are sending to contact: \n" +
+			        	contactIdentity.getDiplayString() + "\n" +
+			        	"Do you wish to send him your send/receive messaging Z address so\n" +
+			        	"that the contact may be able to answer your anonymous messages?", 
+			        	"Send return address?", 
+			        	JOptionPane.YES_NO_OPTION);
+			        
+			        if (reply == JOptionPane.YES_OPTION) 
+			        {
+			        	sendReturnAddress = true;
+			        }
+				}
 
 		        String threadID = UUID.randomUUID().toString();
 		        contactIdentity.setThreadID(threadID);
 		        // If there is no thread ID, this must be a "normal" identity. An anonymous one
 		        // will have a thread ID set on the first arriving message!
-		        if (!Util.stringIsEmpty(contactIdentity.getSenderidaddress()))
+		        if (contactIdentity.isGroup() || (!Util.stringIsEmpty(contactIdentity.getSenderidaddress())))
 		        {
 		        	updateMessagingIdentityJustBeforeSend = true;
 		        } else
@@ -1178,8 +1210,15 @@ public class MessagingPanel
 			
 		if (updateMessagingIdentityJustBeforeSend)
 		{
-        	this.messagingStorage.updateContactIdentityForSenderIDAddress(
-		        contactIdentity.getSenderidaddress(), contactIdentity);
+			if (!contactIdentity.isGroup())
+			{
+			   	this.messagingStorage.updateContactIdentityForSenderIDAddress(
+		            contactIdentity.getSenderidaddress(), contactIdentity);
+			} else
+			{
+				this.messagingStorage.updateGroupContactIdentityForSendReceiveAddress(
+					contactIdentity.getSendreceiveaddress(), contactIdentity);
+			}
 		}
 		
 		// Finally send the message		

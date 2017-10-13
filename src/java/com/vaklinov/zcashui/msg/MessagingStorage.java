@@ -260,6 +260,22 @@ public class MessagingStorage
 			}
 		}			
 	}
+	
+	
+	public void updateGroupContactIdentityForSendReceiveAddress(String sendReceiveAddress, MessagingIdentity newID)
+		throws IOException
+	{
+		for (SingleContactStorage contact : this.contactsList)
+		{
+			MessagingIdentity tempID = contact.getIdentity();
+			
+			if ((tempID.isGroup()) && tempID.getSendreceiveaddress().equals(sendReceiveAddress))
+			{
+				tempID.copyFromJSONObject(newID.toJSONObject(false));
+				contact.updateIdentity(tempID);
+			}
+		}			
+	}
 
 		
 	public void addContactIdentity(MessagingIdentity identity)
