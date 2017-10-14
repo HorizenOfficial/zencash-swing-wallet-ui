@@ -314,6 +314,7 @@ public class CreateGroupDialog
 					JOptionPane.INFORMATION_MESSAGE);
 		} else
 		{
+			CreateGroupDialog.this.createdGroup = existingIdentity;
 			// TODO: Group was already added it seems - see if it can be made more reliable
 			JOptionPane.showMessageDialog(
 				CreateGroupDialog.this,  

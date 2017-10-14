@@ -41,6 +41,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.Reader;
+import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -69,6 +70,8 @@ import javax.swing.JTextPane;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 import javax.swing.border.EtchedBorder;
+import javax.swing.event.HyperlinkEvent;
+import javax.swing.event.HyperlinkListener;
 
 import com.eclipsesource.json.JsonObject;
 import com.eclipsesource.json.JsonValue;
@@ -160,6 +163,7 @@ public class MessagingPanel
 			BorderLayout.CENTER);
 		this.conversationTextPane.setEditable(false);
 		this.conversationTextPane.setContentType("text/html");
+		this.conversationTextPane.addHyperlinkListener(new GroupLinkHandler());
 		JPanel upperPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
 		upperPanel.add(this.conversationLabel = new JLabel(
 			"<html><span style=\"font-size:1.2em;font-style:italic;\">Conversation ...</span>"));
@@ -264,6 +268,55 @@ public class MessagingPanel
 	}
 	
 	
+	private class GroupLinkHandler
+		implements HyperlinkListener
+	{
+		@Override
+		public void hyperlinkUpdate(HyperlinkEvent e) 
+		{
+			if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED)
+			{
+				try
+				{
+					handleURL(e.getURL());
+				} catch (Exception ex)
+				{
+					MessagingPanel.this.errorReporter.reportError(ex, false);
+				}
+			}
+		}
+		
+		public void handleURL(URL u)
+			throws IOException
+		{
+			String id = u.toString();
+			if (id.startsWith("http://"))
+			{
+				id = id.substring("http://".length());
+				boolean anonymous = id.startsWith("ANON_");
+				boolean normal = id.startsWith("NORM_");
+				id = id.substring(5);
+				
+				MessagingIdentity selectedContact = MessagingPanel.this.contactList.getSelectedContact();
+				if (selectedContact == null)
+				{
+					return;
+				}
+				
+				Map<String, MessagingIdentity> senders = MessagingPanel.this.getKnownSendersForGroup(selectedContact);
+				if (senders.containsKey(id))
+				{
+					MessagingIdentity sender = senders.get(id);
+			        System.out.println("TODO: sender is: " + sender.getDiplayString());
+				} else
+				{
+			        System.out.println("TODO: Anon = " + anonymous + ", sender " + id + " unknown!");
+				}
+			}
+		}
+	}
+
+	
 	/**
 	 * Loads all messages for a specific contact and displays them in the conversation text area.
 	 * 
@@ -277,16 +330,7 @@ public class MessagingPanel
 		
 		// Analyze the received messages to extract from them messaging identities (if there are any)
 		// TODO: This could be cached to optimize performance
-		Map<String, MessagingIdentity> knownSenders = new HashMap<String, MessagingIdentity>();
-		for (Message msg : messages)
-		{
-			if (isZENIdentityMessage(msg.getMessage()))
-			{
-				MessagingIdentity senderIdentity = new MessagingIdentity(
-						Util.parseJsonObject(msg.getMessage()).get("zenmessagingidentity").asObject());
-				knownSenders.put(senderIdentity.getSenderidaddress(), senderIdentity);
-			}
-		}
+		Map<String, MessagingIdentity> knownSenders = this.getKnownSendersForGroup(contact);
 		
 		Date now = new Date();
 		StringBuilder text = new StringBuilder();
@@ -361,10 +405,13 @@ public class MessagingPanel
 				}
 			} else
 			{
+				text.append(contact.isGroup() && (msg.getDirection() == DIRECTION_TYPE.RECEIVED) ? 
+					"<a href=\"http://ANON_" + msg.getThreadID() + "\">" : "");
 				text.append("<span style=\"font-weight:bold;\">");
 				text.append("[Anonymous] ");
 				text.append(contact.isGroup() ? "[" + msg.getThreadID().substring(0, 15) + "...] " : "");
 				text.append("</span>");
+				text.append(contact.isGroup() && (msg.getDirection() == DIRECTION_TYPE.RECEIVED) ? "</a>" : "");
 			}
 			
 			// Try to resolve the identity of the sender
@@ -378,10 +425,13 @@ public class MessagingPanel
 			
 			if ((!msg.isAnonymous()) || (msg.getDirection() == DIRECTION_TYPE.SENT))
 			{
+				text.append(contact.isGroup() && (msg.getDirection() == DIRECTION_TYPE.RECEIVED) ? 
+						"<a href=\"http://NORM_" + msg.getFrom() + "\">" : "");
 				text.append("<span style=\"font-weight:bold;\">");
 				text.append(msg.getDirection() == DIRECTION_TYPE.SENT ? 
 						    Util.escapeHTMLValue(ownIdentity.getNickname()) : senderNickname);
 				text.append("</span>");
+				text.append(contact.isGroup() && (msg.getDirection() == DIRECTION_TYPE.RECEIVED) ? "</a>" : "");
 			}
 			text.append(": ");
 			text.append("</span>");
@@ -1852,5 +1902,27 @@ public class MessagingPanel
 	public JContactListPanel getContactList()
 	{
 		return this.contactList;
+	}
+	
+	
+	private Map<String, MessagingIdentity> getKnownSendersForGroup(MessagingIdentity group)
+		throws IOException
+	{
+		List<Message> messages = this.messagingStorage.getAllMessagesForContact(group);
+		
+		// Analyze the received messages to extract from them messaging identities (if there are any)
+		// TODO: This could be cached to optimize performance
+		Map<String, MessagingIdentity> knownSenders = new HashMap<String, MessagingIdentity>();
+		for (Message msg : messages)
+		{
+			if (isZENIdentityMessage(msg.getMessage()))
+			{
+				MessagingIdentity senderIdentity = new MessagingIdentity(
+						Util.parseJsonObject(msg.getMessage()).get("zenmessagingidentity").asObject());
+				knownSenders.put(senderIdentity.getSenderidaddress(), senderIdentity);
+			}
+		}
+		
+		return knownSenders;
 	}
 }
