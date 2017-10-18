@@ -28,15 +28,29 @@
  **********************************************************************************/
 package com.vaklinov.zcashui.msg;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileFilter;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.Reader;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
+import com.eclipsesource.json.Json;
+import com.eclipsesource.json.JsonArray;
+import com.eclipsesource.json.WriterConfig;
 import com.vaklinov.zcashui.Log;
 import com.vaklinov.zcashui.OSUtil;
 import com.vaklinov.zcashui.Util;
@@ -275,6 +289,57 @@ public class MessagingStorage
 				contact.updateIdentity(tempID);
 			}
 		}			
+	}
+	
+	
+	/**
+	 * Checks if a particular sender's ID is ignored. This makes sense only if the
+	 * current contact is a group. The ID may be an anonymous sender UUID or a
+	 * normal from address.
+	 * 
+	 * @param senderID
+	 * @param groupID
+	 * @return true if a particular sender's ID is ignored.
+	 * 
+	 * @throws IOException
+	 */
+	public boolean isSenderIdentityIgnoredForGroup(String senderID, MessagingIdentity groupID)
+		throws IOException
+	{
+		for (SingleContactStorage contact : this.contactsList)
+		{
+			MessagingIdentity tempID = contact.getIdentity();
+			
+			if ((tempID.isGroup()) && tempID.isIdenticalTo(groupID))
+			{
+				return contact.isGroupSenderIDIgnored(senderID);
+			}
+		}			
+
+		return false;
+	}
+	
+	
+	/**
+	 * Adds a new ignored sender ID. This makes sense only if the
+	 * current contact is a group. The ID may be an anonymous sender UUID or a
+	 * normal from address.
+	 * 
+	 * @param senderID to add
+	 */
+	public void addIgnoredSenderIdentityForGroup(String senderID, MessagingIdentity groupID)
+		throws IOException
+	{
+		for (SingleContactStorage contact : this.contactsList)
+		{
+			MessagingIdentity tempID = contact.getIdentity();
+			
+			if ((tempID.isGroup()) && tempID.isIdenticalTo(groupID))
+			{
+				contact.addGroupIgnoredSenderID(senderID);
+				return;
+			}
+		}	
 	}
 
 		
@@ -598,6 +663,8 @@ public class MessagingStorage
 	// ~/.ZENCashSwingWalletUI/messaging/contact_XXXX
 	static class SingleContactStorage
 	{
+		final String IGNORED_GROUP_IDS = "ignored_group_ids.json";
+		
 		private File rootDir;
 		
 		private SentOrReceivedMessagesStore sentMessages;
@@ -605,11 +672,15 @@ public class MessagingStorage
 		
 		private MessagingIdentity cachedIdentity;
 		
+		private Set<String> cachedIgnoredGroupSenderIDs;
+		
 		
 		public SingleContactStorage(File rootDir)
 			throws IOException
 		{
 			this.cachedIdentity = null;
+			this.cachedIgnoredGroupSenderIDs = null;
+			
 			this.rootDir = rootDir;
 			
 			if (!rootDir.exists())
@@ -652,6 +723,113 @@ public class MessagingStorage
 			newIdentity.writeToFile(identityFile);
 			
 			this.cachedIdentity = newIdentity;
+		}
+		
+		
+		/**
+		 * Checks if a particular sender's ID is ignored. This makes sense only if the
+		 * current contact is a group. The ID may be an anonymous sender UUID or a
+		 * normal from address.
+		 * 
+		 * @param senderID
+		 * 
+		 * @return true if a particular sender's ID is ignored
+		 */
+		public boolean isGroupSenderIDIgnored(String senderID)
+			throws IOException
+		{
+			this.preloadCachedIgnoredGroupSenderIDs();
+			boolean ignored = this.cachedIgnoredGroupSenderIDs.contains(senderID);
+			return ignored;
+		}
+		
+
+		/**
+		 * Adds a new ignored sender ID. This makes sense only if the
+		 * current contact is a group. The ID may be an anonymous sender UUID or a
+		 * normal from address.
+		 * 
+		 * @param senderID to add
+		 */
+		public void addGroupIgnoredSenderID(String senderID)
+			throws IOException
+		{
+			this.preloadCachedIgnoredGroupSenderIDs();
+			
+			File ignoredIDsFile = new File(rootDir, IGNORED_GROUP_IDS);	
+			
+			Util.renameFileForMultiVersionBackup(rootDir, IGNORED_GROUP_IDS);
+			
+			this.cachedIgnoredGroupSenderIDs.add(senderID);
+			
+			JsonArray ar = new JsonArray();
+			for (String id : this.cachedIgnoredGroupSenderIDs)
+			{
+				ar.add(id);
+			}
+			
+			OutputStream os = null;
+			try
+			{
+				os = new BufferedOutputStream(new FileOutputStream(ignoredIDsFile));
+				OutputStreamWriter osw = new OutputStreamWriter(os, "UTF-8");
+				ar.writeTo(osw, WriterConfig.PRETTY_PRINT);
+				osw.flush();
+			} finally 
+			{
+				if (os != null)
+				{
+					os.close();
+				}
+			}
+		}
+		
+		
+		private void preloadCachedIgnoredGroupSenderIDs()
+			throws IOException
+		{
+			if (this.cachedIgnoredGroupSenderIDs == null)
+			{
+				this.cachedIgnoredGroupSenderIDs = new HashSet<String>();
+				
+				File ignoredIDsFile = new File(rootDir, IGNORED_GROUP_IDS);	
+				
+				if (!ignoredIDsFile.exists())
+				{
+					return;
+				}
+				
+				InputStream is = null;
+				try
+				{
+					is = new BufferedInputStream(new FileInputStream(ignoredIDsFile));
+					InputStreamReader isr = new InputStreamReader(is, "UTF-8");
+					JsonArray ar = Json.parse(isr).asArray(); // TODO: repackage to checked exception
+					
+					for (int i = 0; i < ar.size(); i++)
+					{
+						String val = ar.get(i).toString();
+						
+						if (val.startsWith("\"")) // Strip the string of the quotes
+						{
+							val = val.substring(1);
+						}
+						
+						if (val.endsWith("\""))
+						{
+							val = val.substring(0, val.length() - 1);
+						}
+						
+						this.cachedIgnoredGroupSenderIDs.add(val);
+					}
+				} finally
+				{
+					if (is != null)
+					{
+						is.close();
+					}
+				}
+			}
 		}
 		
 		

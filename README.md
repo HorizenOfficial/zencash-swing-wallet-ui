@@ -64,7 +64,8 @@ The details of how to build it are described below (easy to follow).
    user@ubuntu:~/build-dir/zencash-swing-wallet-ui$ chmod u+x ./build/jars/ZENCashSwingWalletUI.jar
    ```
    At this point the build process is finished the built GUI wallet program is the JAR 
-   file `./build/jars/ZENCashSwingWalletUI.jar`
+   file `./build/jars/ZENCashSwingWalletUI.jar`. In addition the JAR file 
+   `bitcoinj-core-0.14.5.jar` is also necessary to run the wallet. 
 
 3. Installing the built ZENCash GUI wallet
 

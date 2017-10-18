@@ -268,6 +268,7 @@ public class MessagingPanel
 	}
 	
 	
+	// Handler for hyperlinks in case of group messaging
 	private class GroupLinkHandler
 		implements HyperlinkListener
 	{
@@ -303,18 +304,49 @@ public class MessagingPanel
 					return;
 				}
 				
+				String messageStart;
 				Map<String, MessagingIdentity> senders = MessagingPanel.this.getKnownSendersForGroup(selectedContact);
 				if (senders.containsKey(id))
 				{
 					MessagingIdentity sender = senders.get(id);
-			        System.out.println("TODO: sender is: " + sender.getDiplayString());
+			        messageStart = 
+			        	"This user has messaging identity: " + sender.getDiplayString() + "\n" +
+			        	"and uses sender identification address:\n" +
+			        	sender.getSenderidaddress() + "\n";
 				} else
 				{
-			        System.out.println("TODO: Anon = " + anonymous + ", sender " + id + " unknown!");
+			        messageStart = 
+			        	"This user is " + (anonymous ? "" : "not ") + "anonumous; " +
+			        	(anonymous ? "" : "However ") + "his messaging identity is not known. " +
+			        	"He is only identified \nby " + (anonymous ? "thread ID" : "a sender ID address:") + "\n" +
+			        	id + "\n";
 				}
+				
+		        int reply1 = JOptionPane.showOptionDialog(
+		        	MessagingPanel.this.parentFrame, 
+			        messageStart + "\n" + 
+			        "If you believe this user is spamming the group conversation, you have the option to\n" +
+			        "ignore all his mesages. \n\n" + 
+			        "WARNING: If you choose to ignore this user's messages, you will not be able to see \n"+
+			        "any new messages he sends from this point forward!", 
+			        "Possibly ignore user messages?", 
+			        JOptionPane.YES_NO_OPTION,
+			        JOptionPane.WARNING_MESSAGE, 
+			        null, new String[] { "Igone user's messages", "Cancel & Close" }, 
+			        JOptionPane.NO_OPTION);
+			        
+			    if (reply1 == JOptionPane.NO_OPTION) 
+			    {
+			    	return;
+			    }
+			    
+			    Log.info("Ignoring all messages sent by user id {0} for group conversation {1}", 
+			    		 id, selectedContact.getDiplayString());
+			    MessagingPanel.this.messagingStorage.addIgnoredSenderIdentityForGroup(id, selectedContact);
+			    MessagingPanel.this.displayMessagesForContact(selectedContact);
 			}
 		}
-	}
+	} // End private class GroupLinkHandler
 
 	
 	/**
@@ -341,6 +373,16 @@ public class MessagingPanel
 		message_loop:
 		for (Message msg : messages)
 		{
+			// Skip messages sent to a group from ignored IDs.
+			String mesageIDToCheck = msg.isAnonymous() ? msg.getThreadID() : msg.getFrom();
+			if (contact.isGroup() && (msg.getDirection() == DIRECTION_TYPE.RECEIVED) &&
+				this.messagingStorage.isSenderIdentityIgnoredForGroup(mesageIDToCheck, contact))
+			{
+				Log.warningOneTime("Ignoring message sent to group {1} due to user preference: {0}",
+						           msg.toJSONObject(false).toString(), contact.getDiplayString());
+				continue message_loop;
+			}
+			
 			// Skip message if sent from own id to group
 			if (contact.isGroup() && (!msg.isAnonymous()) && (msg.getDirection() == DIRECTION_TYPE.RECEIVED) && 
 				msg.getFrom().equals(ownIdentity.getSenderidaddress()))
@@ -940,7 +982,7 @@ public class MessagingPanel
 	                                 "<NONE>" : id.getSendreceiveaddress();			
 	        int reply = JOptionPane.showConfirmDialog(
 	        	this.parentFrame, 
-	        	"The contact " + id.getDiplayString() + "\n" +
+	        	"The " + (id.isGroup() ? "messaging group " : "conact ")  + id.getDiplayString() + "\n" +
 	        	"with messaging identification T address:\n" +
 	        	contactTAddress + "\n" +
 	        	"and send/receive Z address:\n" +

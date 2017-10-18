@@ -306,12 +306,16 @@ public class CreateGroupDialog
 			CreateGroupDialog.this.createdGroup = newID;
 			
 			JOptionPane.showMessageDialog(
-					CreateGroupDialog.this,  
-					"The messaging group with key phrase:\n" +
-					keyPhrase + "\n" +
-					"has been added successfully.",
-					"Group added successfully...",
-					JOptionPane.INFORMATION_MESSAGE);
+				CreateGroupDialog.this,  
+				"The messaging group with key phrase:\n" +
+				keyPhrase + "\n" +
+				"has been added successfully. All messages sent by individual users to the " +
+				"group will be sent to Z address:\n"
+				+ ZAddress + "\n\n" +
+				"IMPORTANT: Do NOT send any ZEN to this address except in cases of messaging transactions. Any\n" +
+				"funds sent to this address may be spent by any user who has access to the group key phrase!",
+				"Group added successfully...",
+				JOptionPane.INFORMATION_MESSAGE);
 		} else
 		{
 			CreateGroupDialog.this.createdGroup = existingIdentity;

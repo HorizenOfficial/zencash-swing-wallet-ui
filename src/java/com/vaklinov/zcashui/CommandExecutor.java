@@ -29,6 +29,7 @@
 package com.vaklinov.zcashui;
 
 
+import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -66,7 +67,7 @@ public class CommandExecutor
 		Runtime rt = Runtime.getRuntime();
 		Process proc = rt.exec(args);
 
-		final Reader in = new InputStreamReader(proc.getInputStream());
+		final Reader in = new InputStreamReader(new BufferedInputStream(proc.getInputStream()));
 
 		final Reader err = new InputStreamReader(proc.getErrorStream());
 
