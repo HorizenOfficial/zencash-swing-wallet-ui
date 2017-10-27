@@ -208,7 +208,7 @@ public class AddressBookPanel extends JPanel {
             names.add(name);
             
             String address = (String) JOptionPane.showInputDialog(AddressBookPanel.this,
-                    "Pleae enter the t-address or z-address of "+name,
+                    "Please enter the t-address or z-address of "+name,
                     "Add new contact step 2",
                     JOptionPane.PLAIN_MESSAGE,
                     null,

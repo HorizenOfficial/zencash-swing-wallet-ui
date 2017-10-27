@@ -42,6 +42,7 @@ import javax.swing.JTabbedPane;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import com.vaklinov.zcashui.ZCashClientCaller.WalletCallException;
+import com.vaklinov.zcashui.msg.MessagingPanel;
 
 
 /**
@@ -426,16 +427,13 @@ public class WalletOperations
 		throws IOException
 	{
         String userDir = OSUtil.getSettingsDirectory();
-        File warningFlagFile = new File(userDir + File.separator + "backupInfoShown.flag");
+        File warningFlagFile = new File(userDir + File.separator + "backupInfoShownNG.flag");
         if (warningFlagFile.exists())
         {
             return;
-        } else
-        {
-            warningFlagFile.createNewFile();
-        }
-        
-        JOptionPane.showMessageDialog(
+        } 
+            
+        int reply = JOptionPane.showOptionDialog(
             this.parent,
             "For security reasons the wallet may be backed up/private keys exported only if\n" +
             "the zend parameter -exportdir=<dir> has been set. If you started zend \n" +
@@ -447,8 +445,18 @@ public class WalletOperations
             "instead, the destination file will still end up in the directory provided as \n" +
             "-exportdir=<dir>. If this parameter was not provided to zend, the process\n" +
             "will fail with a security check error. The filename needs to consist of only\n" + 
-            "alphanumeric characters (e.g. dot is not allowed).\n\n" +
-            "(This message will be shown only once)",
-            "Wallet backup directory information", JOptionPane.INFORMATION_MESSAGE);
+            "alphanumeric characters (e.g. dot is not allowed).\n",
+            "Wallet backup directory information", 
+	        JOptionPane.YES_NO_OPTION,
+	        JOptionPane.INFORMATION_MESSAGE, 
+	        null, new String[] { "Do not show this again", "OK" }, 
+	        JOptionPane.NO_OPTION);
+	        
+	    if (reply == JOptionPane.NO_OPTION) 
+	    {
+	    	return;
+	    }
+	    
+	    warningFlagFile.createNewFile();
 	}
 }

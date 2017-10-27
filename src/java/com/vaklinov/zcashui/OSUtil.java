@@ -147,6 +147,43 @@ public class OSUtil
 				return pd.getCanonicalPath();
 			}
 		}
+		
+		// Try with a full class-path, now containing more libraries
+		// This too is very deployment specific
+		if (cp.indexOf(File.pathSeparator) != -1)
+		{
+			String cp2 = cp;
+			if (cp2.endsWith(File.pathSeparator))
+			{
+				cp2 = cp2.substring(0, cp2.length() - 1);
+			}
+			
+			if (cp2.startsWith(File.pathSeparator))
+			{
+				cp2 = cp2.substring(1);
+			}
+			
+			final String CP_JARS = JAR_NAME + File.pathSeparator + "bitcoinj-core-0.14.5.jar";
+			if (cp2.endsWith(CP_JARS))
+			{
+				String cpStart = cp2.substring(0, cp2.length() - CP_JARS.length());
+				if (cpStart.endsWith(File.separator))
+				{
+					cpStart = cpStart.substring(0, cpStart.length() - 1);
+				}
+				int startIndex = cpStart.lastIndexOf(File.pathSeparator);
+				if (startIndex < 0)
+				{
+					startIndex = 0;
+				}
+				
+				if (cpStart.length() > startIndex)
+				{
+					File pd = new File(cpStart.substring(startIndex));
+					return pd.getCanonicalPath();
+				}
+			}			
+		}
 
 		// Current dir of the running JVM (expected)
 		String userDir = System.getProperty("user.dir");
