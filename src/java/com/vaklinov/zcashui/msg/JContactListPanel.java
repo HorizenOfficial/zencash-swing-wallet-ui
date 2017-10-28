@@ -31,9 +31,16 @@ package com.vaklinov.zcashui.msg;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Cursor;
 import java.awt.FlowLayout;
+import java.awt.Toolkit;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -45,15 +52,21 @@ import javax.swing.BorderFactory;
 import javax.swing.DefaultListModel;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
+import javax.swing.JMenuItem;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.KeyStroke;
 import javax.swing.ListCellRenderer;
 import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
+import com.vaklinov.zcashui.DataTable;
 import com.vaklinov.zcashui.Log;
 import com.vaklinov.zcashui.SingleKeyImportDialog;
 import com.vaklinov.zcashui.StatusUpdateErrorReporter;
@@ -71,14 +84,20 @@ public class JContactListPanel
 	private MessagingStorage mesagingStorage;
 	private ContactList      list;
 	private StatusUpdateErrorReporter errorReporter;
+	private JFrame           parentFrame;
 	
-	public JContactListPanel(MessagingPanel parent, MessagingStorage messagingStorage, 
+	private JPopupMenu popupMenu;
+	
+	public JContactListPanel(MessagingPanel parent, 
+			                 JFrame parentFrame,
+			                 MessagingStorage messagingStorage, 
 			                 StatusUpdateErrorReporter errorReporter)
 		throws IOException
 	{
 		super();
 		
 		this.parent = parent;
+		this.parentFrame     = parentFrame;
 		this.mesagingStorage = messagingStorage;
 		this.errorReporter   = errorReporter;
 		
@@ -154,6 +173,11 @@ public class JContactListPanel
 			{
 				try
 				{
+					if (e.getValueIsAdjusting())
+					{
+						return; // Change is not final
+					}
+					
 					MessagingIdentity id = JContactListPanel.this.list.getSelectedValue();
 					
 					if (id == null)
@@ -161,7 +185,15 @@ public class JContactListPanel
 						return; // Nothing selected
 					}
 					
-					JContactListPanel.this.parent.displayMessagesForContact(id);
+					Cursor oldCursor = JContactListPanel.this.parentFrame.getCursor();
+					try
+					{
+						JContactListPanel.this.parentFrame.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+	     				JContactListPanel.this.parent.displayMessagesForContact(id);
+					} finally
+					{
+						JContactListPanel.this.parentFrame.setCursor(oldCursor);
+					}
 				} catch (IOException ioe)
 				{
 					Log.error("Unexpected error: ", ioe);
@@ -169,6 +201,55 @@ public class JContactListPanel
 				}
 			}
 		});
+		
+		// Mouse listener is used to show the popup menu
+		list.addMouseListener(new MouseAdapter()
+        {
+        	public void mousePressed(MouseEvent e)
+        	{
+                if ((!e.isConsumed()) && e.isPopupTrigger())
+                {
+                    ContactList list = (ContactList)e.getSource();
+                    if (list.getSelectedValue() != null)
+                    {
+                    	popupMenu.show(e.getComponent(), e.getPoint().x, e.getPoint().y);
+                    	e.consume();
+                    }
+                }
+        	}
+        	
+            public void mouseReleased(MouseEvent e)
+            {
+            	if ((!e.isConsumed()) && e.isPopupTrigger())
+            	{
+            		mousePressed(e);
+            	}
+            }
+        });
+		
+		
+		// Actions of the popup menu
+		this.popupMenu = new JPopupMenu();
+		int accelaratorKeyMask = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
+		
+		JMenuItem showDetails = new JMenuItem("Show details...");
+        popupMenu.add(showDetails);
+        showDetails.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, accelaratorKeyMask));
+        showDetails.addActionListener(new ActionListener() 
+        {	
+			@Override
+			public void actionPerformed(ActionEvent e) 
+			{
+				// Show a messaging identity dialog
+				if (list.getSelectedValue() != null)
+				{
+					IdentityInfoDialog iid = new IdentityInfoDialog(
+						JContactListPanel.this.parentFrame, list.getSelectedValue());
+					iid.setVisible(true);
+				}
+			}
+		});
+
 	}
 	
 	

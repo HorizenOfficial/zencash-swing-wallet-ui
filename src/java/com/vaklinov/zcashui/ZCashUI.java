@@ -110,7 +110,7 @@ public class ZCashUI
     public ZCashUI(StartupProgressDialog progressDialog)
         throws IOException, InterruptedException, WalletCallException
     {
-        super("ZENCash Desktop Wallet UI 0.74.3");
+        super("ZENCash Desktop Wallet UI 0.74.4");
         
         if (progressDialog != null)
         {

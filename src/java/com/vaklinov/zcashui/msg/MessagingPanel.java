@@ -151,7 +151,8 @@ public class MessagingPanel
 		final JSplitPane textAndContactsPane = new JSplitPane();
 		this.add(textAndContactsPane, BorderLayout.CENTER);
 		
-		this.contactList = new JContactListPanel(this, this.messagingStorage, this.errorReporter);
+		this.contactList = new JContactListPanel(
+			this, this.parentFrame, this.messagingStorage, this.errorReporter);
 		textAndContactsPane.setRightComponent(this.contactList);
 		
 		JPanel conversationPanel = new JPanel(new BorderLayout(0, 0));
@@ -578,15 +579,15 @@ public class MessagingPanel
 				
 				// Own identity exists, check balance of T address !!! - must be none
 				MessagingIdentity ownIdentity =  this.messagingStorage.getOwnIdentity();
-				Cursor oldCursor = this.getCursor();
+				Cursor oldCursor = this.parentFrame.getCursor();
 				String balance = null;
 				try
 				{
-     				this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+     				this.parentFrame.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 		    	    balance = this.clientCaller.getBalanceForAddress(ownIdentity.getSenderidaddress());
 				} finally
 				{
-					this.setCursor(oldCursor);
+					this.parentFrame.setCursor(oldCursor);
 				}
 				
 		    	if (Double.valueOf(balance) > 0)
@@ -1189,10 +1190,21 @@ public class MessagingPanel
 		
 		// Check to make sure the sending address has some funds!!!
 		final double minimumBalance = msgOptions.getAmountToSend() + msgOptions.getTransactionFee();
-		Double balance = Double.valueOf(
-			this.clientCaller.getBalanceForAddress(ownIdentity.getSendreceiveaddress()));
-		Double unconfirmedBalance = Double.valueOf(
-			this.clientCaller.getUnconfirmedBalanceForAddress(ownIdentity.getSendreceiveaddress()));
+		
+		Double balance = null;
+		Double unconfirmedBalance = null;
+		Cursor oldCursor = this.parentFrame.getCursor();
+		try
+		{
+			this.parentFrame.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+			balance = Double.valueOf(
+				this.clientCaller.getBalanceForAddress(ownIdentity.getSendreceiveaddress()));
+			unconfirmedBalance = Double.valueOf(
+				this.clientCaller.getUnconfirmedBalanceForAddress(ownIdentity.getSendreceiveaddress()));
+		} finally
+		{
+			this.parentFrame.setCursor(oldCursor);
+		}		
 		
 		if ((balance < minimumBalance) && (unconfirmedBalance < minimumBalance))
 		{
@@ -1957,7 +1969,9 @@ public class MessagingPanel
 		Map<String, MessagingIdentity> knownSenders = new HashMap<String, MessagingIdentity>();
 		for (Message msg : messages)
 		{
-			if (isZENIdentityMessage(msg.getMessage()))
+			if (isZENIdentityMessage(msg.getMessage()) && 
+				((msg.getDirection() == DIRECTION_TYPE.SENT) || 
+				 (msg.getVerification() == VERIFICATION_TYPE.VERIFICATION_OK)))
 			{
 				MessagingIdentity senderIdentity = new MessagingIdentity(
 						Util.parseJsonObject(msg.getMessage()).get("zenmessagingidentity").asObject());
