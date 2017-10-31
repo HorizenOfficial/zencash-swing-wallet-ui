@@ -118,7 +118,7 @@ public class MessagingPanel
 	private JProgressBar sendMessageProgressBar;
 	private JCheckBox    sendAnonymously;
 	
-	private Timer operationStatusTimer;
+	private Timer operationStatusTimer = null;
 	
 	private DataGatheringThread<Object> receivedMesagesGatheringThread = null;
 	
@@ -1153,6 +1153,17 @@ public class MessagingPanel
 			return;
 		}
 		
+		// Make sure there is not another send operation going on - at this time
+		if ((this.operationStatusTimer != null) || (!this.sendButton.isEnabled()))
+		{
+	        JOptionPane.showMessageDialog(
+	        	this.parentFrame,
+	        	"There is currently another message sending operation under way.\n" +
+	        	"Please wait until the operation is completed...", 
+		        "Another message sending operation is under way!", JOptionPane.ERROR_MESSAGE);					
+			return;
+		}
+		
 		// Disable sending controls, set status.
 		this.sendButton.setEnabled(false);
 		this.writeMessageTextArea.setEnabled(false);
@@ -1365,7 +1376,8 @@ public class MessagingPanel
 						// End the special thread used to follow the operation
 						opFollowingThread.setSuspended(true);
 						
-						if (clientCaller.isCompletedOperationSuccessful(operationStatusID))
+						boolean sendWasSuccessful = clientCaller.isCompletedOperationSuccessful(operationStatusID); 
+						if (sendWasSuccessful)
 						{
 							sendResultLabel.setText(
 								"<html><span style=\"font-size:0.8em;\">Send status: &nbsp;" +
@@ -1387,18 +1399,22 @@ public class MessagingPanel
 								
 						// Restore controls etc. final actions - reenable
 						sendMessageProgressBar.setValue(0);
-						operationStatusTimer.stop();						 
+						operationStatusTimer.stop();
+						operationStatusTimer = null;
 						sendButton.setEnabled(true);
 						writeMessageTextArea.setEnabled(true);
 						writeMessageTextArea.setText(""); // clear message from text area
 					    
-					    // Save message as outgoing
-						Message msg = new Message(jsonInnerMessageForFurtherUse);
-						msg.setTime(new Date());
-						msg.setDirection(DIRECTION_TYPE.SENT);
-						// TODO: We can get the transaction ID for outgoing messages but is is probably unnecessary
-						msg.setTransactionID(""); 
-						messagingStorage.writeNewSentMessageForContact(contactIdentity, msg);
+						if (sendWasSuccessful)
+						{
+						    // Save message as outgoing
+							Message msg = new Message(jsonInnerMessageForFurtherUse);
+							msg.setTime(new Date());
+							msg.setDirection(DIRECTION_TYPE.SENT);
+							// TODO: We can get the transaction ID for outgoing messages but is is probably unnecessary
+							msg.setTransactionID(""); 
+							messagingStorage.writeNewSentMessageForContact(contactIdentity, msg);
+						}
 					    
 					    // Update conversation text pane
 						displayMessagesForContact(contactIdentity);
