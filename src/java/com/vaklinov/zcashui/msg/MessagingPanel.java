@@ -907,33 +907,7 @@ public class MessagingPanel
 			
 			if (sendIDChoice == JOptionPane.YES_OPTION)
 			{
-				// Only a limited set of values is sent over the wire, due tr the limit of 330
-				// characters. // TODO: use protocol versions with larger messages
-				MessagingIdentity ownIdentity = this.messagingStorage.getOwnIdentity();
-				JsonObject innerIDObject = new JsonObject();
-				innerIDObject.set("nickname",           ownIdentity.getNickname());
-				innerIDObject.set("firstname",          ownIdentity.getFirstname());
-				innerIDObject.set("surname",            ownIdentity.getSurname());
-				innerIDObject.set("senderidaddress",    ownIdentity.getSenderidaddress());
-				innerIDObject.set("sendreceiveaddress", ownIdentity.getSendreceiveaddress());
-				JsonObject outerObject = new JsonObject();
-				outerObject.set("zenmessagingidentity", innerIDObject);
-				String identityString = outerObject.toString();
-				
-				// Check and send the messaging identity as a message
-				if (identityString.length() <= 330) // Protocol V1 restriction
-				{
-					this.sendMessage(identityString, contactIdentity);
-				} else
-				{
-					JOptionPane.showMessageDialog(
-						this.parentFrame, 
-						"The size of your messaging identity is unfortunately too large to be sent\n" +
-						"as a message. Your contact will have to import your messaging identity\n" +
-						"manaully from a json file...", 
-						"Messaging identity size is too large!", JOptionPane.ERROR_MESSAGE);
-					return;
-				}
+				this.sendIdentityMessageTo(contactIdentity);
 			}
 			
 		} catch (Exception ex)
@@ -1980,5 +1954,38 @@ public class MessagingPanel
 		}
 		
 		return knownSenders;
+	}
+	
+	
+	public void sendIdentityMessageTo(MessagingIdentity contactIdentity)
+		throws InterruptedException, IOException, WalletCallException
+	{
+		// Only a limited set of values is sent over the wire, due tr the limit of 330
+		// characters. // TODO: use protocol versions with larger messages
+		MessagingIdentity ownIdentity = this.messagingStorage.getOwnIdentity();
+		JsonObject innerIDObject = new JsonObject();
+		innerIDObject.set("nickname",           ownIdentity.getNickname());
+		innerIDObject.set("firstname",          ownIdentity.getFirstname());
+		innerIDObject.set("surname",            ownIdentity.getSurname());
+		innerIDObject.set("senderidaddress",    ownIdentity.getSenderidaddress());
+		innerIDObject.set("sendreceiveaddress", ownIdentity.getSendreceiveaddress());
+		JsonObject outerObject = new JsonObject();
+		outerObject.set("zenmessagingidentity", innerIDObject);
+		String identityString = outerObject.toString();
+		
+		// Check and send the messaging identity as a message
+		if (identityString.length() <= 330) // Protocol V1 restriction
+		{
+			this.sendMessage(identityString, contactIdentity);
+		} else
+		{
+			JOptionPane.showMessageDialog(
+				this.parentFrame, 
+				"The size of your messaging identity is unfortunately too large to be sent\n" +
+				"as a message. Your contact will have to import your messaging identity\n" +
+				"manaully from a json file...", 
+				"Messaging identity size is too large!", JOptionPane.ERROR_MESSAGE);
+			return;
+		}
 	}
 }

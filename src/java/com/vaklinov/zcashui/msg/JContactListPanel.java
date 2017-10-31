@@ -56,6 +56,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
@@ -249,7 +250,72 @@ public class JContactListPanel
 				}
 			}
 		});
+        
+		JMenuItem removeContact = new JMenuItem("Remove...");
+        popupMenu.add(removeContact);
+        removeContact.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R, accelaratorKeyMask));
+        removeContact.addActionListener(new ActionListener() 
+        {	
+			@Override
+			public void actionPerformed(ActionEvent e) 
+			{
+				JContactListPanel.this.parent.removeSelectedContact();
+			}
+		});
 
+		JMenuItem sendContactDetails = new JMenuItem("Send contact details...");
+        popupMenu.add(sendContactDetails);
+        sendContactDetails.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, accelaratorKeyMask));
+        sendContactDetails.addActionListener(new ActionListener() 
+        {	
+			@Override
+			public void actionPerformed(ActionEvent e) 
+			{
+				JContactListPanel.this.sendContactDetailsToSelectedContact();
+			}
+		});
+	}
+	
+	
+	public void sendContactDetailsToSelectedContact()
+	{
+		try
+		{
+			MessagingIdentity id = this.list.getSelectedValue();
+			
+			if (id == null)
+			{
+		        JOptionPane.showMessageDialog(
+			        this.parentFrame,
+			        "No messaging contact is selected in the contact list (on the right side of the UI).\n" +
+			        "In order to send contact details you need to select a contact first!",
+				    "No messaging contact is selected...", JOptionPane.ERROR_MESSAGE);					
+				return;
+			}
+			
+			if (id.isAnonymous())
+			{
+		        int reply = JOptionPane.showConfirmDialog(
+			        this.parentFrame, 
+			        "The contact: " + id.getDiplayString() + "\n" +
+			        "is anonymous. Sending your contact details to him will reveal your messaging\n" +
+			        "identity to! Are you sure you want to send your contact details to him?", 
+			        "Are you sure you want to send your contact details", 
+			        JOptionPane.YES_NO_OPTION);
+			        
+			    if (reply == JOptionPane.NO_OPTION) 
+			    {
+			      	return;
+			    }
+			}
+			
+			this.parent.sendIdentityMessageTo(id);
+			
+		} catch (Exception ioe)
+		{
+			Log.error("Unexpected error: ", ioe);
+			JContactListPanel.this.errorReporter.reportError(ioe, false);
+		}
 	}
 	
 	
