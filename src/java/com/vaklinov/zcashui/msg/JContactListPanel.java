@@ -299,7 +299,7 @@ public class JContactListPanel
 			        this.parentFrame, 
 			        "The contact: " + id.getDiplayString() + "\n" +
 			        "is anonymous. Sending your contact details to him will reveal your messaging\n" +
-			        "identity to! Are you sure you want to send your contact details to him?", 
+			        "identity! Are you sure you want to send your contact details to him?", 
 			        "Are you sure you want to send your contact details", 
 			        JOptionPane.YES_NO_OPTION);
 			        
