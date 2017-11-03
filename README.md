@@ -9,7 +9,7 @@ presents the information in a user-friendly manner.
 
 #### New/Experimental: [ZENCash Desktop GUI Wallet packages for Debian/Ubuntu Linux](https://github.com/ZencashOfficial/zencash-swing-wallet-ui/blob/master/docs/ReleaseUbuntuRepository.md) are available
 
-#### New/Experimental: [ZENCash Desktop GUI Wallet for Mac OS](https://github.com/ZencashOfficial/zencash-swing-wallet-ui/blob/master/docs/Release_0.73.4.md) is available
+#### New/Experimental: [ZENCash Desktop GUI Wallet for Mac OS](https://github.com/ZencashOfficial/zencash-swing-wallet-ui/blob/master/docs/Release_0.74.7.md) is available
 
 #### New/Experimental: [ZENCash Desktop GUI Wallet for Windows](https://github.com/ZencashOfficial/zencash-swing-wallet-ui/blob/master/docs/Release_0.74.2.md) is available
 
@@ -117,7 +117,6 @@ SOFTWARE.
 1. Limitation: Wallet encryption has been temporarily disabled in ZENCash due to stability problems. A corresponding issue 
 [#1552](https://github.com/zcash/zcash/issues/1552) has been opened by the ZCash developers. Correspondingly
 wallet encryption has been temporarily disabled in the ZENCash Desktop GUI Wallet.
-1. Issue: GUI data tables (transactions/addresses etc.) allow copying of data via double click but also allow editing. 
 The latter needs to be disabled. 
 1. Limitation: The list of transactions does not show all outgoing ones (specifically outgoing Z address 
 transactions). A corresponding issue [#1438](https://github.com/zcash/zcash/issues/1438) has been opened 
