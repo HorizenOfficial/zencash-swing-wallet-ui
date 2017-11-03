@@ -83,11 +83,17 @@
 	
     <target name="ubuntuPackage" depends="jar">	
     	<mkdir dir="${ubuntu.package.dir}"/>
-	    <deb destfile="${ubuntu.package.dir}/zencash-desktop-gui-wallet_0.74.2_all.deb" 
+	    <deb destfile="${ubuntu.package.dir}/zencash-desktop-gui-wallet_0.74.7_all.deb" 
 	    	 control="${src.dir}/resources/ubuntu-package" 
 	    	 verbose="true">
 	    	
 	      <data src="${jar.dir}/${ant.project.name}.jar" type="file">
+	        <mapper type="perm" filemode="755" prefix="/usr/lib/zencash-gui-wallet"/>
+	      </data>
+	      <data src="${jar.dir}/bitcoinj-core-0.14.5.jar" type="file">
+	        <mapper type="perm" filemode="755" prefix="/usr/lib/zencash-gui-wallet"/>
+	      </data>
+	      <data src="${jar.dir}/bitcoinj-core-0.14.5_LICENSE.txt" type="file">
 	        <mapper type="perm" filemode="755" prefix="/usr/lib/zencash-gui-wallet"/>
 	      </data>
 	      <data src="${src.dir}/resources/ubuntu-package/zencash-desktop-gui-wallet" type="file">
