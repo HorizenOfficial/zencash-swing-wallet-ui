@@ -16,7 +16,7 @@ Notable new features include messaging interface improvements for group messagin
 such as [http://quickhash-gui.org/](http://quickhash-gui.org/) you may calculate the its SHA256 checksum. The 
 result should be:
 ```
-f64af29a8cb242056be0dcdf29cf6630991ea29242a0a4c284d71595f9e00e10  ZENCashSwingWalletUI_0.73.1.zip
+f64af29a8cb242056be0dcdf29cf6630991ea29242a0a4c284d71595f9e00e10  ZENCashSwingWalletUI_0.74.2.zip
 ```
 **If the resulting checksum is not `f64af29a8cb242056be0dcdf29cf6630991ea29242a0a4c284d71595f9e00e10` then**
 **something is wrong and you should discard the downloaded wallet!**
