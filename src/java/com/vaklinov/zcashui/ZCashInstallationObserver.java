@@ -116,10 +116,16 @@ public class ZCashInstallationObserver
 			return getDaemonInfoForUNIXLikeOS();
 		}
 	}
+
 	
+	private synchronized DaemonInfo getDaemonInfoForUNIXLikeOS()
+		throws IOException, InterruptedException
+	{
+		return getDaemonInfoForUNIXLikeOS("zend");
+	}
 
 	// So far tested on Mac OS X and Linux - expected to work on other UNIXes as well
-	private synchronized DaemonInfo getDaemonInfoForUNIXLikeOS()
+	public static synchronized DaemonInfo getDaemonInfoForUNIXLikeOS(String daemonName)
 		throws IOException, InterruptedException
 	{
 		DaemonInfo info = new DaemonInfo();
@@ -164,7 +170,7 @@ public class ZCashInstallationObserver
 					} catch (NumberFormatException nfe) { /* TODO: Log or handle exception */ };
 				} else if (i == 10)
 				{
-					if ((token.equals("zend")) || (token.endsWith("/zend")))
+					if ((token.equals(daemonName)) || (token.endsWith("/" + daemonName)))
 					{
 						info.status = DAEMON_STATUS.RUNNING;
 						foundZCash = true;
@@ -189,8 +195,13 @@ public class ZCashInstallationObserver
 		return info;
 	}
 	
-	
 	private synchronized DaemonInfo getDaemonInfoForWindowsOS()
+		throws IOException, InterruptedException
+	{
+		return getDaemonInfoForWindowsOS("zend");
+	}
+	
+	public static synchronized DaemonInfo getDaemonInfoForWindowsOS(String daemonName)
 		throws IOException, InterruptedException
 	{
 		DaemonInfo info = new DaemonInfo();
@@ -230,7 +241,7 @@ public class ZCashInstallationObserver
 
 				if (i == 0)
 				{
-					if (token.equals("zend.exe") || token.equals("zend"))
+					if (token.equals(daemonName + ".exe") || token.equals(daemonName))
 					{
 						info.status = DAEMON_STATUS.RUNNING;
 						foundZCash = true;
@@ -257,7 +268,7 @@ public class ZCashInstallationObserver
 				} catch (NumberFormatException nfe)
 				{
 					info.residentSizeMB = 0;
-					Log.error("Error: could not find the numeric memory size of zend: " + size);
+					Log.error("Error: could not find the numeric memory size of " + daemonName + ": " + size);
 				};
 				
 				break;

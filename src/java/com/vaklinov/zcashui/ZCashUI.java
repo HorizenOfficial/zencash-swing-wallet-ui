@@ -98,6 +98,7 @@ public class ZCashUI
     private JMenuItem menuItemAddMessagingGroup;
     private JMenuItem menuItemRemoveContactIdentity;
     private JMenuItem menuItemMessagingOptions;
+    private JMenuItem menuItemShareFileViaIPFS;
 
     private DashboardPanel   dashboard;
     private AddressesPanel   addresses;
@@ -110,7 +111,7 @@ public class ZCashUI
     public ZCashUI(StartupProgressDialog progressDialog)
         throws IOException, InterruptedException, WalletCallException
     {
-        super("ZENCash Desktop Wallet UI 0.74.7");
+        super("ZENCash Desktop GUI Wallet 0.75.0");
         
         if (progressDialog != null)
         {
@@ -211,6 +212,12 @@ public class ZCashUI
         menuItemRemoveContactIdentity.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R, accelaratorKeyMask));
         messaging.add(menuItemMessagingOptions = new JMenuItem("Options...", KeyEvent.VK_O));
         menuItemMessagingOptions.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, accelaratorKeyMask));
+        
+        JMenu shareFileVia = new JMenu("Share file via:");
+        shareFileVia.setMnemonic(KeyEvent.VK_V);
+        messaging.add(shareFileVia);
+        shareFileVia.add(menuItemShareFileViaIPFS = new JMenuItem("IPFS", KeyEvent.VK_F));
+        menuItemShareFileViaIPFS.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F, accelaratorKeyMask));
         
         mb.add(messaging);
 
@@ -359,7 +366,6 @@ public class ZCashUI
                    }
                }
         );
-
        
        menuItemRemoveContactIdentity.addActionListener(   
                new ActionListener()
@@ -381,7 +387,18 @@ public class ZCashUI
             			ZCashUI.this.messagingPanel.openOptionsDialog();
                    }
                }
-        );
+       );
+       
+       menuItemShareFileViaIPFS.addActionListener(   
+               new ActionListener()
+               {
+                   @Override
+                   public void actionPerformed(ActionEvent e)
+                   {
+            			ZCashUI.this.messagingPanel.shareFileViaIPFS();
+                   }
+               }
+       );
 
        
         // Close operation

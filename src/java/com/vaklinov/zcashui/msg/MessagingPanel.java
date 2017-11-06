@@ -128,6 +128,8 @@ public class MessagingPanel
 	
 	private Object messageCollectionMutex = new Object();
 	
+	private IPFSWrapper ipfs;
+	
 	
 	public MessagingPanel(JFrame parentFrame, SendCashPanel sendCashPanel, JTabbedPane parentTabs, 
 			              ZCashClientCaller clientCaller, StatusUpdateErrorReporter errorReporter)
@@ -142,7 +144,7 @@ public class MessagingPanel
 		this.clientCaller     = clientCaller;
 		this.errorReporter    = errorReporter;
 		this.messagingStorage = new MessagingStorage();
-		
+		this.ipfs             = new IPFSWrapper(parentFrame);
 		
 		// Start building UI
 		this.setLayout(new BorderLayout(0, 0));
@@ -2002,6 +2004,19 @@ public class MessagingPanel
 				"manaully from a json file...", 
 				"Messaging identity size is too large!", JOptionPane.ERROR_MESSAGE);
 			return;
+		}
+	}
+	
+	
+	public void shareFileViaIPFS()
+	{
+		try
+		{
+			this.ipfs.shareFileViaIPFS();
+		} catch (Exception ex)
+		{
+			Log.error("Unexpected error in sharing file via IPFS: ", ex);
+			this.errorReporter.reportError(ex, false);
 		}
 	}
 }
