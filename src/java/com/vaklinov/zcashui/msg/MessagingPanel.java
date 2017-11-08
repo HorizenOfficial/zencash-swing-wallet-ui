@@ -2012,7 +2012,13 @@ public class MessagingPanel
 	{
 		try
 		{
-			this.ipfs.shareFileViaIPFS();
+			String ipfsLink = this.ipfs.shareFileViaIPFS();
+			Log.info("IPFS Link is: {0}", ipfsLink);
+			
+			String oldText = this.writeMessageTextArea.getText();
+			oldText = oldText != null ? oldText : "";
+			
+			this.writeMessageTextArea.setText(oldText + "\n" + ipfsLink);
 		} catch (Exception ex)
 		{
 			Log.error("Unexpected error in sharing file via IPFS: ", ex);

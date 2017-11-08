@@ -28,9 +28,14 @@
  **********************************************************************************/
 package com.vaklinov.zcashui.msg;
 
+import java.awt.Cursor;
+import java.awt.Toolkit;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.StringSelection;
 import java.io.File;
 import java.io.IOException;
 
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
@@ -61,29 +66,77 @@ public class IPFSWrapper
 	}
 	
 
+	// Returns null or [name](link)
 	public String shareFileViaIPFS()
 		throws IOException, InterruptedException
 	{
-		System.out.println("Sharing file ...");
-		
-		this.ensureIPFSIsRunning();
-		
-		// TODO: delay to start - check is we started it etc...
-		
-		String ipfs = this.getIPFSFullExecutablePath();
-		
-		CommandExecutor exec = new CommandExecutor(new String[]
+		JFileChooser fileChooser = new JFileChooser();
+		fileChooser.setDialogTitle("Share file via IPFS...");
+		fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+		 
+		int result = fileChooser.showOpenDialog(this.parentFrame);
+		 
+		if (result != JFileChooser.APPROVE_OPTION) 
 		{
-			ipfs, "add", "/home/ivan/temp/zer of ile.dat"	   
-		});
+		    return null;
+		}
 		
-		String strResponse = exec.execute();
+		File f = fileChooser.getSelectedFile();
 		
-		System.out.println("Response is: " + strResponse);
-		
-		return null;
+		Cursor oldCursor = this.parentFrame.getCursor();
+		try
+		{
+			this.parentFrame.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+						
+			Log.info("Sharing file: {0}", f.getCanonicalPath());
+			
+			if (!this.ensureIPFSIsRunning())
+			{
+				return null;
+			}
+			
+			String ipfs = this.getIPFSFullExecutablePath();
+			
+			CommandExecutor exec = new CommandExecutor(new String[]
+			{
+				ipfs, "add", "--quieter", f.getCanonicalPath()  
+			});
+			
+			String strResponse = exec.execute().trim();
+			
+			Log.info("IPFS hash is: " + strResponse);
+			
+			this.parentFrame.setCursor(oldCursor);
+			
+			Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+			clipboard.setContents(new StringSelection("http://localhost:8080/ipfs/" + strResponse), null);
+			
+			JOptionPane.showMessageDialog(
+				this.parentFrame, 
+				"The file " + f.getName() + " has been shared successfully via IPFS.\n" +
+				"It may be reached by other users via IPFS link: \n" +
+				"http://localhost:8080/ipfs/" + strResponse + "\n\n" +
+				"The link has been added to the messaging text box and also copied \n" +
+				"to the clipboard.", 
+				"File shared successfully", JOptionPane.INFORMATION_MESSAGE);
+			
+			return "[" + f.getName() + "] " +
+			       "http://localhost:8080/ipfs/" + strResponse;
+		} catch (Exception wce)
+		{
+			Log.error("Unexpected error: ", wce);
+			
+			JOptionPane.showMessageDialog(
+				this.parentFrame, 
+				"An unexpected error occurred while sharing file via IPFS!" +
+				"\n" + wce.getMessage().replace(",", ",\n"),
+				"Error in importing wallet private keys...", JOptionPane.ERROR_MESSAGE);
+			return null;
+		} finally
+		{
+			this.parentFrame.setCursor(oldCursor);
+		}
 	}
-	
 	
 	
 	private boolean ensureIPFSIsRunning()
@@ -97,8 +150,6 @@ public class IPFSWrapper
 			}
 			
 			this.startIPFS();
-			
-			// TODO: delay here...
 		}
 		
 		return true;
@@ -106,15 +157,27 @@ public class IPFSWrapper
 	
 	
 	private void startIPFS()
-		throws IOException
+		throws IOException, InterruptedException
 	{
+		// TODO: warn user if executable and dir are missing!
+		
+		// TODO: check IPFS config and possibly initialize!
+		
 		CommandExecutor starter = new CommandExecutor(
 		    new String[] 
 		    {
 		        this.getIPFSFullExecutablePath(), "daemon"
-		    });
+		    }
+		);
 		    
 		this.IPFSProcess = starter.startChildProcess();
+		
+		// Wait 30 sec to make sure the daemon is started
+		// TODO: better way to find out if it is started
+		Cursor oldCursor = this.parentFrame.getCursor();
+		this.parentFrame.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+		Thread.sleep(30 * 1000);
+		this.parentFrame.setCursor(oldCursor);
 		
         Runtime.getRuntime().addShutdownHook(new Thread() 
         {
@@ -151,9 +214,12 @@ public class IPFSWrapper
 			"This operation will start an IPFS server on your PC to enable file sharing.\n"      +
 			"As a result your PC will become a node in the Inter-Planetary File System that\n"   +
 			"enables distributed sharing of information. Before proceeding with IPFS, please\n"  +
-			"make sure you understand the full implications of this by getting familiar with\n" +
-			"the details of IPFS at this web site: https://ipfs.io/\n" +
-			"\n" +
+			"make sure you understand the full implications of this by getting familiar with\n"  +
+			"the details of IPFS at this web site: https://ipfs.io/\n"                           +
+			"\n"                                                                                 +
+			"The IPFS server needs TCP ports 4001 and 8080 on the system for its own use!\n"     +
+			"The IPFS server will be stopped automatically if you quit the ZENCash wallet. \n"   +
+			"\n"                                                                                 +
 			"Do you wish to start an IPFS server on your PC?", 
 			"Confirm starting an IPFS server...",
 			JOptionPane.DEFAULT_OPTION, 
