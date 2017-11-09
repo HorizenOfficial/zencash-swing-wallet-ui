@@ -29,11 +29,16 @@
 package com.vaklinov.zcashui.msg;
 
 import java.awt.Cursor;
+import java.awt.Desktop;
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
 import java.io.File;
 import java.io.IOException;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -59,10 +64,48 @@ public class IPFSWrapper
 	
 	private Process IPFSProcess;
 	
+	private final Pattern ipfsUrlPattern = Pattern.compile("http://localhost:8080/ipfs/[a-zA-Z0-9]{15,100}"); 
+	
+	
 	public IPFSWrapper(JFrame parentFrame)
 	{
 		this.parentFrame = parentFrame;
 		this.IPFSProcess = null;
+	}
+	
+	
+	public boolean isIPFSURL(String url)
+	{
+		return ipfsUrlPattern.matcher(url).matches();
+	}
+	
+	
+	public String replaceIPFSHTMLLinks(String html)
+	{
+		Matcher m = ipfsUrlPattern.matcher(html);
+		StringBuffer sb = new StringBuffer(html.length());
+		while (m.find()) 
+		{
+		    String link = m.group(0);
+		    link = "<a href=\"" + link + "\">" + link + "</a>";
+		    m.appendReplacement(sb, Matcher.quoteReplacement(link));
+		}
+		m.appendTail(sb);
+		return sb.toString();
+	}
+	
+	
+	public void followIPFSLink(URL u)
+		throws IOException, InterruptedException, URISyntaxException
+	{
+		if (this.ensureIPFSIsRunning())
+		{
+			Log.info("Opening IPFS link: {0}", u.toString());
+			Desktop.getDesktop().browse(u.toURI());
+		} else
+		{
+			Log.info("NOT opening IPFS link: {0} due to IPFS not running!!!", u.toString());
+		}
 	}
 	
 
@@ -120,8 +163,8 @@ public class IPFSWrapper
 				"to the clipboard.", 
 				"File shared successfully", JOptionPane.INFORMATION_MESSAGE);
 			
-			return "[" + f.getName() + "] " +
-			       "http://localhost:8080/ipfs/" + strResponse;
+			return "[" + f.getName() + "](" +
+			       "http://localhost:8080/ipfs/" + strResponse + ")";
 		} catch (Exception wce)
 		{
 			Log.error("Unexpected error: ", wce);
@@ -139,6 +182,7 @@ public class IPFSWrapper
 	}
 	
 	
+	// true if started OK
 	private boolean ensureIPFSIsRunning()
 		throws IOException, InterruptedException
 	{
@@ -149,14 +193,15 @@ public class IPFSWrapper
 				return false;
 			}
 			
-			this.startIPFS();
+			return this.startIPFS();
 		}
 		
 		return true;
 	}
 	
 	
-	private void startIPFS()
+	// true if started OK
+	private boolean startIPFS()
 		throws IOException, InterruptedException
 	{
 		// TODO: warn user if executable and dir are missing!
@@ -193,6 +238,8 @@ public class IPFSWrapper
                 }
             }
         });
+        
+        return true;
 	}
 	
 	
@@ -218,7 +265,9 @@ public class IPFSWrapper
 			"the details of IPFS at this web site: https://ipfs.io/\n"                           +
 			"\n"                                                                                 +
 			"The IPFS server needs TCP ports 4001 and 8080 on the system for its own use!\n"     +
-			"The IPFS server will be stopped automatically if you quit the ZENCash wallet. \n"   +
+			"The IPFS server will be stopped automatically if you quit the ZENCash wallet. To\n" +
+			"ensure that your contacts can reach the data you share, you may not quit the\n"     +
+			"wallet for as long as you expect your contacts to access the data.\n"               +
 			"\n"                                                                                 +
 			"Do you wish to start an IPFS server on your PC?", 
 			"Confirm starting an IPFS server...",
