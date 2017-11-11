@@ -420,7 +420,7 @@ public class ZCashUI
                 try
                 {
                     String userDir = OSUtil.getSettingsDirectory();
-                    File warningFlagFile = new File(userDir + File.separator + "initialInfoShown.flag");
+                    File warningFlagFile = new File(userDir + File.separator + "initialInfoShown_0.75.flag");
                     if (warningFlagFile.exists())
                     {
                         return;
@@ -447,7 +447,7 @@ public class ZCashUI
                     "LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,\n" +
                     "OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN\n" +
                     "THE SOFTWARE.\n\n" +
-                    "(This message will be shown only once)",
+                    "(This message will be shown only once, per release)",
                     "Disclaimer", JOptionPane.INFORMATION_MESSAGE);
             }
         });

@@ -140,6 +140,7 @@ public class IPFSWrapper
 			
 			String ipfs = this.getIPFSFullExecutablePath();
 			
+			// TODO: Windows filename parameter to be wrapped!
 			CommandExecutor exec = new CommandExecutor(new String[]
 			{
 				ipfs, "add", "--quieter", f.getCanonicalPath()  
