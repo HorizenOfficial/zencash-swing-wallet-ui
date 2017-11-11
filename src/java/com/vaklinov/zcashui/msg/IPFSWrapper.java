@@ -156,11 +156,10 @@ public class IPFSWrapper
 			
 			JOptionPane.showMessageDialog(
 				this.parentFrame, 
-				"The file " + f.getName() + " has been shared successfully via IPFS.\n" +
-				"It may be reached by other users via IPFS link: \n" +
+				"The file " + f.getName() + " has been shared successfully via IPFS. It may be\n" +
+				"reached by other users (who have a local IPFS server running) via IPFS link: \n" +
 				"http://localhost:8080/ipfs/" + strResponse + "\n\n" +
-				"The link has been added to the messaging text box and also copied \n" +
-				"to the clipboard.", 
+				"The link has been added to the messaging text box and also copied to the clipboard.\n", 
 				"File shared successfully", JOptionPane.INFORMATION_MESSAGE);
 			
 			return "[" + f.getName() + "](" +
@@ -204,10 +203,52 @@ public class IPFSWrapper
 	private boolean startIPFS()
 		throws IOException, InterruptedException
 	{
-		// TODO: warn user if executable and dir are missing!
+		// Warn user if executable and dir are missing!
+		File dir = new File(this.getIPFSDirectory());
+		if ((!dir.exists()) || (!dir.isDirectory()))
+		{
+	        JOptionPane.showMessageDialog(
+	        	this.parentFrame,
+	        	"The IPFS executables are expected to be found in directory:\n" +
+	        	dir.getCanonicalPath() + "\n" +
+	        	"However this directory is missing! IPFS cannot be started!", 
+	        	"IPFS directory is not available", JOptionPane.ERROR_MESSAGE);
+		    return false;
+		}
 		
-		// TODO: check IPFS config and possibly initialize!
+		File ipfsCmd = new File(this.getIPFSFullExecutablePath());
+		if ((!ipfsCmd.exists()) || (!ipfsCmd.isFile()))
+		{
+	        JOptionPane.showMessageDialog(
+	        	this.parentFrame,
+	        	"The IPFS command executable:\n" +
+	        	ipfsCmd.getCanonicalPath() + "\n" +
+	        	"needs to be available in order to start an IPFS Server on this PC." +
+	        	"However this executable file is missing! IPFS cannot be started!", 
+	        	"IPFS executable is not available", JOptionPane.ERROR_MESSAGE);
+		    return false;
+		}
 		
+		// Check IPFS config and possibly initialize it
+		File userhome = OSUtil.getUserHomeDirectory();
+		File ipfsConfig = new File(userhome, ".ipfs" + File.separator + "config");
+		if (!ipfsConfig.exists())
+		{
+			Log.info("IPFS configuration file {0} does not exist. IPFS will be initilaized!",
+					 ipfsConfig.getCanonicalPath());
+			CommandExecutor initilaizer = new CommandExecutor(
+			    new String[] 
+			    {
+			        this.getIPFSFullExecutablePath(), "init"
+			    }
+		    );
+			
+			String initResponse = initilaizer.execute();
+			
+			Log.info("IPFS initilaization messages: {0}", initResponse);
+		}
+		
+		// Finally start IPFS
 		CommandExecutor starter = new CommandExecutor(
 		    new String[] 
 		    {
@@ -217,11 +258,11 @@ public class IPFSWrapper
 		    
 		this.IPFSProcess = starter.startChildProcess();
 		
-		// Wait 30 sec to make sure the daemon is started
+		// Wait 25 sec to make sure the daemon is started
 		// TODO: better way to find out if it is started
 		Cursor oldCursor = this.parentFrame.getCursor();
 		this.parentFrame.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-		Thread.sleep(30 * 1000);
+		Thread.sleep(25 * 1000);
 		this.parentFrame.setCursor(oldCursor);
 		
         Runtime.getRuntime().addShutdownHook(new Thread() 
@@ -264,10 +305,13 @@ public class IPFSWrapper
 			"make sure you understand the full implications of this by getting familiar with\n"  +
 			"the details of IPFS at this web site: https://ipfs.io/\n"                           +
 			"\n"                                                                                 +
-			"The IPFS server needs TCP ports 4001 and 8080 on the system for its own use!\n"     +
+			"The IPFS server needs TCP ports 4001, 5001, 8080 on the system for its own use!\n"  +
 			"The IPFS server will be stopped automatically if you quit the ZENCash wallet. To\n" +
 			"ensure that your contacts can reach the data you share, you may not quit the\n"     +
-			"wallet for as long as you expect your contacts to access the data.\n"               +
+			"wallet for as long as you expect your contacts to access the data. The data you\n"  + 
+			"share over IPFS is public - may be accessed by anyone! The IPFS server startup\n"   +
+			"may take some seconds so please be patient...\n"                                    +
+// TODO: firewalled warning
 			"\n"                                                                                 +
 			"Do you wish to start an IPFS server on your PC?", 
 			"Confirm starting an IPFS server...",
