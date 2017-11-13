@@ -33,13 +33,20 @@ import java.awt.Desktop;
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
+import java.io.BufferedReader;
+import java.io.DataOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.ProtocolException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.net.ssl.HttpsURLConnection;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
@@ -48,6 +55,8 @@ import com.vaklinov.zcashui.CommandExecutor;
 import com.vaklinov.zcashui.Log;
 import com.vaklinov.zcashui.OSUtil;
 import com.vaklinov.zcashui.OSUtil.OS_TYPE;
+import com.vaklinov.zcashui.Util;
+import com.vaklinov.zcashui.ZCashClientCaller;
 import com.vaklinov.zcashui.ZCashInstallationObserver;
 import com.vaklinov.zcashui.ZCashInstallationObserver.DAEMON_STATUS;
 import com.vaklinov.zcashui.ZCashInstallationObserver.DaemonInfo;
@@ -139,16 +148,19 @@ public class IPFSWrapper
 			}
 			
 			String ipfs = this.getIPFSFullExecutablePath();
+			String pathParameter = ZCashClientCaller.wrapStringParameter(f.getCanonicalPath());
 			
-			// TODO: Windows filename parameter to be wrapped!
 			CommandExecutor exec = new CommandExecutor(new String[]
 			{
-				ipfs, "add", "--quieter", f.getCanonicalPath()  
+				ipfs, "add", "--quieter", pathParameter
 			});
 			
 			String strResponse = exec.execute().trim();
 			
-			Log.info("IPFS hash is: " + strResponse);
+			Log.info("IPFS hash of added file is: " + strResponse);
+			
+			// TODO: add via HTTP to some public writable IPFS gateway
+			//this.uploadIPFSDataViaPost(f, "http://localhost:8080/ipfs/");
 			
 			this.parentFrame.setCursor(oldCursor);
 			
@@ -259,11 +271,11 @@ public class IPFSWrapper
 		    
 		this.IPFSProcess = starter.startChildProcess();
 		
-		// Wait 25 sec to make sure the daemon is started
+		// Wait 20 sec to make sure the daemon is started
 		// TODO: better way to find out if it is started
 		Cursor oldCursor = this.parentFrame.getCursor();
 		this.parentFrame.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-		Thread.sleep(25 * 1000);
+		Thread.sleep(20 * 1000);
 		this.parentFrame.setCursor(oldCursor);
 		
         Runtime.getRuntime().addShutdownHook(new Thread() 
@@ -383,4 +395,29 @@ public class IPFSWrapper
 		return ipfs;
 	}
 		
+	
+	// Uploads IPFS data via a writable gateway
+	// serverURL - like http://localhost:8080/ipfs/
+	private boolean uploadIPFSDataViaPost(File f, String serverURL) 
+		throws MalformedURLException, ProtocolException, IOException
+	{
+		URL obj = new URL(serverURL);
+		HttpURLConnection con = (HttpURLConnection) obj.openConnection();
+
+		con.setRequestMethod("POST");
+		con.setRequestProperty("User-Agent", "Mozilla/5.0");
+		con.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+		
+		con.setDoOutput(true);
+		DataOutputStream out = new DataOutputStream(con.getOutputStream());
+		out.write(Util.loadFileInMemory(f));
+		out.flush();
+		out.close();
+		
+		int responseCode = con.getResponseCode();
+		// TODO: for now compare hashes until it is clear POST works the same way
+		System.out.println("IPFS header fields:" + con.getHeaderFields());
+		
+		return responseCode == 201; // Created
+	}
 }

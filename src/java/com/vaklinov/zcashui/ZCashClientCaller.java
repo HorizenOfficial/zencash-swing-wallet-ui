@@ -1074,7 +1074,7 @@ public class ZCashClientCaller
 	
 	
 	// Used to wrap string parameters on the command line - not doing so causes problems on Windows.
-	private String wrapStringParameter(String param)
+	public static String wrapStringParameter(String param)
 	{
 		OS_TYPE os = OSUtil.getOSType();
 		
