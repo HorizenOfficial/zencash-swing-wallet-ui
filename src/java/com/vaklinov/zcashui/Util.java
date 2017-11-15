@@ -32,6 +32,7 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.LineNumberReader;
+import java.io.RandomAccessFile;
 import java.io.Reader;
 import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
@@ -413,4 +414,25 @@ public class Util
 		return block.toString();
 	}
 	
+	
+	public static byte[] loadFileInMemory(File f)
+		throws IOException
+	{
+		RandomAccessFile oRAF = null;
+		try
+		{
+			oRAF = new RandomAccessFile(f, "r");
+			
+			byte bytes[] = new byte[(int)oRAF.length()];
+			oRAF.readFully(bytes);
+			
+			return bytes;
+		} finally
+		{
+			if (oRAF != null)
+			{
+				oRAF.close();
+			}
+		}
+	}
 }

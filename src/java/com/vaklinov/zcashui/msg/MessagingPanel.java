@@ -30,6 +30,7 @@ package com.vaklinov.zcashui.msg;
 
 import java.awt.BorderLayout;
 import java.awt.Cursor;
+import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
@@ -41,6 +42,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.Reader;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -128,6 +130,8 @@ public class MessagingPanel
 	
 	private Object messageCollectionMutex = new Object();
 	
+	private IPFSWrapper ipfs;
+	
 	
 	public MessagingPanel(JFrame parentFrame, SendCashPanel sendCashPanel, JTabbedPane parentTabs, 
 			              ZCashClientCaller clientCaller, StatusUpdateErrorReporter errorReporter)
@@ -142,7 +146,7 @@ public class MessagingPanel
 		this.clientCaller     = clientCaller;
 		this.errorReporter    = errorReporter;
 		this.messagingStorage = new MessagingStorage();
-		
+		this.ipfs             = new IPFSWrapper(parentFrame);
 		
 		// Start building UI
 		this.setLayout(new BorderLayout(0, 0));
@@ -289,9 +293,18 @@ public class MessagingPanel
 		}
 		
 		public void handleURL(URL u)
-			throws IOException
+			throws IOException, URISyntaxException, InterruptedException
 		{
 			String id = u.toString();
+			
+			// Special handling of IPFS URLs
+			if (MessagingPanel.this.ipfs.isIPFSURL(id))
+			{
+				MessagingPanel.this.ipfs.followIPFSLink(u);
+				return;
+			}
+			
+			// Handle uer links
 			if (id.startsWith("http://"))
 			{
 				id = id.substring("http://".length());
@@ -418,6 +431,8 @@ public class MessagingPanel
 				// Replace line end characters, for multi-line messages
 				preparedMessage = Util.escapeHTMLValue(msg.getMessage());
 				preparedMessage = preparedMessage.replace("\n", "<br/>");
+				// Possibly replace IPFS links
+				preparedMessage = this.ipfs.replaceIPFSHTMLLinks(preparedMessage);
 			};
 			
 			text.append("<span style=\"color:" + color +";\">");
@@ -2002,6 +2017,28 @@ public class MessagingPanel
 				"manaully from a json file...", 
 				"Messaging identity size is too large!", JOptionPane.ERROR_MESSAGE);
 			return;
+		}
+	}
+	
+	
+	public void shareFileViaIPFS()
+	{
+		try
+		{
+			String ipfsLink = this.ipfs.shareFileViaIPFS();
+			Log.info("IPFS Link is: {0}", ipfsLink);
+			
+			if (ipfsLink != null)
+			{
+				String oldText = this.writeMessageTextArea.getText();
+				oldText = oldText != null ? oldText : "";
+				
+				this.writeMessageTextArea.setText(oldText + "\n" + ipfsLink);
+			}
+		} catch (Exception ex)
+		{
+			Log.error("Unexpected error in sharing file via IPFS: ", ex);
+			this.errorReporter.reportError(ex, false);
 		}
 	}
 }

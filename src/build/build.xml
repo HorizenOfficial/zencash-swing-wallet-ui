@@ -6,7 +6,7 @@
  * /____\____\__,_|___/_| |_|____/ \_/\_/ |_|_| |_|\__, | \_/\_/ \__,_|_|_|\___|\__|\___/|___|
  *                                                 |___/                                      
  *                                       
- * Copyright (c) 2016 Ivan Vaklinov <ivan@vaklinov.com>
+ * Copyright (c) 2016-2017 Ivan Vaklinov <ivan@vaklinov.com>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -33,6 +33,7 @@
 	<property name="lib.dir"     value="lib"/>
     <property name="build.dir"   value="build"/>
     <property name="classes.dir" value="${build.dir}/classes"/>
+	<property name="temp.dir"    value="${build.dir}/temp"/>
     <property name="jar.dir"     value="${build.dir}/jars"/>
 	<property name="ubuntu.package.dir" value="${build.dir}/ubuntu-package"/>
 
@@ -46,11 +47,25 @@
 	</path>
 	<taskdef name="deb" classpathref="jdeb.jar" classname="org.vafer.jdeb.ant.DebAntTask"/>
 	
+	<condition property="isMacOS">
+	    <os family="mac" />
+	</condition>
+
+	<condition property="isWindows">
+	    <os family="windows" />
+	</condition>
+
+	<condition property="isUnix">
+	    <os family="unix" />
+	</condition>
+	
+	<!-- TARGETS -->
+	
     <target name="clean">
         <delete dir="${build.dir}"/>
     </target>
 	
-    <target name="copyResources">
+    <target name="copyResources" depends="clean">
     	<copy todir="${classes.dir}" >  
     	    <fileset dir="${src.dir}/resources">  
     	        <include name="images/**"/>
@@ -59,7 +74,7 @@
     	</copy>
     </target>
 
-    <target name="compile">
+    <target name="compile" depends="clean">
         <mkdir dir="${classes.dir}"/>
         <javac srcdir="${src.dir}" destdir="${classes.dir}" debug="on">
         	<classpath refid="main-classpath"/>
@@ -81,9 +96,9 @@
         </jar>
     </target>
 	
-    <target name="ubuntuPackage" depends="jar">	
+    <target name="ubuntuPackage" depends="jar,copyothers">	
     	<mkdir dir="${ubuntu.package.dir}"/>
-	    <deb destfile="${ubuntu.package.dir}/zencash-desktop-gui-wallet_0.74.7_all.deb" 
+	    <deb destfile="${ubuntu.package.dir}/zencash-desktop-gui-wallet_0.75.1_amd64.deb" 
 	    	 control="${src.dir}/resources/ubuntu-package" 
 	    	 verbose="true">
 	    	
@@ -96,12 +111,42 @@
 	      <data src="${jar.dir}/bitcoinj-core-0.14.5_LICENSE.txt" type="file">
 	        <mapper type="perm" filemode="755" prefix="/usr/lib/zencash-gui-wallet"/>
 	      </data>
+	      <!-- TODO: As of Nov 2017 the IPFS wallet integration is suspended. 
+		  <data src="${jar.dir}/go-ipfs/ipfs" type="file">
+		    <mapper type="perm" filemode="755" prefix="/usr/lib/zencash-gui-wallet/go-ipfs"/>
+		  </data>
+		  <data src="${jar.dir}/go-ipfs/LICENSE" type="file">
+			<mapper type="perm" filemode="755" prefix="/usr/lib/zencash-gui-wallet/go-ipfs"/>
+		  </data>
+		  <data src="${jar.dir}/go-ipfs/README.md" type="file">
+			<mapper type="perm" filemode="755" prefix="/usr/lib/zencash-gui-wallet/go-ipfs"/>
+		  </data>	    		
+		  -->
 	      <data src="${src.dir}/resources/ubuntu-package/zencash-desktop-gui-wallet" type="file">
 	        <mapper type="perm" filemode="755" prefix="/usr/bin"/>
 	      </data>	    	
 	    </deb>
 	</target>
 	
+	<!-- TODO: As of Nov 2017 the IPFS wallet integration is suspended. 
+	<target name="unpackIPFSForMacOS" if="isMacOS">
+	    <echo message="Using the IPFS packaged executable on Mac OS..." />
+		<mkdir dir="${temp.dir}"/>
+		<gunzip src="${basedir}/lib/go-ipfs_v0.4.11_darwin-amd64.tar.gz" dest="${temp.dir}/ipfs.tar"/>
+	</target>
+
+	<target name="unpackIPFSForWindows" if="isWindows">
+	    <echo message="Using the IPFS packaged executable on Windows..." />
+		<mkdir dir="${temp.dir}"/>
+		<gunzip src="${basedir}/lib/go-ipfs_v0.4.11_windows-amd64.tar.gz" dest="${temp.dir}/ipfs.tar"/>
+	</target>
+
+	<target name="unpackIPFSForLinux" if="isUnix">
+	    <echo message="Using the IPFS packaged executable on Linux..." />
+		<mkdir dir="${temp.dir}"/>
+		<gunzip src="${basedir}/lib/go-ipfs_v0.4.11_linux-amd64.tar.gz" dest="${temp.dir}/ipfs.tar"/>
+	</target>
+	-->
 	
 	<target name="copyothers">
     	<copy todir="${jar.dir}" >  
@@ -109,11 +154,15 @@
     	        <include name="bitcoinj-core-0.14.5*"/>
     	    </fileset>
     	</copy>
+		<!-- As of Nov 2017 the IPFS wallet integration is suspended.
+		<untar src="${temp.dir}/ipfs.tar" dest="${jar.dir}"/>
+		-->
 	</target>
-
+	
     <target name="buildit" depends="clean,jar,copyothers,ubuntuPackage">
     	<!-- Final cleanup -->
     	<delete dir="${classes.dir}"/>
+    	<delete dir="${temp.dir}"/>
 	</target>
 
 </project>

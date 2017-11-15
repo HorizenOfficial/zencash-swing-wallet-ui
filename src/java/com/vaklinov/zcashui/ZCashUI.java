@@ -98,6 +98,7 @@ public class ZCashUI
     private JMenuItem menuItemAddMessagingGroup;
     private JMenuItem menuItemRemoveContactIdentity;
     private JMenuItem menuItemMessagingOptions;
+    private JMenuItem menuItemShareFileViaIPFS;
 
     private DashboardPanel   dashboard;
     private AddressesPanel   addresses;
@@ -110,7 +111,7 @@ public class ZCashUI
     public ZCashUI(StartupProgressDialog progressDialog)
         throws IOException, InterruptedException, WalletCallException
     {
-        super("ZENCash Desktop Wallet UI 0.74.7");
+        super("ZENCash Desktop GUI Wallet 0.75.1");
         
         if (progressDialog != null)
         {
@@ -145,7 +146,7 @@ public class ZCashUI
         		    addresses = new AddressesPanel(clientCaller, errorReporter));
         tabs.addTab("Send cash ",
         		    new ImageIcon(cl.getResource("images/send.png")),
-        		    sendPanel = new SendCashPanel(clientCaller, errorReporter));
+        		    sendPanel = new SendCashPanel(clientCaller, errorReporter, installationObserver));
         tabs.addTab("Address book ",
     		        new ImageIcon(cl.getResource("images/address-book.png")),
     		        addressBookPanel = new AddressBookPanel(sendPanel, tabs));
@@ -211,6 +212,13 @@ public class ZCashUI
         menuItemRemoveContactIdentity.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R, accelaratorKeyMask));
         messaging.add(menuItemMessagingOptions = new JMenuItem("Options...", KeyEvent.VK_O));
         menuItemMessagingOptions.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, accelaratorKeyMask));
+        
+        JMenu shareFileVia = new JMenu("Share file via:");
+        shareFileVia.setMnemonic(KeyEvent.VK_V);
+        // TODO: uncomment this for IPFS integration
+        //messaging.add(shareFileVia);
+        shareFileVia.add(menuItemShareFileViaIPFS = new JMenuItem("IPFS", KeyEvent.VK_F));
+        menuItemShareFileViaIPFS.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F, accelaratorKeyMask));
         
         mb.add(messaging);
 
@@ -359,7 +367,6 @@ public class ZCashUI
                    }
                }
         );
-
        
        menuItemRemoveContactIdentity.addActionListener(   
                new ActionListener()
@@ -381,7 +388,18 @@ public class ZCashUI
             			ZCashUI.this.messagingPanel.openOptionsDialog();
                    }
                }
-        );
+       );
+       
+       menuItemShareFileViaIPFS.addActionListener(   
+               new ActionListener()
+               {
+                   @Override
+                   public void actionPerformed(ActionEvent e)
+                   {
+            			ZCashUI.this.messagingPanel.shareFileViaIPFS();
+                   }
+               }
+       );
 
        
         // Close operation
@@ -403,7 +421,7 @@ public class ZCashUI
                 try
                 {
                     String userDir = OSUtil.getSettingsDirectory();
-                    File warningFlagFile = new File(userDir + File.separator + "initialInfoShown.flag");
+                    File warningFlagFile = new File(userDir + File.separator + "initialInfoShown_0.75.flag");
                     if (warningFlagFile.exists())
                     {
                         return;
@@ -430,7 +448,7 @@ public class ZCashUI
                     "LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,\n" +
                     "OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN\n" +
                     "THE SOFTWARE.\n\n" +
-                    "(This message will be shown only once)",
+                    "(This message will be shown only once, per release)",
                     "Disclaimer", JOptionPane.INFORMATION_MESSAGE);
             }
         });
