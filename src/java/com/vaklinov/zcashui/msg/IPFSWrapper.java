@@ -73,7 +73,8 @@ public class IPFSWrapper
 	
 	private Process IPFSProcess;
 	
-	private final Pattern ipfsUrlPattern = Pattern.compile("http://localhost:8080/ipfs/[a-zA-Z0-9]{15,100}"); 
+	private final Pattern ipfsUrlPattern = Pattern.compile(
+		"https?://[a-zA-Z0-9\\.\\-]+(:[0-9]{2,5})?/ipfs/[a-zA-Z0-9]{15,100}"); 
 	
 	
 	public IPFSWrapper(JFrame parentFrame)
@@ -198,6 +199,13 @@ public class IPFSWrapper
 	private boolean ensureIPFSIsRunning()
 		throws IOException, InterruptedException
 	{
+		// TODO: As of Nov 2017 the IPFS wallet integration is suspended. This method just returns
+		// true. This is to be corrected when IPFS integration resumes.
+		if (true)
+		{
+			return !false;
+		}
+		
 		if (!isIPFSWrapperRunning())
 		{
 			if (!this.getUserConsentToStartIPFS())

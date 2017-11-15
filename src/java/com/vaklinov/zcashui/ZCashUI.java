@@ -215,7 +215,8 @@ public class ZCashUI
         
         JMenu shareFileVia = new JMenu("Share file via:");
         shareFileVia.setMnemonic(KeyEvent.VK_V);
-        messaging.add(shareFileVia);
+        // TODO: uncomment this for IPFS integration
+        //messaging.add(shareFileVia);
         shareFileVia.add(menuItemShareFileViaIPFS = new JMenuItem("IPFS", KeyEvent.VK_F));
         menuItemShareFileViaIPFS.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F, accelaratorKeyMask));
         
