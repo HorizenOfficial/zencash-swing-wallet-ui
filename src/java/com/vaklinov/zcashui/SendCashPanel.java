@@ -34,9 +34,7 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.Toolkit;
-import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.DataFlavor;
-import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -45,7 +43,6 @@ import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import javax.swing.BorderFactory;
@@ -59,7 +56,6 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JProgressBar;
-import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.Timer;
@@ -76,8 +72,9 @@ import com.vaklinov.zcashui.ZCashClientCaller.WalletCallException;
 public class SendCashPanel
 	extends WalletTabPanel
 {
-	private ZCashClientCaller clientCaller;
+	private ZCashClientCaller         clientCaller;
 	private StatusUpdateErrorReporter errorReporter;
+	private ZCashInstallationObserver installationObserver;
 	
 	private JComboBox  balanceAddressCombo     = null;
 	private JPanel     comboBoxParentPanel     = null;
@@ -100,7 +97,9 @@ public class SendCashPanel
 	private int          operationStatusCounter      = 0;
 	
 
-	public SendCashPanel(ZCashClientCaller clientCaller,  StatusUpdateErrorReporter errorReporter)
+	public SendCashPanel(ZCashClientCaller clientCaller,  
+			             StatusUpdateErrorReporter errorReporter,
+			             ZCashInstallationObserver installationObserver)
 		throws IOException, InterruptedException, WalletCallException
 	{
 		this.timers = new ArrayList<Timer>();
@@ -108,7 +107,8 @@ public class SendCashPanel
 		
 		this.clientCaller = clientCaller;
 		this.errorReporter = errorReporter;
-
+		this.installationObserver = installationObserver;
+		
 		// Build content
 		this.setBorder(BorderFactory.createEmptyBorder(3, 3, 3, 3));
 		this.setLayout(new BorderLayout());
@@ -408,6 +408,35 @@ public class SendCashPanel
 		} else if (destinationAddress.length() > 512)
 		{
 			errorMessage = "Destination address is invalid; it is too long.";
+		}
+		
+		// Prevent accidental sending to non-ZEN addresses (which zend supports) probably because of
+		// ZClassic compatibility
+		if (!installationObserver.isOnTestNet())
+		{
+			if (!(destinationAddress.startsWith("zc") || destinationAddress.startsWith("zn")))
+			{
+				Object[] options = { "Yes", "No" };
+
+				int option = JOptionPane.showOptionDialog(
+					SendCashPanel.this.getRootPane().getParent(), 
+					"The destination address to send ZEN to:\n" +
+					destinationAddress + "\n"+
+					"does not appear to be a valid ZEN address. ZEN addresses typically start with zc or\n" +
+					"zn. As a legacy feature the ZEN core software can send funds to addresses in ZClassic\n" +
+					"format but this is rarely intended. Are you sure you want to send to this address?", 
+					"Destination address seems incorrect...",
+					JOptionPane.DEFAULT_OPTION, 
+					JOptionPane.WARNING_MESSAGE,
+					null, 
+					options, 
+					options[1]);
+				
+			    if (option == 1)
+			    {
+			    	return; // not end anything
+			    }
+			}
 		}
 		
 		if ((amount == null) || (amount.trim().length() <= 0))

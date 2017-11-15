@@ -111,7 +111,7 @@ public class ZCashUI
     public ZCashUI(StartupProgressDialog progressDialog)
         throws IOException, InterruptedException, WalletCallException
     {
-        super("ZENCash Desktop GUI Wallet 0.75.0");
+        super("ZENCash Desktop GUI Wallet 0.75.1");
         
         if (progressDialog != null)
         {
@@ -146,7 +146,7 @@ public class ZCashUI
         		    addresses = new AddressesPanel(clientCaller, errorReporter));
         tabs.addTab("Send cash ",
         		    new ImageIcon(cl.getResource("images/send.png")),
-        		    sendPanel = new SendCashPanel(clientCaller, errorReporter));
+        		    sendPanel = new SendCashPanel(clientCaller, errorReporter, installationObserver));
         tabs.addTab("Address book ",
     		        new ImageIcon(cl.getResource("images/address-book.png")),
     		        addressBookPanel = new AddressBookPanel(sendPanel, tabs));
