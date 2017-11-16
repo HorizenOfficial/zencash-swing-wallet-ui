@@ -28,12 +28,16 @@
  **********************************************************************************/
 package com.vaklinov.zcashui;
 
-import java.awt.Cursor;
-import java.awt.Toolkit;
+import java.awt.*;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -42,7 +46,10 @@ import javax.swing.JTabbedPane;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import com.vaklinov.zcashui.ZCashClientCaller.WalletCallException;
+import com.vaklinov.zcashui.models.Address;
 import com.vaklinov.zcashui.msg.MessagingPanel;
+import com.vaklinov.zcashui.repo.ArizenWallet;
+import com.vaklinov.zcashui.repo.WalletRepo;
 
 
 /**
@@ -421,8 +428,99 @@ public class WalletOperations
 			this.errorReporter.reportError(ex, false);
 		}
 	}
-	
-	
+
+	/**
+	 * export to Arizen wallet
+	 */
+	public void exportToArizenWallet()
+	{
+		String absolutePath = "";
+		WalletRepo arizenWallet = new ArizenWallet();
+		try
+		{
+			JFileChooser fileChooser = new JFileChooser();
+			fileChooser.setFileFilter(new FileNameExtensionFilter("Arizen wallet file", "uawd"));
+			fileChooser.setDialogTitle("Export wallet to Arizen wallet format...");
+			fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+			fileChooser.setCurrentDirectory(OSUtil.getUserHomeDirectory());
+			int result = fileChooser.showDialog(this.parent, "Export");
+
+			if (result != JFileChooser.APPROVE_OPTION)
+			{
+				return;
+			}
+
+			File f = fileChooser.getSelectedFile();
+			String fullPath = f.getAbsolutePath();
+			if (!fullPath.endsWith(".uawd"))
+				fullPath += ".uawd";
+
+			absolutePath = fullPath;
+			f = new File(fullPath);
+			if(f.exists()) {
+				int r = JOptionPane.showConfirmDialog((Component) null,
+						String.format("The file %s already exists, do you want proceed and delete it?", f.getName()),
+						"Alert", JOptionPane.YES_NO_OPTION);
+				if (r==1) { return; }
+				Files.delete(f.toPath());
+			}
+			arizenWallet.createWallet(f);
+
+			String[] zaddress = clientCaller.getWalletZAddresses();
+			String[] taddress = clientCaller.getWalletAllPublicAddresses();
+			String[] tAddressesWithUnspentOuts = clientCaller.getWalletPublicAddressesWithUnspentOutputs();
+
+			Set<Address> addressPublicSet = new HashSet<Address>();
+			Set<Address> addressPrivateSet = new HashSet<Address>();
+
+			Map<String, Address> tMap = new HashMap<String, Address>();
+			Map<String, Address> zMap = new HashMap<String, Address>();
+
+			for(String straddr:taddress) {
+				String pk = clientCaller.getTPrivateKey(straddr);
+				String balance = clientCaller.getBalanceForAddress(straddr);
+				Address addr = new Address(Address.ADDRESS_TYPE.TRANSPARENT, straddr, pk, balance);
+				tMap.put(straddr, addr);
+			}
+
+			for(String straddr:tAddressesWithUnspentOuts) {
+				String pk = clientCaller.getTPrivateKey(straddr);
+				String balance = clientCaller.getBalanceForAddress(straddr);
+				Address addr = new Address(Address.ADDRESS_TYPE.TRANSPARENT, straddr, pk, balance);
+				tMap.put(straddr, addr);
+			}
+
+			for(String straddr:zaddress) {
+				String pk = clientCaller.getZPrivateKey(straddr);
+				String balance = clientCaller.getBalanceForAddress(straddr);
+				Address addr = new Address(Address.ADDRESS_TYPE.PRIVATE, straddr, pk, balance);
+				zMap.put(straddr, addr);
+			}
+
+			addressPublicSet.addAll(tMap.values());
+			addressPrivateSet.addAll(zMap.values());
+			arizenWallet.insertAddressBatch(addressPublicSet);
+			arizenWallet.insertAddressBatch(addressPrivateSet);
+
+		} catch (Exception ex)
+		{
+			this.errorReporter.reportError(ex, false);
+		} finally {
+			try {
+				if (arizenWallet != null && arizenWallet.isOpen()) {
+					arizenWallet.close();
+				}
+				JOptionPane.showConfirmDialog(this.parent, String.format("The wallet is exported to: %s",  absolutePath),
+						"Export to Arizen wallet", JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE);
+
+			} catch (Exception ex) {
+				this.errorReporter.reportError(ex, false);
+			}
+		}
+	}
+
+
+
 	private void issueBackupDirectoryWarning()
 		throws IOException
 	{
