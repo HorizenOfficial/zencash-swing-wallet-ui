@@ -163,7 +163,8 @@ public class OSUtil
 				cp2 = cp2.substring(1);
 			}
 			
-			final String CP_JARS = JAR_NAME + File.pathSeparator + "bitcoinj-core-0.14.5.jar";
+			final String CP_JARS = JAR_NAME + File.pathSeparator + "bitcoinj-core-0.14.5.jar" +
+					                          File.pathSeparator + "sqlite-jdbc-3.21.0.jar";
 			if (cp2.endsWith(CP_JARS))
 			{
 				String cpStart = cp2.substring(0, cp2.length() - CP_JARS.length());

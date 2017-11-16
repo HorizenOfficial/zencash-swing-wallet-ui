@@ -88,8 +88,7 @@
         	 excludes="**/tradetest/*.class">
             <manifest>
                 <attribute name="Main-Class" value="${main-class}"/>
-                <attribute name="Class-Path" value="bitcoinj-core-0.14.5.jar"/>
-				<attribute name="Class-Path" value="sqlite-jdbc-3.21.0.jar"/>
+                <attribute name="Class-Path" value="bitcoinj-core-0.14.5.jar sqlite-jdbc-3.21.0.jar"/>
             </manifest>
         </jar>
         <jar destfile="${jar.dir}/${ant.project.name}-src.jar" 
