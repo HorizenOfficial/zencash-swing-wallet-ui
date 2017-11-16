@@ -414,7 +414,9 @@ public class SendCashPanel
 		// ZClassic compatibility
 		if (!installationObserver.isOnTestNet())
 		{
-			if (!(destinationAddress.startsWith("zc") || destinationAddress.startsWith("zn")))
+			if (!(destinationAddress.startsWith("zc") || 
+				  destinationAddress.startsWith("zn") ||
+				  destinationAddress.startsWith("zs")))
 			{
 				Object[] options = { "Yes", "No" };
 
@@ -422,9 +424,9 @@ public class SendCashPanel
 					SendCashPanel.this.getRootPane().getParent(), 
 					"The destination address to send ZEN to:\n" +
 					destinationAddress + "\n"+
-					"does not appear to be a valid ZEN address. ZEN addresses typically start with zc or\n" +
-					"zn. As a legacy feature the ZEN core software can send funds to addresses in ZClassic\n" +
-					"format but this is rarely intended. Are you sure you want to send to this address?", 
+					"does not appear to be a valid ZEN address. ZEN addresses typically start with zc, zn or\n" +
+					"zs. As a legacy feature the ZEN core software can send funds to addresses in ZClassic\n" +
+					"format but this is rarely intended. Are you sure you want to send ZEN to this address?", 
 					"Destination address seems incorrect...",
 					JOptionPane.DEFAULT_OPTION, 
 					JOptionPane.WARNING_MESSAGE,
