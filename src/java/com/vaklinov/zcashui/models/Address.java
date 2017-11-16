@@ -1,7 +1,7 @@
 package com.vaklinov.zcashui.models;
 /**
  * 
- * @author Pier Stabilini <pier@zencash.io>
+ * @author Pier Stabilini <pier@zensystem.io>
  *
  */
 public class Address {

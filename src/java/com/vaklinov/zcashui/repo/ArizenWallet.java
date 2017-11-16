@@ -15,7 +15,7 @@ import java.util.Set;
 /**
  * Arizen wallet implementation
  *
- * @author Pier Stabilini <pier@zencash.io> 
+ * @author Pier Stabilini <pier@zensystem.io>
  */
 public class ArizenWallet implements WalletRepo {
 

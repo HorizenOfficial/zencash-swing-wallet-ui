@@ -7,7 +7,7 @@ import java.util.Set;
 
 /**
  * 
- * @author Pier Stabilini <pier@zencash.io> 
+ * @author Pier Stabilini <pier@zensystem.io>
  *
  */
 public interface WalletRepo {
