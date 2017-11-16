@@ -112,17 +112,24 @@
 	      <data src="${jar.dir}/bitcoinj-core-0.14.5_LICENSE.txt" type="file">
 	        <mapper type="perm" filemode="755" prefix="/usr/lib/zencash-gui-wallet"/>
 	      </data>
-	      <!-- TODO: As of Nov 2017 the IPFS wallet integration is suspended. 
-		  <data src="${jar.dir}/go-ipfs/ipfs" type="file">
-		    <mapper type="perm" filemode="755" prefix="/usr/lib/zencash-gui-wallet/go-ipfs"/>
+		  <data src="${jar.dir}/sqlite-jdbc-3.21.0.jar" type="file">
+			 <mapper type="perm" filemode="755" prefix="/usr/lib/zencash-gui-wallet"/>
 		  </data>
-		  <data src="${jar.dir}/go-ipfs/LICENSE" type="file">
-			<mapper type="perm" filemode="755" prefix="/usr/lib/zencash-gui-wallet/go-ipfs"/>
+		  <data src="${jar.dir}/sqlite-jdbc-3.21.0_LICENSE.txt" type="file">
+			 <mapper type="perm" filemode="755" prefix="/usr/lib/zencash-gui-wallet"/>
 		  </data>
-		  <data src="${jar.dir}/go-ipfs/README.md" type="file">
-			<mapper type="perm" filemode="755" prefix="/usr/lib/zencash-gui-wallet/go-ipfs"/>
-		  </data>	    		
-		  -->
+
+			<!-- TODO: As of Nov 2017 the IPFS wallet integration is suspended.
+            <data src="${jar.dir}/go-ipfs/ipfs" type="file">
+              <mapper type="perm" filemode="755" prefix="/usr/lib/zencash-gui-wallet/go-ipfs"/>
+            </data>
+            <data src="${jar.dir}/go-ipfs/LICENSE" type="file">
+              <mapper type="perm" filemode="755" prefix="/usr/lib/zencash-gui-wallet/go-ipfs"/>
+            </data>
+            <data src="${jar.dir}/go-ipfs/README.md" type="file">
+              <mapper type="perm" filemode="755" prefix="/usr/lib/zencash-gui-wallet/go-ipfs"/>
+            </data>
+            -->
 	      <data src="${src.dir}/resources/ubuntu-package/zencash-desktop-gui-wallet" type="file">
 	        <mapper type="perm" filemode="755" prefix="/usr/bin"/>
 	      </data>	    	
