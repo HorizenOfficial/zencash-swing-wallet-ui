@@ -30,16 +30,21 @@ package com.vaklinov.zcashui;
 
 
 import java.awt.BorderLayout;
+import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.Toolkit;
+import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.IOException;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -539,31 +544,8 @@ public class SendCashPanel
 						// End the special thread used to follow the operation
 						opFollowingThread.setSuspended(true);
 						
-						if (clientCaller.isCompletedOperationSuccessful(operationStatusID))
-						{
-							operationStatusLabel.setText(
-								"<html><span style=\"color:green;font-weight:bold\">SUCCESSFUL</span></html>");
-							JOptionPane.showMessageDialog(
-									SendCashPanel.this.getRootPane().getParent(), 
-									"Succesfully sent " + amount + " ZEN from address: \n" +
-									sourceAddress + "\n" +
-									"to address: \n" +
-									destinationAddress + "\n", 
-									"Cash sent successfully", JOptionPane.INFORMATION_MESSAGE);
-						} else
-						{
-							String errorMessage = clientCaller.getOperationFinalErrorMessage(operationStatusID); 
-							operationStatusLabel.setText(
-								"<html><span style=\"color:red;font-weight:bold\">ERROR: " + errorMessage + "</span></html>");
-
-							JOptionPane.showMessageDialog(
-									SendCashPanel.this.getRootPane().getParent(), 
-									"An error occurred when sending cash. Error message is:\n" +
-									errorMessage + "\n\n" +
-									"Please ensure that sending parameters are correct. You may try again later...\n", 
-									"Error in sending cash", JOptionPane.ERROR_MESSAGE);
-
-						}
+						SendCashPanel.this.reportCompleteOperationToTheUser(
+							amount, sourceAddress, destinationAddress);
 						
 						// Lock the wallet again 
 						if (bEncryptedWallet)
@@ -722,4 +704,61 @@ public class SendCashPanel
 	}
 	
 	
+	private void reportCompleteOperationToTheUser(String amount, String sourceAddress, String destinationAddress)
+		throws InterruptedException, WalletCallException, IOException, URISyntaxException
+	{
+		if (clientCaller.isCompletedOperationSuccessful(operationStatusID))
+		{
+			operationStatusLabel.setText(
+				"<html><span style=\"color:green;font-weight:bold\">SUCCESSFUL</span></html>");
+			String TXID = clientCaller.getSuccessfulOperationTXID(operationStatusID);
+			
+			Object[] options = { "OK", "Copy transaction ID", "View on the blockchain" };
+			
+			int option = JOptionPane.showOptionDialog(
+				SendCashPanel.this.getRootPane().getParent(), 
+				"Succesfully sent " + amount + " ZEN from address: \n" +
+				sourceAddress + "\n" +
+				"to address: \n" +
+				destinationAddress + "\n\n" +
+				"Transaction ID: " + TXID, 
+				"Cash sent successfully", 
+				JOptionPane.DEFAULT_OPTION, 
+				JOptionPane.INFORMATION_MESSAGE,
+				null, 
+				options, 
+				options[0]);
+			
+		    if (option == 1)
+		    {
+		    	// Copy the transaction ID to clipboard
+		    	Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+				clipboard.setContents(new StringSelection(TXID), null);
+		    } else if (option == 2)
+		    {
+		    	// Open block explorer
+				Log.info("Transaction ID for block explorer is: " + TXID);
+				// TODO: code duplication with transactions table
+				String urlPrefix = "https://explorer.zensystem.io/tx/";
+				if (installationObserver.isOnTestNet())
+				{
+					urlPrefix = "https://explorer-testnet.zen-solutions.io/tx/";
+				}
+				Desktop.getDesktop().browse(new URL(urlPrefix + TXID).toURI());
+		    }
+		} else
+		{
+			String errorMessage = clientCaller.getOperationFinalErrorMessage(operationStatusID); 
+			operationStatusLabel.setText(
+				"<html><span style=\"color:red;font-weight:bold\">ERROR: " + errorMessage + "</span></html>");
+
+			JOptionPane.showMessageDialog(
+					SendCashPanel.this.getRootPane().getParent(), 
+					"An error occurred when sending cash. Error message is:\n" +
+					errorMessage + "\n\n" +
+					"Please ensure that sending parameters are correct. You may try again later...\n", 
+					"Error in sending cash", JOptionPane.ERROR_MESSAGE);
+
+		}
+	}
 }

@@ -693,6 +693,28 @@ public class ZCashClientCaller
 			throw new WalletCallException("Unexpected final operation status response from wallet: " + response.toString());
 		}
 	}
+	
+	
+	public synchronized String getSuccessfulOperationTXID(String opID)
+        throws WalletCallException, IOException, InterruptedException
+	{
+		String TXID = null;
+		JsonArray response = this.executeCommandAndGetJsonArray(
+			"z_getoperationstatus", wrapStringParameter("[\"" + opID + "\"]"));
+		JsonObject jsonStatus = response.get(0).asObject();
+		JsonValue  opResultValue = jsonStatus.get("result"); 
+		
+		if (opResultValue != null)
+		{
+			JsonObject opResult = opResultValue.asObject();
+			if (opResult.get("txid") != null)
+			{
+				TXID = opResult.get("txid").asString();
+			}
+		}
+		
+		return TXID;
+	}
 
 
 	// May only be called for already failed operations

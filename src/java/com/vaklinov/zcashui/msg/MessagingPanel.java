@@ -572,7 +572,7 @@ public class MessagingPanel
 				        ownIdentity.getSendreceiveaddress() + "\n" +
 				        "You will be redirected to the UI tab for sending ZEN to add some balance to it. You need only\n" +
 				        "a small amount e.g. typically 0.1 ZEN is suffucient to send 500 messages. After sending some\n" +
-				        "ZEN you need to wait for the transaciton to be confirmed (typically takes 2.5 minutes). It is\n" +
+				        "ZEN you need to wait for the transaction to be confirmed (typically takes 2.5 minutes). It is\n" +
 				        "recommended to send ZEN to this Z address in two or more separate transactions (though one \n" +
 				        "transaction is sufficient).", 
 					    "Z address to send/receive messages needs to be supplied with ZEN...", 
