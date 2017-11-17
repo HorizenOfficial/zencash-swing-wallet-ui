@@ -1,6 +1,6 @@
-package com.vaklinov.zcashui.repo;
+package com.vaklinov.zcashui.arizen.repo;
 
-import com.vaklinov.zcashui.models.Address;
+import com.vaklinov.zcashui.arizen.models.Address;
 
 import java.io.File;
 import java.util.Set;

@@ -1,8 +1,8 @@
-package com.vaklinov.zcashui.repo;
+package com.vaklinov.zcashui.arizen.repo;
 
 import com.vaklinov.zcashui.Log;
-import com.vaklinov.zcashui.models.Address;
-import com.vaklinov.zcashui.models.Address.ADDRESS_TYPE;
+import com.vaklinov.zcashui.arizen.models.Address;
+import com.vaklinov.zcashui.arizen.models.Address.ADDRESS_TYPE;
 
 import java.io.File;
 import java.sql.Connection;

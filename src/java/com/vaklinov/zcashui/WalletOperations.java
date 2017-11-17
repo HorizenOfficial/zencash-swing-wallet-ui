@@ -39,17 +39,13 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import javax.swing.JFileChooser;
-import javax.swing.JFrame;
-import javax.swing.JOptionPane;
-import javax.swing.JTabbedPane;
+import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import com.vaklinov.zcashui.ZCashClientCaller.WalletCallException;
-import com.vaklinov.zcashui.models.Address;
-import com.vaklinov.zcashui.msg.MessagingPanel;
-import com.vaklinov.zcashui.repo.ArizenWallet;
-import com.vaklinov.zcashui.repo.WalletRepo;
+import com.vaklinov.zcashui.arizen.models.Address;
+import com.vaklinov.zcashui.arizen.repo.ArizenWallet;
+import com.vaklinov.zcashui.arizen.repo.WalletRepo;
 
 
 /**
@@ -434,10 +430,10 @@ public class WalletOperations
 	 */
 	public void exportToArizenWallet()
 	{
-		String absolutePath = "";
-		WalletRepo arizenWallet = new ArizenWallet();
-		try
-		{
+		final JDialog dialog = new JDialog(this.parent, "Exporting Arizen wallet");
+		final JLabel exportLabel = new JLabel();
+		final WalletRepo arizenWallet = new ArizenWallet();
+		try {
 			JFileChooser fileChooser = new JFileChooser();
 			fileChooser.setFileFilter(new FileNameExtensionFilter("Arizen wallet file", "uawd"));
 			fileChooser.setDialogTitle("Export wallet to Arizen wallet format...");
@@ -445,77 +441,135 @@ public class WalletOperations
 			fileChooser.setCurrentDirectory(OSUtil.getUserHomeDirectory());
 			int result = fileChooser.showDialog(this.parent, "Export");
 
-			if (result != JFileChooser.APPROVE_OPTION)
-			{
+			if (result != JFileChooser.APPROVE_OPTION) {
 				return;
 			}
 
-			File f = fileChooser.getSelectedFile();
-			String fullPath = f.getAbsolutePath();
+			File chooseFile = fileChooser.getSelectedFile();
+			String fullPath = chooseFile.getAbsolutePath();
 			if (!fullPath.endsWith(".uawd"))
 				fullPath += ".uawd";
 
-			absolutePath = fullPath;
-			f = new File(fullPath);
-			if(f.exists()) {
+			final File f = new File(fullPath);
+			if (f.exists()) {
 				int r = JOptionPane.showConfirmDialog((Component) null,
 						String.format("The file %s already exists, do you want proceed and delete it?", f.getName()),
 						"Alert", JOptionPane.YES_NO_OPTION);
-				if (r==1) { return; }
+				if (r == 1) {
+					return;
+				}
 				Files.delete(f.toPath());
 			}
-			arizenWallet.createWallet(f);
+			final String strFullpath = fullPath;
 
-			String[] zaddress = clientCaller.getWalletZAddresses();
-			String[] taddress = clientCaller.getWalletAllPublicAddresses();
-			String[] tAddressesWithUnspentOuts = clientCaller.getWalletPublicAddressesWithUnspentOutputs();
+			dialog.setSize(300, 75);
+			dialog.setLocationRelativeTo(parent);
+			dialog.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
+			dialog.setLayout(new BorderLayout());
 
-			Set<Address> addressPublicSet = new HashSet<Address>();
-			Set<Address> addressPrivateSet = new HashSet<Address>();
+			JProgressBar progressBar = new JProgressBar();
+			progressBar.setIndeterminate(true);
+			dialog.add(progressBar, BorderLayout.CENTER);
+			exportLabel.setText("Exporting wallet...");
+			exportLabel.setHorizontalAlignment(JLabel.CENTER);
+			exportLabel.setBorder(BorderFactory.createEmptyBorder(0, 0, 16, 0));
 
-			Map<String, Address> tMap = new HashMap<String, Address>();
-			Map<String, Address> zMap = new HashMap<String, Address>();
+			dialog.add(exportLabel, BorderLayout.SOUTH);
+			dialog.setVisible(true);
 
-			for(String straddr:taddress) {
-				String pk = clientCaller.getTPrivateKey(straddr);
-				String balance = clientCaller.getBalanceForAddress(straddr);
-				Address addr = new Address(Address.ADDRESS_TYPE.TRANSPARENT, straddr, pk, balance);
-				tMap.put(straddr, addr);
-			}
+			SwingWorker<Boolean, Void> worker = new SwingWorker<Boolean, Void>() {
+				@Override
+				public Boolean doInBackground() {
+					try {
+						arizenWallet.createWallet(f);
+						Thread.sleep(750);
+						updateProgressText("Reading addresses and private keys...");
+						String[] zaddress = clientCaller.getWalletZAddresses();
+						String[] taddress = clientCaller.getWalletAllPublicAddresses();
+						String[] tAddressesWithUnspentOuts = clientCaller.getWalletPublicAddressesWithUnspentOutputs();
 
-			for(String straddr:tAddressesWithUnspentOuts) {
-				String pk = clientCaller.getTPrivateKey(straddr);
-				String balance = clientCaller.getBalanceForAddress(straddr);
-				Address addr = new Address(Address.ADDRESS_TYPE.TRANSPARENT, straddr, pk, balance);
-				tMap.put(straddr, addr);
-			}
+						Set<Address> addressPublicSet = new HashSet<Address>();
+						Set<Address> addressPrivateSet = new HashSet<Address>();
 
-			for(String straddr:zaddress) {
-				String pk = clientCaller.getZPrivateKey(straddr);
-				String balance = clientCaller.getBalanceForAddress(straddr);
-				Address addr = new Address(Address.ADDRESS_TYPE.PRIVATE, straddr, pk, balance);
-				zMap.put(straddr, addr);
-			}
+						Map<String, Address> tMap = new HashMap<String, Address>();
+						Map<String, Address> zMap = new HashMap<String, Address>();
 
-			addressPublicSet.addAll(tMap.values());
-			addressPrivateSet.addAll(zMap.values());
-			arizenWallet.insertAddressBatch(addressPublicSet);
-			arizenWallet.insertAddressBatch(addressPrivateSet);
+						for (String straddr : taddress) {
+							String pk = clientCaller.getTPrivateKey(straddr);
+							String balance = clientCaller.getBalanceForAddress(straddr);
+							Address addr = new Address(Address.ADDRESS_TYPE.TRANSPARENT, straddr, pk, balance);
+							tMap.put(straddr, addr);
+						}
 
-		} catch (Exception ex)
-		{
-			this.errorReporter.reportError(ex, false);
-		} finally {
-			try {
-				if (arizenWallet != null && arizenWallet.isOpen()) {
-					arizenWallet.close();
+						for (String straddr : tAddressesWithUnspentOuts) {
+							String pk = clientCaller.getTPrivateKey(straddr);
+							String balance = clientCaller.getBalanceForAddress(straddr);
+							Address addr = new Address(Address.ADDRESS_TYPE.TRANSPARENT, straddr, pk, balance);
+							tMap.put(straddr, addr);
+						}
+
+						for (String straddr : zaddress) {
+							String pk = clientCaller.getZPrivateKey(straddr);
+							String balance = clientCaller.getBalanceForAddress(straddr);
+							Address addr = new Address(Address.ADDRESS_TYPE.PRIVATE, straddr, pk, balance);
+							zMap.put(straddr, addr);
+						}
+						addressPublicSet.addAll(tMap.values());
+						addressPrivateSet.addAll(zMap.values());
+						Thread.sleep(1000);
+
+						updateProgressText("Writing addresses and private keys...");
+						arizenWallet.insertAddressBatch(addressPublicSet);
+						arizenWallet.insertAddressBatch(addressPrivateSet);
+						Thread.sleep(1000);
+
+						updateProgressText("Wallet exported");
+						Thread.sleep(1000);
+
+						SwingUtilities.invokeLater(new Runnable() {
+							@Override
+							public void run() {
+								dialog.dispose();
+								JOptionPane.showConfirmDialog(parent, String.format("The Arizen wallet is exported to: %s", strFullpath),
+										"Export Arizen wallet", JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE);
+							}
+						});
+
+					} catch (Exception e) {
+						SwingUtilities.invokeLater(new Runnable() {
+							@Override
+							public void run() {
+								dialog.dispose();
+							}
+						});
+						errorReporter.reportError(e, false);
+					} finally {
+						try {
+							if (arizenWallet != null && arizenWallet.isOpen()) {
+								arizenWallet.close();
+							}
+						} catch (Exception ex) {
+							errorReporter.reportError(ex, false);
+						}
+					}
+					return true;
 				}
-				JOptionPane.showConfirmDialog(this.parent, String.format("The wallet is exported to: %s",  absolutePath),
-						"Export to Arizen wallet", JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE);
 
-			} catch (Exception ex) {
-				this.errorReporter.reportError(ex, false);
-			}
+				private void updateProgressText(String text) {
+					SwingUtilities.invokeLater(new Runnable() {
+						@Override
+						public void run() {
+							exportLabel.setText(text);
+						}
+					});
+
+				}
+			};
+
+			worker.execute();
+
+		} catch (Exception ex) {
+			errorReporter.reportError(ex, false);
 		}
 	}
 

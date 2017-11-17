@@ -1,4 +1,4 @@
-package com.vaklinov.zcashui.models;
+package com.vaklinov.zcashui.arizen.models;
 /**
  * 
  * @author Pier Stabilini <pier@zensystem.io>
