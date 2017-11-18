@@ -515,8 +515,7 @@ public class WalletOperations
 						for (String straddr : zaddress) {
 							String pk = clientCaller.getZPrivateKey(straddr);
 							String balance = clientCaller.getBalanceForAddress(straddr);
-							String pkHex = Util.wifToHex(pk);
-							Address addr = new Address(Address.ADDRESS_TYPE.PRIVATE, straddr, pkHex, balance);
+							Address addr = new Address(Address.ADDRESS_TYPE.PRIVATE, straddr, pk, balance);
 							zMap.put(straddr, addr);
 						}
 						addressPublicSet.addAll(tMap.values());
