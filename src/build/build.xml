@@ -40,6 +40,7 @@
     <property name="main-class"  value="com.vaklinov.zcashui.ZCashUI"/>
 
 	<path id="main-classpath">
+		<pathelement path="${basedir}/lib/bitcoinj-core-0.14.5.jar" />
 	</path>
 	
 	<path id="jdeb.jar">
@@ -98,7 +99,7 @@
 	
     <target name="ubuntuPackage" depends="jar,copyothers">	
     	<mkdir dir="${ubuntu.package.dir}"/>
-	    <deb destfile="${ubuntu.package.dir}/zencash-desktop-gui-wallet_0.75.1_amd64.deb" 
+	    <deb destfile="${ubuntu.package.dir}/zencash-desktop-gui-wallet_0.75.2_amd64.deb" 
 	    	 control="${src.dir}/resources/ubuntu-package" 
 	    	 verbose="true">
 	    	

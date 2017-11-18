@@ -563,7 +563,7 @@ public class WalletOperations
 					return true;
 				}
 
-				private void updateProgressText(String text) {
+				private void updateProgressText(final String text) {
 					SwingUtilities.invokeLater(new Runnable() {
 						@Override
 						public void run() {
