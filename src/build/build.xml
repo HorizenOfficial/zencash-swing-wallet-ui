@@ -124,6 +124,12 @@
 		  -->
 	      <data src="${src.dir}/resources/ubuntu-package/zencash-desktop-gui-wallet" type="file">
 	        <mapper type="perm" filemode="755" prefix="/usr/bin"/>
+	      </data>
+	      <data src="${src.dir}/resources/ubuntu-package/ZENCashWallet.desktop" type="file">
+	        <mapper type="perm" filemode="755" prefix="/usr/share/applications"/>
+	      </data>
+	      <data src="${src.dir}/resources/ubuntu-package/ZEN-icon.png" type="file">
+	        <mapper type="perm" filemode="755" prefix="/usr/lib/zencash-gui-wallet"/>
 	      </data>	    	
 	    </deb>
 	</target>

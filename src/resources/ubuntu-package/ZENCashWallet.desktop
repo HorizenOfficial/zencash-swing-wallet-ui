@@ -1,0 +1,13 @@
+[Desktop Entry]
+Version=1.0
+Name=ZENCash Wallet
+Comment=ZENCash Desktop GUI Wallet (full node)
+GenericName=ZENCash Wallet
+Keywords=ZENCash;Crypto-currency;ZEN;
+Exec=zencash-desktop-gui-wallet
+Terminal=false
+X-MultipleArgs=false
+Type=Application
+Icon=/usr/lib/zencash-gui-wallet/ZEN-icon.png
+Categories=GNOME;Application;
+StartupNotify=true
