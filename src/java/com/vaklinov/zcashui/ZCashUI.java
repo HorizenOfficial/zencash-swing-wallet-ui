@@ -594,7 +594,7 @@ public class ZCashUI
                 null,
                 "This program was started in directory: " + OSUtil.getProgramDirectory() + "\n" +
                 ide.getMessage() + "\n" +
-                "See the console output for more detailed error information!",
+                "See the console/logfile output for more detailed error information!",
                 "Installation error",
                 JOptionPane.ERROR_MESSAGE);
             System.exit(1);
@@ -620,7 +620,7 @@ public class ZCashUI
                     "Please ensure that the ZENCash server zend is started (e.g. via \n" + 
                     "command  \"zend --daemon\"). Error message is: \n" +
                      wce.getMessage() +
-                    "See the console output for more detailed error information!",
+                    "See the console/logfile output for more detailed error information!",
                     "Wallet communication error",
                     JOptionPane.ERROR_MESSAGE);
             }
@@ -632,7 +632,7 @@ public class ZCashUI
             JOptionPane.showMessageDialog(
                 null,
                 "A general unexpected critical error has occurred: \n" + e.getMessage() + "\n" +
-                "See the console output for more detailed error information!",
+                "See the console/logfile output for more detailed error information!",
                 "Error",
                 JOptionPane.ERROR_MESSAGE);
             System.exit(3);
@@ -643,7 +643,7 @@ public class ZCashUI
             JOptionPane.showMessageDialog(
                 null,
                 "A general unexpected critical/unrecoverable error has occurred: \n" + err.getMessage() + "\n" +
-                "See the console output for more detailed error information!",
+                "See the console/logfile output for more detailed error information!",
                 "Error",
                 JOptionPane.ERROR_MESSAGE);
             System.exit(4);

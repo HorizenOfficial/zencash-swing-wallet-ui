@@ -33,7 +33,10 @@ zen-fetch-params
    
 ### Running the ZENCash Desktop GUI Wallet on Linux
 
-To run the desktop GUI wallet, run the command `zencash-desktop-gui-wallet` from a terminal:
+To launch the ZENCash Desktop GUI Wallet you can just search and click on it in the Ubuntu unity menu:
+![UnityLauncher](ZENUnityLauncher.png "ZENCash Wallet launcher")
+
+...or alternatively, run the command `zencash-desktop-gui-wallet` from a terminal:
 ```
 zencash-desktop-gui-wallet
 ```

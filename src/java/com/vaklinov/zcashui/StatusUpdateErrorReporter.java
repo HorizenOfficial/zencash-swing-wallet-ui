@@ -69,12 +69,22 @@ public class StatusUpdateErrorReporter
 			lastReportedErrroTime = time;
 		}
 		
+		String settingsDirectory = ".ZENCashSwingWalletUI";
+		
+		try
+		{
+			settingsDirectory = OSUtil.getSettingsDirectory();
+		} catch (Exception e2)
+		{
+			Log.error("Secondary error: ", e2);
+		}
+		
 		JOptionPane.showMessageDialog(
 			parent, 
-			"An unexpected error occurred when updating the GUI wallet\n" +
-			"state. Please ensure that the ZENCash daemon is running. \n" +
+			"An unexpected error occurred during the operation of the GUI wallet.\n" +
+			"Details may be found in the log in directory: " + settingsDirectory + "\n" +
 			"\n" +
 			e.getMessage(),
-			"Error in updating status.", JOptionPane.ERROR_MESSAGE);
+			"Error in wallet operation.", JOptionPane.ERROR_MESSAGE);
 	}
 }
