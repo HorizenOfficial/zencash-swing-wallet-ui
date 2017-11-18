@@ -46,6 +46,7 @@ import com.vaklinov.zcashui.ZCashClientCaller.WalletCallException;
 import com.vaklinov.zcashui.arizen.models.Address;
 import com.vaklinov.zcashui.arizen.repo.ArizenWallet;
 import com.vaklinov.zcashui.arizen.repo.WalletRepo;
+import org.bitcoinj.core.Base58;
 
 
 /**
@@ -425,6 +426,8 @@ public class WalletOperations
 		}
 	}
 
+
+
 	/**
 	 * export to Arizen wallet
 	 */
@@ -436,7 +439,7 @@ public class WalletOperations
 		try {
 			JFileChooser fileChooser = new JFileChooser();
 			fileChooser.setFileFilter(new FileNameExtensionFilter("Arizen wallet file", "uawd"));
-			fileChooser.setDialogTitle("Export wallet to Arizen wallet format...");
+			fileChooser.setDialogTitle("Export wallet to Arizen wallet unencrypted format...");
 			fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
 			fileChooser.setCurrentDirectory(OSUtil.getUserHomeDirectory());
 			int result = fileChooser.showDialog(this.parent, "Export");
@@ -496,27 +499,30 @@ public class WalletOperations
 
 						for (String straddr : taddress) {
 							String pk = clientCaller.getTPrivateKey(straddr);
+							String pkHex = Util.wifToHex(pk);
 							String balance = clientCaller.getBalanceForAddress(straddr);
-							Address addr = new Address(Address.ADDRESS_TYPE.TRANSPARENT, straddr, pk, balance);
+							Address addr = new Address(Address.ADDRESS_TYPE.TRANSPARENT, straddr, pkHex, balance);
 							tMap.put(straddr, addr);
 						}
 
 						for (String straddr : tAddressesWithUnspentOuts) {
 							String pk = clientCaller.getTPrivateKey(straddr);
+							String pkHex = Util.wifToHex(pk);
 							String balance = clientCaller.getBalanceForAddress(straddr);
-							Address addr = new Address(Address.ADDRESS_TYPE.TRANSPARENT, straddr, pk, balance);
+							Address addr = new Address(Address.ADDRESS_TYPE.TRANSPARENT, straddr, pkHex, balance);
 							tMap.put(straddr, addr);
 						}
 
 						for (String straddr : zaddress) {
 							String pk = clientCaller.getZPrivateKey(straddr);
 							String balance = clientCaller.getBalanceForAddress(straddr);
-							Address addr = new Address(Address.ADDRESS_TYPE.PRIVATE, straddr, pk, balance);
+							String pkHex = Util.wifToHex(pk);
+							Address addr = new Address(Address.ADDRESS_TYPE.PRIVATE, straddr, pkHex, balance);
 							zMap.put(straddr, addr);
 						}
 						addressPublicSet.addAll(tMap.values());
 						addressPrivateSet.addAll(zMap.values());
-						Thread.sleep(1000);
+						Thread.sleep(500);
 
 						updateProgressText("Writing addresses and private keys...");
 						arizenWallet.insertAddressBatch(addressPublicSet);
@@ -524,13 +530,16 @@ public class WalletOperations
 						Thread.sleep(1000);
 
 						updateProgressText("Wallet exported");
-						Thread.sleep(1000);
+						Thread.sleep(750);
 
 						SwingUtilities.invokeLater(new Runnable() {
 							@Override
 							public void run() {
 								dialog.dispose();
-								JOptionPane.showConfirmDialog(parent, String.format("The Arizen wallet is exported to: %s", strFullpath),
+								JOptionPane.showConfirmDialog(parent,
+										new Object[]{String.format("The Arizen wallet is exported to: %s", strFullpath),
+												"Using Arizen to import select: Import UNENCRYPTED Arizen wallet",
+												"The wallet will be imported and encrypted"},
 										"Export Arizen wallet", JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE);
 							}
 						});
