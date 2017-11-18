@@ -28,21 +28,24 @@
  **********************************************************************************/
 package com.vaklinov.zcashui;
 
-import java.awt.Cursor;
-import java.awt.Toolkit;
+import java.awt.*;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
-import javax.swing.JFileChooser;
-import javax.swing.JFrame;
-import javax.swing.JOptionPane;
-import javax.swing.JTabbedPane;
+import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import com.vaklinov.zcashui.ZCashClientCaller.WalletCallException;
-import com.vaklinov.zcashui.msg.MessagingPanel;
+import com.vaklinov.zcashui.arizen.models.Address;
+import com.vaklinov.zcashui.arizen.repo.ArizenWallet;
+import com.vaklinov.zcashui.arizen.repo.WalletRepo;
 
 
 /**
@@ -421,8 +424,165 @@ public class WalletOperations
 			this.errorReporter.reportError(ex, false);
 		}
 	}
-	
-	
+
+
+
+	/**
+	 * export to Arizen wallet
+	 */
+	public void exportToArizenWallet()
+	{
+		final JDialog dialog = new JDialog(this.parent, "Exporting Arizen wallet");
+		final JLabel exportLabel = new JLabel();
+		final WalletRepo arizenWallet = new ArizenWallet();
+		try {
+			JFileChooser fileChooser = new JFileChooser();
+			fileChooser.setFileFilter(new FileNameExtensionFilter("Arizen wallet file", "uawd"));
+			fileChooser.setDialogTitle("Export wallet to Arizen wallet unencrypted format...");
+			fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+			fileChooser.setCurrentDirectory(OSUtil.getUserHomeDirectory());
+			int result = fileChooser.showDialog(this.parent, "Export");
+
+			if (result != JFileChooser.APPROVE_OPTION) {
+				return;
+			}
+
+			File chooseFile = fileChooser.getSelectedFile();
+			String fullPath = chooseFile.getAbsolutePath();
+			if (!fullPath.endsWith(".uawd"))
+				fullPath += ".uawd";
+
+			final File f = new File(fullPath);
+			if (f.exists()) {
+				int r = JOptionPane.showConfirmDialog((Component) null,
+						String.format("The file %s already exists, do you want proceed and delete it?", f.getName()),
+						"Alert", JOptionPane.YES_NO_OPTION);
+				if (r == 1) {
+					return;
+				}
+				Files.delete(f.toPath());
+			}
+			final String strFullpath = fullPath;
+
+			dialog.setSize(300, 75);
+			dialog.setLocationRelativeTo(parent);
+			dialog.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
+			dialog.setLayout(new BorderLayout());
+
+			JProgressBar progressBar = new JProgressBar();
+			progressBar.setIndeterminate(true);
+			dialog.add(progressBar, BorderLayout.CENTER);
+			exportLabel.setText("Exporting wallet...");
+			exportLabel.setHorizontalAlignment(JLabel.CENTER);
+			exportLabel.setBorder(BorderFactory.createEmptyBorder(0, 0, 16, 0));
+
+			dialog.add(exportLabel, BorderLayout.SOUTH);
+			dialog.setVisible(true);
+
+			SwingWorker<Boolean, Void> worker = new SwingWorker<Boolean, Void>() {
+				@Override
+				public Boolean doInBackground() {
+					try {
+						arizenWallet.createWallet(f);
+						Thread.sleep(750);
+						updateProgressText("Reading addresses and private keys...");
+						String[] zaddress = clientCaller.getWalletZAddresses();
+						String[] taddress = clientCaller.getWalletAllPublicAddresses();
+						String[] tAddressesWithUnspentOuts = clientCaller.getWalletPublicAddressesWithUnspentOutputs();
+
+						Set<Address> addressPublicSet = new HashSet<Address>();
+						Set<Address> addressPrivateSet = new HashSet<Address>();
+
+						Map<String, Address> tMap = new HashMap<String, Address>();
+						Map<String, Address> zMap = new HashMap<String, Address>();
+
+						for (String straddr : taddress) {
+							String pk = clientCaller.getTPrivateKey(straddr);
+							String pkHex = Util.wifToHex(pk);
+							String balance = clientCaller.getBalanceForAddress(straddr);
+							Address addr = new Address(Address.ADDRESS_TYPE.TRANSPARENT, straddr, pkHex, balance);
+							tMap.put(straddr, addr);
+						}
+
+						for (String straddr : tAddressesWithUnspentOuts) {
+							String pk = clientCaller.getTPrivateKey(straddr);
+							String pkHex = Util.wifToHex(pk);
+							String balance = clientCaller.getBalanceForAddress(straddr);
+							Address addr = new Address(Address.ADDRESS_TYPE.TRANSPARENT, straddr, pkHex, balance);
+							tMap.put(straddr, addr);
+						}
+
+						for (String straddr : zaddress) {
+							String pk = clientCaller.getZPrivateKey(straddr);
+							String balance = clientCaller.getBalanceForAddress(straddr);
+							String pkHex = Util.wifToHex(pk);
+							Address addr = new Address(Address.ADDRESS_TYPE.PRIVATE, straddr, pkHex, balance);
+							zMap.put(straddr, addr);
+						}
+						addressPublicSet.addAll(tMap.values());
+						addressPrivateSet.addAll(zMap.values());
+						Thread.sleep(500);
+
+						updateProgressText("Writing addresses and private keys...");
+						arizenWallet.insertAddressBatch(addressPublicSet);
+						arizenWallet.insertAddressBatch(addressPrivateSet);
+						Thread.sleep(1000);
+
+						updateProgressText("Wallet exported");
+						Thread.sleep(750);
+
+						SwingUtilities.invokeLater(new Runnable() {
+							@Override
+							public void run() {
+								dialog.dispose();
+								JOptionPane.showConfirmDialog(parent,
+										new Object[]{String.format("The Arizen wallet is exported to: %s", strFullpath),
+												"Using Arizen to import select: Import UNENCRYPTED Arizen wallet",
+												"The wallet will be imported and encrypted"},
+										"Export Arizen wallet", JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE);
+							}
+						});
+
+					} catch (Exception e) {
+						SwingUtilities.invokeLater(new Runnable() {
+							@Override
+							public void run() {
+								dialog.dispose();
+							}
+						});
+						errorReporter.reportError(e, false);
+					} finally {
+						try {
+							if (arizenWallet != null && arizenWallet.isOpen()) {
+								arizenWallet.close();
+							}
+						} catch (Exception ex) {
+							errorReporter.reportError(ex, false);
+						}
+					}
+					return true;
+				}
+
+				private void updateProgressText(String text) {
+					SwingUtilities.invokeLater(new Runnable() {
+						@Override
+						public void run() {
+							exportLabel.setText(text);
+						}
+					});
+
+				}
+			};
+
+			worker.execute();
+
+		} catch (Exception ex) {
+			errorReporter.reportError(ex, false);
+		}
+	}
+
+
+
 	private void issueBackupDirectoryWarning()
 		throws IOException
 	{
