@@ -26,7 +26,7 @@ public class ArizenWallet implements WalletRepo {
 	private static String settingApi = "https://explorer.zensystem.io/insight-api-zen/";
 	
     private static String sqlInsertPublicAddress = "INSERT INTO wallet(pk, addr, lastbalance, name) VALUES(?,?,?,?)";
-    private static String sqlInsertPrivateAddress = "INSERT INTO zwallet(pk, addr, lastbalance, name) VALUES(?,?,?,?)";
+    private static String sqlInsertPrivateAddress = "INSERT INTO zwallet(spk, addr, lastbalance, name) VALUES(?,?,?,?)";
 	
 	@Override
 	public void createWallet(File f) throws Exception {					
@@ -35,7 +35,7 @@ public class ArizenWallet implements WalletRepo {
 			Statement stmt = conn.createStatement();
 			String sqlWallet = "CREATE TABLE wallet " + "(id INTEGER PRIMARY KEY AUTOINCREMENT, pk TEXT, addr TEXT UNIQUE, lastbalance REAL, name TEXT);";
 			stmt.execute(sqlWallet);
-			String sqlZWallet = "CREATE TABLE zwallet " + "(id INTEGER PRIMARY KEY AUTOINCREMENT, pk TEXT, addr TEXT UNIQUE, lastbalance REAL, name TEXT);";
+			String sqlZWallet = "CREATE TABLE zwallet " + "(id INTEGER PRIMARY KEY AUTOINCREMENT, pk TEXT, spk TEXT, addr TEXT UNIQUE, lastbalance REAL, name TEXT);";
 			stmt.execute(sqlZWallet);
 			
 			String sqlContacts = "CREATE TABLE contacts (id INTEGER PRIMARY KEY AUTOINCREMENT, addr TEXT UNIQUE, name TEXT, nick TEXT);";
