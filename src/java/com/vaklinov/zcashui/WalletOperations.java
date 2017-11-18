@@ -46,7 +46,6 @@ import com.vaklinov.zcashui.ZCashClientCaller.WalletCallException;
 import com.vaklinov.zcashui.arizen.models.Address;
 import com.vaklinov.zcashui.arizen.repo.ArizenWallet;
 import com.vaklinov.zcashui.arizen.repo.WalletRepo;
-import org.bitcoinj.core.Base58;
 
 
 /**
