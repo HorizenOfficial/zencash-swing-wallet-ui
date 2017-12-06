@@ -72,6 +72,7 @@ public class DashboardPanel
 	private ZCashInstallationObserver installationObserver;
 	private ZCashClientCaller clientCaller;
 	private StatusUpdateErrorReporter errorReporter;
+	private BackupTracker backupTracker;
 	
 	private JLabel networkAndBlockchainLabel = null;
 	private DataGatheringThread<NetworkAndBlockchainInfo> netInfoGatheringThread = null;
@@ -95,13 +96,15 @@ public class DashboardPanel
 	public DashboardPanel(JFrame parentFrame,
 			              ZCashInstallationObserver installationObserver,
 			              ZCashClientCaller clientCaller,
-			              StatusUpdateErrorReporter errorReporter)
+			              StatusUpdateErrorReporter errorReporter,
+			              BackupTracker backupTracker)
 		throws IOException, InterruptedException, WalletCallException
 	{
-		this.parentFrame = parentFrame;
+		this.parentFrame          = parentFrame;
 		this.installationObserver = installationObserver;
-		this.clientCaller = clientCaller;
+		this.clientCaller  = clientCaller;
 		this.errorReporter = errorReporter;
+		this.backupTracker = backupTracker;
 		
 		this.timers = new ArrayList<Timer>();
 		this.threads = new ArrayList<DataGatheringThread<?>>();
@@ -546,6 +549,11 @@ public class DashboardPanel
 		}
 		
 		this.walletBalanceLabel.setToolTipText(toolTip);
+		
+		if (this.parentFrame.isVisible())
+		{
+			this.backupTracker.handleWalletBalanceUpdate(balance.totalBalance);
+		}
 	}
 
 

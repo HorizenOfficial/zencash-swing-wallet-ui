@@ -80,6 +80,7 @@ public class SendCashPanel
 	private ZCashClientCaller         clientCaller;
 	private StatusUpdateErrorReporter errorReporter;
 	private ZCashInstallationObserver installationObserver;
+	private BackupTracker             backupTracker;
 	
 	private JComboBox  balanceAddressCombo     = null;
 	private JPanel     comboBoxParentPanel     = null;
@@ -104,7 +105,8 @@ public class SendCashPanel
 
 	public SendCashPanel(ZCashClientCaller clientCaller,  
 			             StatusUpdateErrorReporter errorReporter,
-			             ZCashInstallationObserver installationObserver)
+			             ZCashInstallationObserver installationObserver,
+			             BackupTracker backupTracker)
 		throws IOException, InterruptedException, WalletCallException
 	{
 		this.timers = new ArrayList<Timer>();
@@ -113,6 +115,7 @@ public class SendCashPanel
 		this.clientCaller = clientCaller;
 		this.errorReporter = errorReporter;
 		this.installationObserver = installationObserver;
+		this.backupTracker = backupTracker;
 		
 		// Build content
 		this.setBorder(BorderFactory.createEmptyBorder(3, 3, 3, 3));
@@ -746,6 +749,9 @@ public class SendCashPanel
 				}
 				Desktop.getDesktop().browse(new URL(urlPrefix + TXID).toURI());
 		    }
+		    
+		    // Call the backup tracker - to remind the user
+		    this.backupTracker.handleNewTransaction();
 		} else
 		{
 			String errorMessage = clientCaller.getOperationFinalErrorMessage(operationStatusID); 

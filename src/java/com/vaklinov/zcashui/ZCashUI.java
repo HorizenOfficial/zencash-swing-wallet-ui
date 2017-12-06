@@ -112,7 +112,7 @@ public class ZCashUI
     public ZCashUI(StartupProgressDialog progressDialog)
         throws IOException, InterruptedException, WalletCallException
     {
-        super("ZENCash Desktop GUI Wallet 0.75.3");
+        super("ZENCash Desktop GUI Wallet 0.75.4");
         
         if (progressDialog != null)
         {
@@ -139,15 +139,18 @@ public class ZCashUI
         Font oldTabFont = tabs.getFont();
         Font newTabFont  = new Font(oldTabFont.getName(), Font.BOLD | Font.ITALIC, oldTabFont.getSize() * 57 / 50);
         tabs.setFont(newTabFont);
+        BackupTracker backupTracker = new BackupTracker(this);
+        
         tabs.addTab("Overview ",
         		    new ImageIcon(cl.getResource("images/overview.png")),
-        		    dashboard = new DashboardPanel(this, installationObserver, clientCaller, errorReporter));
+        		    dashboard = new DashboardPanel(this, installationObserver, clientCaller, 
+        		    		                       errorReporter, backupTracker));
         tabs.addTab("Own addresses ",
         		    new ImageIcon(cl.getResource("images/own-addresses.png")),
         		    addresses = new AddressesPanel(clientCaller, errorReporter));
         tabs.addTab("Send cash ",
         		    new ImageIcon(cl.getResource("images/send.png")),
-        		    sendPanel = new SendCashPanel(clientCaller, errorReporter, installationObserver));
+        		    sendPanel = new SendCashPanel(clientCaller, errorReporter, installationObserver, backupTracker));
         tabs.addTab("Address book ",
     		        new ImageIcon(cl.getResource("images/address-book.png")),
     		        addressBookPanel = new AddressBookPanel(sendPanel, tabs));
