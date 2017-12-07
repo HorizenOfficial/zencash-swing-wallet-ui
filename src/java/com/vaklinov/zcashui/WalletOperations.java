@@ -64,6 +64,7 @@ public class WalletOperations
 	private ZCashInstallationObserver installationObserver;
 	private ZCashClientCaller         clientCaller;
 	private StatusUpdateErrorReporter errorReporter;
+	private BackupTracker             backupTracker;
 
 
 	public WalletOperations(ZCashUI parent,
@@ -74,7 +75,8 @@ public class WalletOperations
 			                
 			                ZCashInstallationObserver installationObserver, 
 			                ZCashClientCaller clientCaller,
-			                StatusUpdateErrorReporter errorReporter) 
+			                StatusUpdateErrorReporter errorReporter,
+			                BackupTracker             backupTracker) 
         throws IOException, InterruptedException, WalletCallException 
 	{
 		this.parent    = parent;
@@ -86,6 +88,8 @@ public class WalletOperations
 		this.installationObserver = installationObserver;
 		this.clientCaller = clientCaller;
 		this.errorReporter = errorReporter;
+		
+		this.backupTracker = backupTracker;
 	}
 
 	
@@ -185,6 +189,8 @@ public class WalletOperations
 							
 				path = this.clientCaller.backupWallet(f.getName());
 				
+				this.backupTracker.handleBackup();
+				
 				this.parent.setCursor(oldCursor);
 			} catch (WalletCallException wce)
 			{
@@ -242,6 +248,7 @@ public class WalletOperations
 				this.parent.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 							
 				path = this.clientCaller.exportWallet(f.getName());
+				this.backupTracker.handleBackup();
 				
 				this.parent.setCursor(oldCursor);
 			} catch (WalletCallException wce)

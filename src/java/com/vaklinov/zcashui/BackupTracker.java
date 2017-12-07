@@ -158,14 +158,14 @@ public class BackupTracker
 		String dir = OSUtil.getSettingsDirectory();
 		File counter = new File(dir + File.separator + TRANSACTIONS_COUNTER_FILE);
 		
-		if (!counter.exists())
+		if (counter.exists())
 		{
 			byte[] bytes = Util.loadFileInMemory(counter);
 			String countAsString = new String(bytes, "ISO-8859-1");
 			
 			try
 			{
-				countNum = Integer.parseInt(countAsString);
+				countNum = Integer.parseInt(countAsString.trim());
 			} catch (NumberFormatException nfe)
 			{
 				// No error but only a logged message

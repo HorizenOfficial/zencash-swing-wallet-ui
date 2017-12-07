@@ -160,7 +160,8 @@ public class ZCashUI
         contentPane.add(tabs);
 
         this.walletOps = new WalletOperations(
-            	this, tabs, dashboard, addresses, sendPanel, installationObserver, clientCaller, errorReporter);
+            	this, tabs, dashboard, addresses, sendPanel, 
+            	installationObserver, clientCaller, errorReporter, backupTracker);
 
         int width = 870;
         
