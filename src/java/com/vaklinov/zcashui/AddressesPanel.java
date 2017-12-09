@@ -249,11 +249,21 @@ public class AddressesPanel
 			{
 				this.clientCaller.lockWallet();
 			}
-						
+			
+			String backupMessage = "";
+			if (isZAddress)
+			{
+				backupMessage = 
+				"\n\nIt is necessary to back up the wallet after creating a new Z address. The wallet needs\n" +
+				"to be backed up to a safe location that can survive any data loss on the PC where the wallet\n" +
+				"is currenly located. Not backing up the wallet may result in loss of funds in case of data\n" +
+				"loss on the current PC. To backup the wallet, use menu option: Wallet >> Backup\n";
+			}			
+			
 			JOptionPane.showMessageDialog(
 				this.getRootPane().getParent(), 
 				"A new " + (isZAddress ? "Z (Private)" : "T (Transparent)") 
-				+ " address has been created cuccessfully:\n" + address, 
+				+ " address has been created cuccessfully:\n" + address + backupMessage, 
 				"Address created", JOptionPane.INFORMATION_MESSAGE);
 			
 			this.updateWalletAddressBalanceTableInteractive();

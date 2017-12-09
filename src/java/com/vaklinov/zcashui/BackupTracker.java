@@ -151,7 +151,7 @@ public class BackupTracker
 	}	
 	
 	
-	private int getNumTransactionsSinceLastBackup()
+	public int getNumTransactionsSinceLastBackup()
 		throws IOException
 	{
 		int countNum = 0;

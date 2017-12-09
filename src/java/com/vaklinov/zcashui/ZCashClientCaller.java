@@ -402,6 +402,14 @@ public class ZCashClientCaller
         return null;
 	}
 	
+    
+	public synchronized void keypoolRefill(int count)
+		throws WalletCallException, IOException, InterruptedException
+	{
+		String result = this.executeCommandAndGetSingleStringResponse(
+			"keypoolrefill", String.valueOf(count));
+	}
+    
 	
 	public synchronized String getRawTransaction(String txID)
 		throws WalletCallException, IOException, InterruptedException

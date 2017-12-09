@@ -504,6 +504,12 @@ public class SendCashPanel
 		// Call the wallet send method
 		operationStatusID = this.clientCaller.sendCash(sourceAddress, destinationAddress, amount, memo, fee);
 				
+		// Make sure the keypool has spare addresses
+		if ((this.backupTracker.getNumTransactionsSinceLastBackup() % 5) == 0)
+		{
+			this.clientCaller.keypoolRefill(100);
+		}
+		
 		// Disable controls after send
 		sendButton.setEnabled(false);
 		balanceAddressCombo.setEnabled(false);
