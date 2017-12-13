@@ -915,7 +915,7 @@ public class ZCashClientCaller
 	
 	
 	// Imports a private key - tries both possibilities T/Z
-	public synchronized void importPrivateKey(String key)
+	public synchronized String importPrivateKey(String key)
 		throws WalletCallException, IOException, InterruptedException
 	{
 		// First try a Z key
@@ -929,9 +929,10 @@ public class ZCashClientCaller
 		CommandExecutor caller = new CommandExecutor(params);
     	String strResult = caller.execute();
 		
-		if ((strResult == null) || (strResult.trim().length() <= 0))
+		if (Util.stringIsEmpty(strResult) || 
+			(!strResult.trim().toLowerCase(Locale.ROOT).contains("error:")))
 		{
-			return;
+			return strResult == null ? "" : strResult.trim();
 		}
 		
 		// Obviously we have an error trying to import a Z key
@@ -975,11 +976,13 @@ public class ZCashClientCaller
 		}
 		
 		// Second try a T key
-		strResult = this.executeCommandAndGetSingleStringResponse("importprivkey", wrapStringParameter(key));
+		strResult = this.executeCommandAndGetSingleStringResponse(
+			"-rpcclienttimeout=5000", "importprivkey", wrapStringParameter(key));
 		
-		if ((strResult == null) || (strResult.trim().length() <= 0))
+		if (Util.stringIsEmpty(strResult) || 
+			(!strResult.trim().toLowerCase(Locale.ROOT).contains("error:")))
 		{
-			return;
+			return strResult == null ? "" : strResult.trim();
 		}
 		
 		// Obviously an error

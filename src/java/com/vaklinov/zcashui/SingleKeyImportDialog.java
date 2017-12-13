@@ -198,15 +198,21 @@ public class SingleKeyImportDialog
 			{
 				try
 				{
-					SingleKeyImportDialog.this.caller.importPrivateKey(key);
+					String address = SingleKeyImportDialog.this.caller.importPrivateKey(key);
+					String addition = "";
+					
+					if (!Util.stringIsEmpty(address))
+					{
+						addition = " It corresponds to address:\n" + address;
+					}
 			    
 					JOptionPane.showMessageDialog(
-							SingleKeyImportDialog.this,  
-							"The private key:\n" +
-							key + "\n" +
-							"has been imported successfully.",
-							"Private key imported successfully...",
-							JOptionPane.INFORMATION_MESSAGE);		
+						SingleKeyImportDialog.this,  
+						"The private key:\n" +
+						key + "\n" + 
+						"has been imported successfully." + addition,
+						"Private key imported successfully...",
+						JOptionPane.INFORMATION_MESSAGE);		
 				} catch (Exception e)
 				{
 					Log.error("An error occurred when importing private key", e);
