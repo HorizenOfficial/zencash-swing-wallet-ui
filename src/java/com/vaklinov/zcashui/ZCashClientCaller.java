@@ -930,13 +930,13 @@ public class ZCashClientCaller
     	String strResult = caller.execute();
 		
 		if (Util.stringIsEmpty(strResult) || 
-			(!strResult.trim().toLowerCase(Locale.ROOT).contains("error:")))
+			(!strResult.trim().toLowerCase(Locale.ROOT).contains("error")))
 		{
 			return strResult == null ? "" : strResult.trim();
 		}
 		
 		// Obviously we have an error trying to import a Z key
-		if (strResult.trim().toLowerCase(Locale.ROOT).startsWith("error:") &&
+		if (strResult.trim().toLowerCase(Locale.ROOT).startsWith("error") &&
 			(strResult.indexOf("{") != -1))
 		{
    		 	 // Expecting an error of a T address key
@@ -980,7 +980,7 @@ public class ZCashClientCaller
 			"-rpcclienttimeout=5000", "importprivkey", wrapStringParameter(key));
 		
 		if (Util.stringIsEmpty(strResult) || 
-			(!strResult.trim().toLowerCase(Locale.ROOT).contains("error:")))
+			(!strResult.trim().toLowerCase(Locale.ROOT).contains("error")))
 		{
 			return strResult == null ? "" : strResult.trim();
 		}
