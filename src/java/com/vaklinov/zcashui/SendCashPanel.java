@@ -426,26 +426,21 @@ public class SendCashPanel
 				  destinationAddress.startsWith("zn") ||
 				  destinationAddress.startsWith("zs")))
 			{
-				Object[] options = { "Yes", "No" };
+				Object[] options = { "OK" };
 
-				int option = JOptionPane.showOptionDialog(
+				JOptionPane.showOptionDialog(
 					SendCashPanel.this.getRootPane().getParent(), 
 					"The destination address to send ZEN to:\n" +
 					destinationAddress + "\n"+
-					"does not appear to be a valid ZEN address. ZEN addresses typically start with zc, zn or\n" +
-					"zs. As a legacy feature the ZEN core software can send funds to addresses in ZClassic\n" +
-					"format but this is rarely intended. Are you sure you want to send ZEN to this address?", 
-					"Destination address seems incorrect...",
+					"does not appear to be a valid ZEN address. ZEN addresses start with zc, zn or zs!", 
+					"Destination address is incorrect...",
 					JOptionPane.DEFAULT_OPTION, 
-					JOptionPane.WARNING_MESSAGE,
+					JOptionPane.ERROR_MESSAGE,
 					null, 
 					options, 
-					options[1]);
+					options[0]);
 				
-			    if (option == 1)
-			    {
-			    	return; // not end anything
-			    }
+			    return; // Do not send anything!
 			}
 		}
 		
