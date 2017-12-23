@@ -11,7 +11,7 @@ presents the information in a user-friendly manner.
 
 #### New/Experimental: [ZENCash Desktop GUI Wallet for Mac OS](https://github.com/ZencashOfficial/zencash-swing-wallet-ui/blob/master/docs/Release_0.74.7.md) is available
 
-#### New/Experimental: [ZENCash Desktop GUI Wallet for Windows](https://github.com/ZencashOfficial/zencash-swing-wallet-ui/blob/master/docs/Release_0.74.2.md) is available
+#### New/Experimental: [ZENCash Desktop GUI Wallet for Windows](https://github.com/ZencashOfficial/zencash-swing-wallet-ui/blob/master/docs/Release_0.75.8.md) is available
 
 #### Information on diagnosing some common problems may be found in this [troubleshooting guide](docs/TroubleshootingGuide.md).
 
