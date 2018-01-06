@@ -3,6 +3,7 @@
 This is a [ZENCash](https://zensystem.io/) Desktop GUI Wallet binary release 0.75.8 for Windows. 
 It requires a 64-bit Windows 7 or later version to run. It includes [ZENCash 2.0.10-1 binaries](https://github.com/ZencashOfficial/zen/releases/tag/v2.0.10-1)
 
+### IMPORTANT: Please read the [security notice](KnownSecurityIssues.md) about watch-only addresses before using the wallet!
 
 ### Installing the ZENCash Desktop GUI Wallet on Windows
 

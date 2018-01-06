@@ -4,6 +4,7 @@ This is a [ZENCash](https://zensystem.io/) Desktop GUI Wallet binary release 0.7
 It includes [ZENCash 2.0.10-1 binaries](https://github.com/ZencashOfficial/zen/releases/tag/v2.0.10-1)
 One notable new feature is the ability to send encrypted text messages in group conversations on the ZEN blockchain. It is also possible to block/ignore other users if they are spamming the conversation.
 
+### IMPORTANT: Please read the [security notice](KnownSecurityIssues.md) about watch-only addresses before using the wallet!
 
 ### Installing the ZENCash Desktop GUI Wallet on Mac OS
 
