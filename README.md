@@ -2,6 +2,8 @@
 
 ## Graphical user interface wrapper for the [ZENCash](https://zensystem.io/) command line tools
 
+### IMPORTANT: Please read the [security notice](docs/KnownSecurityIssues.md) about watch-only addresses before using the wallet!
+
 This program provides a Graphical User Interface (GUI) for the ZENCash client tools that acts as a wrapper and 
 presents the information in a user-friendly manner.
 
