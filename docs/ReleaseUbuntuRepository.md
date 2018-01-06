@@ -3,6 +3,8 @@
 This is a [ZENCash](https://zensystem.io/) Desktop GUI Wallet made available through a package repository
 for Debian/Ubuntu (and similar) Linux systems.
 
+### IMPORTANT: Please read the [security notice](KnownSecurityIssues.md) about watch-only addresses before using the wallet!
+
 ![Screenshot](ZENCashWalletUbuntu.png "Main Window")
 
 ### Installing the ZENCash Desktop GUI Wallet on Linux
