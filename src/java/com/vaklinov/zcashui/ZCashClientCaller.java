@@ -441,6 +441,21 @@ public class ZCashClientCaller
 		return jsonTransaction.get("confirmations").toString();
 	}
 	
+	
+	// Checks if a certain T address is a watch-only address or is otherwise invalid.
+	public synchronized boolean isWatchOnlyOrInvalidAddress(String address)
+		throws WalletCallException, IOException, InterruptedException
+	{
+		JsonObject response = this.executeCommandAndGetJsonValue("validateaddress", wrapStringParameter(address)).asObject();
+
+		if (response.getBoolean("isvalid", false))
+		{
+			return response.getBoolean("iswatchonly", true);
+		}
+		
+		return true;
+	}
+	
 
 	// Returns confirmed balance only!
 	public synchronized String getBalanceForAddress(String address)

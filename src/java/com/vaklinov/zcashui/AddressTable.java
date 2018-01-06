@@ -111,7 +111,12 @@ public class AddressTable
 					} catch (Exception ex)
 					{
 						Log.error("Unexpected error: ", ex);
-						// TODO: report exception to user
+			            JOptionPane.showMessageDialog(
+			                AddressTable.this.getRootPane().getParent(),
+					        "Error in obtaining private key:" + "\n" +
+					         ex.getMessage() + "\n\n",
+					        "Error in obtaining private key!",
+					        JOptionPane.ERROR_MESSAGE);
 					}
 				} else
 				{

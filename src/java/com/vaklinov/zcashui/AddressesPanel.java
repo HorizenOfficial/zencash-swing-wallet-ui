@@ -75,7 +75,7 @@ public class AddressesPanel
 	private long lastInteractiveRefresh;
 	
 
-	public AddressesPanel(ZCashClientCaller clientCaller, StatusUpdateErrorReporter errorReporter)
+	public AddressesPanel(JFrame parentFrame, ZCashClientCaller clientCaller, StatusUpdateErrorReporter errorReporter)
 		throws IOException, InterruptedException, WalletCallException
 	{
 		this.clientCaller = clientCaller;
@@ -103,12 +103,38 @@ public class AddressesPanel
 		
 		addressesPanel.add(buttonPanel, BorderLayout.SOUTH);
 
-		// Table of transactions
+		// Table of addresses
 		lastAddressBalanceData = getAddressBalanceDataFromWallet();
 		addressesPanel.add(addressBalanceTablePane = new JScrollPane(
 				               addressBalanceTable = this.createAddressBalanceTable(lastAddressBalanceData)),
 				           BorderLayout.CENTER);
 		
+		// Make sure that the T addresses are valid and not watch-only. Watch-only addresses are not supported.
+		for (String[] addressesToValidate : lastAddressBalanceData)
+		{
+			String addrToValidate = addressesToValidate[2];
+			if ((!Util.stringIsEmpty(addrToValidate)) && (!Util.isZAddress(addrToValidate)))
+			{
+				boolean watchOnlyOrInvalid = this.clientCaller.isWatchOnlyOrInvalidAddress(addrToValidate);
+				if (watchOnlyOrInvalid)
+				{
+					Log.error("The following address is invalid or a watch-only address: {0}", addressesToValidate);
+				}
+				
+				if (watchOnlyOrInvalid)
+				{
+		            JOptionPane.showMessageDialog(
+		                parentFrame,
+		                "An invalid or watch-only address exists in the wallet:" + "\n" +
+		                addrToValidate + "\n\n" +
+		                "The GUI wallet software cannot operate properly with addresses that are invalid or\n" +
+		                "exist in the wallet as watch-only addresses. Do NOT use this address as a destination\n" +
+		                "address for payment operations!",
+		                "Error: invalid or watch-only address exists!",
+		                JOptionPane.ERROR_MESSAGE);
+				}
+			}
+		}
 		
 		JPanel warningPanel = new JPanel();
 		warningPanel.setLayout(new BorderLayout(3, 3));
