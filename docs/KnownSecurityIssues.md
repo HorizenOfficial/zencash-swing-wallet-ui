@@ -12,6 +12,12 @@ the wallet. In addition users should make sure they are in control of all addres
 doubt whether a certain address is under user control, the user may obtain its private key via the wallet UI. If the private key is known/
 obtainable then the address belongs to the wallet and its balance is spend-able.
 
+### Compatibility with other applications
+
+The ZENCash Desktop GUI Wallet is not compatible with applications that modify the ZEN `wallet.dat` file. The wallet should not be used
+with such applications on the same PC. For instance some distributed exchange applications are known to create watch-only addresses in the
+`wallet.dat` file that cause the GUI wallet to display a wrong balance and/or display addresses that do not belong to the wallet. 
+
 ### Disclaimer
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
