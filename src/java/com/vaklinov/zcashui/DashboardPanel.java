@@ -125,7 +125,7 @@ public class DashboardPanel
 			this.getClass().getClassLoader().getResource("images/ZEN-yellow.orange-logo-small.png")));
 		tempPanel.add(logoLabel);
 		// TODO: use relative size
-		JLabel zcLabel = new JLabel("ZENCash Wallet ");
+		JLabel zcLabel = new JLabel(" ZENCash Wallet ");
 		zcLabel.setFont(new Font("Helvetica", Font.BOLD | Font.ITALIC, 28));
 		tempPanel.add(zcLabel);
 		tempPanel.setToolTipText("Powered by ZEN");
