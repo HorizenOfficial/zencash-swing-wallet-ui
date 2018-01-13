@@ -237,7 +237,7 @@ public class AddressBookPanel extends JPanel {
                 return;
             AddressBookEntry entry = entries.get(row);
             sendCashPanel.prepareForSending(entry.address);
-            tabs.setSelectedIndex(2);
+            tabs.setSelectedIndex(3);
         }
     }
 

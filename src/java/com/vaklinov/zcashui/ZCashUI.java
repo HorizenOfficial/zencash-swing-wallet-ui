@@ -102,6 +102,7 @@ public class ZCashUI
     private JMenuItem menuItemExportToArizen;
 
     private DashboardPanel   dashboard;
+    private TransactionsDetailPanel transactionDetailsPanel;
     private AddressesPanel   addresses;
     private SendCashPanel    sendPanel;
     private AddressBookPanel addressBookPanel;
@@ -112,7 +113,7 @@ public class ZCashUI
     public ZCashUI(StartupProgressDialog progressDialog)
         throws IOException, InterruptedException, WalletCallException
     {
-        super("ZENCash Desktop GUI Wallet 0.76.3");
+        super("ZENCash Desktop GUI Wallet 0.80.1");
         
         if (progressDialog != null)
         {
@@ -145,6 +146,10 @@ public class ZCashUI
         		    new ImageIcon(cl.getResource("images/overview.png")),
         		    dashboard = new DashboardPanel(this, installationObserver, clientCaller, 
         		    		                       errorReporter, backupTracker));
+        tabs.addTab("Transactions ",
+    		        new ImageIcon(cl.getResource("images/transactions.png")),
+    		        transactionDetailsPanel = new TransactionsDetailPanel(this, installationObserver, clientCaller, 
+    		    	errorReporter));
         tabs.addTab("Own addresses ",
         		    new ImageIcon(cl.getResource("images/own-addresses.png")),
         		    addresses = new AddressesPanel(this, clientCaller, errorReporter));
@@ -438,7 +443,7 @@ public class ZCashUI
                 try
                 {
                     String userDir = OSUtil.getSettingsDirectory();
-                    File warningFlagFile = new File(userDir + File.separator + "initialInfoShown_0.75.flag");
+                    File warningFlagFile = new File(userDir + File.separator + "initialInfoShown_0.80.flag");
                     if (warningFlagFile.exists())
                     {
                         return;
@@ -458,6 +463,13 @@ public class ZCashUI
                     "The ZENCash GUI Wallet is currently considered experimental. Use of this software\n" +
                     "comes at your own risk! Be sure to read the list of known issues and limitations\n" +
                     "at this page: https://github.com/ZencashOfficial/zencash-swing-wallet-ui\n\n" +
+                    
+                    "The ZENCash Desktop GUI Wallet is not compatible with applications that modify\n" + 
+                    "the ZEN wallet.dat file. The wallet should not be used with such applications\n" +
+                    "on the same PC. For instance some distributed exchange applications are known to\n" +
+                    "create watch-only addresses in the wallet.dat file that cause the GUI wallet to\n" +
+                    "display a wrong balance and/or display addresses that do not belong to the wallet.\n\n" +
+                    
                     "THE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR\n" +
                     "IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,\n" +
                     "FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE\n" +

@@ -357,7 +357,7 @@ public class WalletOperations
 				"Please select an address in the \"Own addresses\" tab " +
 				"to view its private key",
 				"Please select an address...", JOptionPane.INFORMATION_MESSAGE);
-			this.tabs.setSelectedIndex(1);
+			this.tabs.setSelectedIndex(2);
 			return;
 		}
 		
