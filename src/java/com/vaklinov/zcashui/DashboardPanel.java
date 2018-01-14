@@ -50,6 +50,8 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.JTextField; // Inserted by Wayne Dawson
+import javax.swing.DefaultCellEditor; // Inserted by Wayne Dawson
 import javax.swing.Timer;
 
 import com.vaklinov.zcashui.OSUtil.OS_TYPE;
@@ -597,6 +599,12 @@ public class DashboardPanel
         table.getColumnModel().getColumn(3).setPreferredWidth(210);
         table.getColumnModel().getColumn(4).setPreferredWidth(405);
         table.getColumnModel().getColumn(5).setPreferredWidth(800);
+
+        // Inserted by Wayne Dawson (4 lines)
+        JTextField tf = new JTextField();
+        tf.setEditable(false);
+        DefaultCellEditor editor = new DefaultCellEditor( tf );
+        table.setDefaultEditor(Object.class, editor);
 
         return table;
 	}

@@ -49,6 +49,8 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.JTextField; // Inserted by Wayne Dawson
+import javax.swing.DefaultCellEditor; // Inserted by Wayne Dawson
 import javax.swing.Timer;
 import javax.swing.border.EtchedBorder;
 
@@ -340,6 +342,12 @@ public class AddressesPanel
         table.getColumnModel().getColumn(0).setPreferredWidth(160);
         table.getColumnModel().getColumn(1).setPreferredWidth(140);
         table.getColumnModel().getColumn(2).setPreferredWidth(1000);
+
+        // Inserted by Wayne Dawson (4 lines)
+        JTextField tf = new JTextField();
+        tf.setEditable(false);
+        DefaultCellEditor editor = new DefaultCellEditor( tf );
+        table.setDefaultEditor(Object.class, editor);
 
         return table;
 	}
