@@ -513,6 +513,7 @@ public class ZCashUI
         this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
         
         this.dashboard.stopThreadsAndTimers();
+        this.transactionDetailsPanel.stopThreadsAndTimers();
         this.addresses.stopThreadsAndTimers();
         this.sendPanel.stopThreadsAndTimers();
         this.messagingPanel.stopThreadsAndTimers();

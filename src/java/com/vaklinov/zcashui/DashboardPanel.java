@@ -87,7 +87,6 @@ public class DashboardPanel
 	private JLabel walletBalanceLabel  = null;
 	private DataGatheringThread<WalletBalance> walletBalanceGatheringThread = null;
 	
-	private JTable transactionsTable   = null;
 	private JScrollPane transactionsTablePane  = null;
 	private String[][] lastTransactionsData = null;
 	private DataGatheringThread<String[][]> transactionGatheringThread = null;
@@ -115,40 +114,49 @@ public class DashboardPanel
 		dashboard.setLayout(new BorderLayout(0, 0));
 
 		// Upper panel with wallet balance
-		JPanel balanceStatusPanel = new JPanel();
-		// Use border layout to have balances to the left
-		balanceStatusPanel.setLayout(new BorderLayout(3, 3)); 
-		//balanceStatusPanel.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
+		JPanel upperLogoAndWarningPanel = new JPanel();
+		upperLogoAndWarningPanel.setLayout(new BorderLayout(3, 3)); 
 		
 		JPanel tempPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 9));
 		JLabel logoLabel = new JLabel(new ImageIcon(
 			this.getClass().getClassLoader().getResource("images/ZEN-yellow.orange-logo-small.png")));
 		tempPanel.add(logoLabel);
-		// TODO: use relative size
-		JLabel zcLabel = new JLabel(" ZENCash Wallet ");
-		zcLabel.setFont(new Font("Helvetica", Font.BOLD | Font.ITALIC, 28));
+		JLabel zcLabel = new JLabel("<html><span style=\"font-size:3.3em;font-weight:bold;font-style:italic;\">&nbsp;ZENCash Wallet&nbsp;</span></html>");
 		tempPanel.add(zcLabel);
 		tempPanel.setToolTipText("Powered by ZEN");
-		balanceStatusPanel.add(tempPanel, BorderLayout.WEST);
-		// TODO: use relative size - only!
-		JLabel transactionHeadingLabel = new JLabel(
-			"<html><span style=\"font-size:2em\"><br/></span>Transactions:</html>");
-		tempPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 1, 1));
-		transactionHeadingLabel.setFont(new Font("Helvetica", Font.BOLD, 19));
-		tempPanel.add(transactionHeadingLabel);
-		balanceStatusPanel.add(tempPanel, BorderLayout.CENTER);
-						
-		PresentationPanel walletBalancePanel = new PresentationPanel();
-		walletBalancePanel.add(walletBalanceLabel = new JLabel());
-		balanceStatusPanel.add(walletBalancePanel, BorderLayout.EAST);
+		upperLogoAndWarningPanel.add(tempPanel, BorderLayout.WEST);
 		
-		dashboard.add(balanceStatusPanel, BorderLayout.NORTH);
+		// TODO: just a test warning panel - needs to be made better
+		tempPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+        PresentationPanel warningPanel = new PresentationPanel();
+		JLabel warningLabel = new JLabel(
+			"<html><span style=\"font-size:1em;font-weight:bold;color:red;\">" +
+		    "WARNING: The blockchaiin is not fully synchronized. The latest block<br/> " +
+		    "of transactions known to the wallet is dated: 17.01.2017 237846283<br/>" +
+		    "Transactions and balance reflect the wallet state up to this date!" +
+		    "</span></html>");
+		warningPanel.add(warningLabel);
+		tempPanel.add(warningPanel);
+		upperLogoAndWarningPanel.add(tempPanel, BorderLayout.EAST);
+		
+		dashboard.add(upperLogoAndWarningPanel, BorderLayout.NORTH);
 
-		// Table of transactions
+		
+		
+		tempPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+        PresentationPanel walletBalancePanel = new PresentationPanel();
+        walletBalancePanel.add(walletBalanceLabel = new JLabel());
+        tempPanel.add(walletBalancePanel);
+        dashboard.add(tempPanel, BorderLayout.WEST);
+
+		// Table of transactions 
+		// TODO: to be replaced with a detailed list of transacitons
+		/*
 		lastTransactionsData = getTransactionsDataFromWallet();
 		dashboard.add(transactionsTablePane = new JScrollPane(
 				         transactionsTable = this.createTransactionsTable(lastTransactionsData)),
 				      BorderLayout.CENTER);
+        */
 
 		// Lower panel with installation status
 		JPanel installationStatusPanel = new JPanel();
@@ -523,11 +531,14 @@ public class DashboardPanel
 		
 		String text =
 			"<html>" + 
-		    "<span style=\"font-family:monospace;font-size:1em;" + color1 + "\">Transparent balance: <span style=\"font-size:1.1em;\">" + 
+		    "<span style=\"font-family:monospace;font-size:1.8em;font-weight:bold;" + color1 + "\">BALANCE:</span><br/> " +
+		    "<span style=\"font-family:monospace;font-size:0.7em;font-weight:bold;" + color1 + "\"></span><br/> " +
+		    "<span style=\"font-family:monospace;font-size:1.8em;" + color1 + "\">Transparent: <span style=\"font-size:1.8em;\">" + 
 				transparentUCBalance + " ZEN </span></span><br/> " +
-			"<span style=\"font-family:monospace;font-size:1em;" + color2 + "\">Private (Z) balance: <span style=\"font-weight:bold;font-size:1.1em;\">" + 
+			"<span style=\"font-family:monospace;font-size:1.8em;" + color2 + "\">Private (Z): <span style=\"font-weight:bold;font-size:1.8em;\">" + 
 		    	privateUCBalance + " ZEN </span></span><br/> " +
-			"<span style=\"font-family:monospace;;font-size:1em;" + color3 + "\">Total (Z+T) balance: <span style=\"font-weight:bold;font-size:1.35em;\">" + 
+			"<hr/>" +
+		    "<span style=\"font-family:monospace;font-size:1.8em;" + color3 + "\">Total (Z+T): <span style=\"font-weight:bold;font-size:2.1em;\">" + 
 		    	totalUCBalance + " ZEN </span></span>" +
 			"<br/>  </html>";
 		
@@ -571,10 +582,13 @@ public class DashboardPanel
 		if (Util.arraysAreDifferent(lastTransactionsData, newTransactionsData))
 		{
 			Log.info("Updating table of transactions...");
+			// TODO: replace list model for transactions
+			/*
 			this.remove(transactionsTablePane);
 			this.add(transactionsTablePane = new JScrollPane(
 			             transactionsTable = this.createTransactionsTable(newTransactionsData)),
 			         BorderLayout.CENTER);
+		     */
 		}
 
 		lastTransactionsData = newTransactionsData;
@@ -583,23 +597,6 @@ public class DashboardPanel
 		this.repaint();
 	}
 
-
-	private JTable createTransactionsTable(String rowData[][])
-		throws WalletCallException, IOException, InterruptedException
-	{
-		String columnNames[] = { "Type", "Direction", "Confirmed?", "Amount", "Date", "Destination Address"};
-        JTable table = new TransactionTable(
-        	rowData, columnNames, this.parentFrame, this.clientCaller, this.installationObserver); 
-        table.setAutoResizeMode(JTable.AUTO_RESIZE_SUBSEQUENT_COLUMNS);
-        table.getColumnModel().getColumn(0).setPreferredWidth(190);
-        table.getColumnModel().getColumn(1).setPreferredWidth(145);
-        table.getColumnModel().getColumn(2).setPreferredWidth(170);
-        table.getColumnModel().getColumn(3).setPreferredWidth(210);
-        table.getColumnModel().getColumn(4).setPreferredWidth(405);
-        table.getColumnModel().getColumn(5).setPreferredWidth(800);
-
-        return table;
-	}
 
 
 	private String[][] getTransactionsDataFromWallet()
