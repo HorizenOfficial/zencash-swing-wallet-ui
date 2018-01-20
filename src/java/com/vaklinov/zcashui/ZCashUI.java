@@ -149,7 +149,7 @@ public class ZCashUI
         tabs.addTab("Transactions ",
     		        new ImageIcon(cl.getResource("images/transactions.png")),
     		        transactionDetailsPanel = new TransactionsDetailPanel(this, installationObserver, clientCaller, 
-    		    	errorReporter));
+    		    	errorReporter, dashboard.getTransactionGatheringThread()));
         tabs.addTab("Own addresses ",
         		    new ImageIcon(cl.getResource("images/own-addresses.png")),
         		    addresses = new AddressesPanel(this, clientCaller, errorReporter));
@@ -167,18 +167,8 @@ public class ZCashUI
         this.walletOps = new WalletOperations(
             	this, tabs, dashboard, addresses, sendPanel, 
             	installationObserver, clientCaller, errorReporter, backupTracker);
-
-        int width = 870;
-        
-        OS_TYPE os = OSUtil.getOSType();
-    	
-        // Window needs to be larger on Mac/Windows - typically
-    	if ((os == OS_TYPE.WINDOWS) || (os == OS_TYPE.MAC_OS))
-    	{
-    		width += 100;
-    	}
-        
-        this.setSize(new Dimension(width, 440));
+                
+        this.setSize(new Dimension(1000, 500));
 
         // Build menu
         JMenuBar mb = new JMenuBar();

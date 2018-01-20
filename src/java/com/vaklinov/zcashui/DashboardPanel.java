@@ -31,7 +31,6 @@ package com.vaklinov.zcashui;
 
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
-import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -41,7 +40,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Date;
-import java.util.List;
 
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
@@ -49,7 +47,6 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JTable;
 import javax.swing.Timer;
 
 import com.vaklinov.zcashui.OSUtil.OS_TYPE;
@@ -74,8 +71,11 @@ public class DashboardPanel
 	private StatusUpdateErrorReporter errorReporter;
 	private BackupTracker backupTracker;
 	
+	private JPanel upperLogoAndWarningPanel = null;
 	private JLabel networkAndBlockchainLabel = null;
 	private DataGatheringThread<NetworkAndBlockchainInfo> netInfoGatheringThread = null;
+	private JPanel blockcahinWarningPanel = null;
+	private JLabel blockcahinWarningLabel = null;
 
 	private Boolean walletIsEncrypted   = null;
 	private Integer blockchainPercentage = null;
@@ -114,7 +114,7 @@ public class DashboardPanel
 		dashboard.setLayout(new BorderLayout(0, 0));
 
 		// Upper panel with wallet balance
-		JPanel upperLogoAndWarningPanel = new JPanel();
+		upperLogoAndWarningPanel = new JPanel();
 		upperLogoAndWarningPanel.setLayout(new BorderLayout(3, 3)); 
 		
 		JPanel tempPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 9));
@@ -122,26 +122,11 @@ public class DashboardPanel
 			this.getClass().getClassLoader().getResource("images/ZEN-yellow.orange-logo-small.png")));
 		tempPanel.add(logoLabel);
 		JLabel zcLabel = new JLabel("<html><span style=\"font-size:3.3em;font-weight:bold;font-style:italic;\">&nbsp;ZENCash Wallet&nbsp;</span></html>");
-		tempPanel.add(zcLabel);
-		tempPanel.setToolTipText("Powered by ZEN");
-		upperLogoAndWarningPanel.add(tempPanel, BorderLayout.WEST);
-		
-		// TODO: just a test warning panel - needs to be made better
-		tempPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
-        PresentationPanel warningPanel = new PresentationPanel();
-		JLabel warningLabel = new JLabel(
-			"<html><span style=\"font-size:1em;font-weight:bold;color:red;\">" +
-		    "WARNING: The blockchaiin is not fully synchronized. The latest block<br/> " +
-		    "of transactions known to the wallet is dated: 17.01.2017 237846283<br/>" +
-		    "Transactions and balance reflect the wallet state up to this date!" +
-		    "</span></html>");
-		warningPanel.add(warningLabel);
-		tempPanel.add(warningPanel);
-		upperLogoAndWarningPanel.add(tempPanel, BorderLayout.EAST);
-		
+		tempPanel.add(zcLabel); 
+		tempPanel.setToolTipText("Powered by ZENCash");
+		upperLogoAndWarningPanel.add(tempPanel, BorderLayout.WEST);		
 		dashboard.add(upperLogoAndWarningPanel, BorderLayout.NORTH);
 
-		
 		
 		tempPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
         PresentationPanel walletBalancePanel = new PresentationPanel();
@@ -334,6 +319,12 @@ public class DashboardPanel
 		return this.blockchainPercentage;
 	}
 	
+	
+	public DataGatheringThread<String[][]> getTransactionGatheringThread()
+	{
+		return this.transactionGatheringThread;
+	}
+	
 
 	private void updateDaemonStatusLabel()
 		throws IOException, InterruptedException, WalletCallException
@@ -500,6 +491,41 @@ public class DashboardPanel
 			"Network: <span style=\"font-weight:bold\">" + info.numConnections + " connections</span>" +
 			"<span style=\"font-size:1.7em;color:" + netColor + "\">" + connections + "</span>";
 		this.networkAndBlockchainLabel.setText(text);
+		
+		// Possibly show a blockchain synchronization warning
+		if (this.blockchainPercentage < 100)
+		{
+			String warningText = 					
+					"<html><span style=\"font-size:1em;font-weight:bold;color:red;\">" +
+				    "WARNING: The blockchain is not 100% synchronized. The visible<br/>" +
+				    "transactions and wallet balaance reflect an old state of the<br/>" +
+				    "wallet as of " + info.lastBlockDate.toLocaleString() + " !" +
+				    "</span></html>";
+			
+			if (this.blockcahinWarningPanel == null)
+			{
+				// Create a new warning panel
+				JPanel tempPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+		        PresentationPanel warningPanel = new PresentationPanel();
+		        this.blockcahinWarningLabel = new JLabel(warningText);
+				warningPanel.add(this.blockcahinWarningLabel);
+				tempPanel.add(warningPanel);
+				this.blockcahinWarningPanel = tempPanel;
+				this.upperLogoAndWarningPanel.add(this.blockcahinWarningPanel, BorderLayout.EAST);
+			} else if (this.blockcahinWarningLabel != null)
+			{
+				this.blockcahinWarningLabel.setText(warningText);
+			}
+		} else
+		{
+			if (this.blockcahinWarningPanel != null)
+			{
+				this.upperLogoAndWarningPanel.remove(this.blockcahinWarningPanel);
+				this.upperLogoAndWarningPanel.revalidate();
+				this.blockcahinWarningPanel = null;
+				this.blockcahinWarningLabel = null;
+			}
+		}
 	}
 	
 
@@ -717,5 +743,12 @@ public class DashboardPanel
 
 		return allTransactions;
 	}
+	
+	
+	
+	
+	// Specific panel class for showing the exchange rates and values in FIAT
+	
+	
 	
 } // End class

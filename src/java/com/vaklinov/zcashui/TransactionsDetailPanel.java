@@ -30,8 +30,6 @@ package com.vaklinov.zcashui;
 
 
 import java.awt.BorderLayout;
-import java.awt.FlowLayout;
-import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
@@ -43,7 +41,6 @@ import java.util.Date;
 
 import javax.swing.BorderFactory;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -77,13 +74,15 @@ public class TransactionsDetailPanel
 	public TransactionsDetailPanel(JFrame parentFrame,
 			              ZCashInstallationObserver installationObserver,
 			              ZCashClientCaller clientCaller,
-			              StatusUpdateErrorReporter errorReporter)
+			              StatusUpdateErrorReporter errorReporter,
+			              DataGatheringThread<String[][]> transactionGatheringThread)
 		throws IOException, InterruptedException, WalletCallException
 	{
 		this.parentFrame          = parentFrame;
 		this.clientCaller  = clientCaller;
 		this.errorReporter = errorReporter;
 		this.installationObserver = installationObserver;
+		this.transactionGatheringThread = transactionGatheringThread;
 		
 		this.timers = new ArrayList<Timer>();
 		this.threads = new ArrayList<DataGatheringThread<?>>();
@@ -93,38 +92,11 @@ public class TransactionsDetailPanel
 		dashboard.setBorder(BorderFactory.createEmptyBorder(3, 3, 3, 3));
 		dashboard.setLayout(new BorderLayout(0, 0));
 
-		// Upper panel with wallet balance
-		// TODO: use relative size - only!
-		/*JLabel transactionHeadingLabel = new JLabel(
-			"<html>Transactions:</html>");
-		JPanel tempPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 1, 1));
-		transactionHeadingLabel.setFont(new Font("Helvetica", Font.BOLD, 19));
-		tempPanel.add(transactionHeadingLabel);
-		dashboard.add(tempPanel, BorderLayout.NORTH);
-		*/
 		// Table of transactions
 		lastTransactionsData = getTransactionsDataFromWallet();
 		dashboard.add(transactionsTablePane = new JScrollPane(
 				         transactionsTable = this.createTransactionsTable(lastTransactionsData)),
 				      BorderLayout.CENTER);
-
-		// Thread and timer to update the transactions table - TODO: share one thread or otherwise optimize
-		this.transactionGatheringThread = new DataGatheringThread<String[][]>(
-			new DataGatheringThread.DataGatherer<String[][]>() 
-			{
-				public String[][] gatherData()
-					throws Exception
-				{
-					long start = System.currentTimeMillis();
-					String[][] data =  TransactionsDetailPanel.this.getTransactionsDataFromWallet();
-					long end = System.currentTimeMillis();
-					Log.info("Gathering of dashboard wallet transactions table data done in " + (end - start) + "ms." );
-					
-					return data;
-				}
-			}, 
-			this.errorReporter, 30000);
-		this.threads.add(this.transactionGatheringThread);
 		
 		ActionListener alTransactions = new ActionListener() {
 			@Override
