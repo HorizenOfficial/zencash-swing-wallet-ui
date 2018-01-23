@@ -35,6 +35,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.net.URL;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -49,6 +52,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.Timer;
 
+import com.eclipsesource.json.JsonObject;
 import com.vaklinov.zcashui.OSUtil.OS_TYPE;
 import com.vaklinov.zcashui.ZCashClientCaller.NetworkAndBlockchainInfo;
 import com.vaklinov.zcashui.ZCashClientCaller.WalletBalance;
@@ -745,9 +749,81 @@ public class DashboardPanel
 	}
 	
 	
-	
-	
 	// Specific panel class for showing the exchange rates and values in FIAT
+	class ExchangeRatePanel
+		extends JPanel
+	{
+		private DataGatheringThread<JsonObject> zenDataGatheringThread = null;
+		
+		private DataTable table;
+		
+		public ExchangeRatePanel(StatusUpdateErrorReporter errorReporter)
+		{
+			this.setLayout(new BorderLayout(3, 3));
+			
+			this.table = new DataTable(getExchangeDataInTableForm(), 
+					                   new String[] { "ZEN information", "Value" });
+			
+			this.zenDataGatheringThread = new DataGatheringThread<JsonObject>(
+				new DataGatheringThread.DataGatherer<JsonObject>() 
+				{
+					public JsonObject gatherData()
+						throws Exception
+					{
+						long start = System.currentTimeMillis();
+						JsonObject exchangeData = ExchangeRatePanel.this.getExchangeDataFromRemoteService();
+						long end = System.currentTimeMillis();
+						Log.info("Gathering of ZEN Exchange data done in " + (end - start) + "ms." );
+							
+						return exchangeData;
+					}
+				}, 
+				errorReporter, 60000, true);
+
+		}
+		
+		
+		// Forms the exchange data for a table
+		private Object[][] getExchangeDataInTableForm()
+		{
+			JsonObject data = this.zenDataGatheringThread.getLastData();
+			if (data == null)
+			{
+				data = new JsonObject();
+			}
+			
+			// Query the object for individual fields
+			String tableData[][] = new String[][]
+			{
+				{ "Current price in USD:",     data.getString("price_usd",          "N/A") },
+				{ "Current price in BTC:",     data.getString("price_btc",          "N/A") },
+				{ "ZEN capitalization (USD):", data.getString("market_cap_usd",     "N/A") },
+				{ "Daily change (USD price):", data.getString("percent_change_24h", "N/A") },
+			};
+			
+			return tableData;
+		}
+		
+				
+		// Obtains the ZEN exchange data as a JsonObject
+		private JsonObject getExchangeDataFromRemoteService()
+		{
+			JsonObject data = new JsonObject();
+			
+			try
+			{
+				URL u = new URL("https://api.coinmarketcap.com/v1/ticker/zencash");
+				Reader r = new InputStreamReader(u.openStream(), "UTF-8");
+				data = Util.parseJsonObject(r);
+			} catch (IOException ioe)
+			{
+				Log.warning("Could not obtain ZEN exchange information from coinmarketcap.com due to: {0} {1}", 
+						    ioe.getClass().getName(), ioe.getMessage());
+			}
+			
+			return data;
+		}
+	}
 	
 	
 	
