@@ -30,6 +30,7 @@ package com.vaklinov.zcashui;
 
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -45,13 +46,17 @@ import java.util.Comparator;
 import java.util.Date;
 
 import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
 import javax.swing.Timer;
 
+import com.eclipsesource.json.Json;
+import com.eclipsesource.json.JsonArray;
 import com.eclipsesource.json.JsonObject;
 import com.vaklinov.zcashui.OSUtil.OS_TYPE;
 import com.vaklinov.zcashui.ZCashClientCaller.NetworkAndBlockchainInfo;
@@ -80,6 +85,7 @@ public class DashboardPanel
 	private DataGatheringThread<NetworkAndBlockchainInfo> netInfoGatheringThread = null;
 	private JPanel blockcahinWarningPanel = null;
 	private JLabel blockcahinWarningLabel = null;
+	private ExchangeRatePanel exchangeRatePanel = null;
 
 	private Boolean walletIsEncrypted   = null;
 	private Integer blockchainPercentage = null;
@@ -131,12 +137,18 @@ public class DashboardPanel
 		upperLogoAndWarningPanel.add(tempPanel, BorderLayout.WEST);		
 		dashboard.add(upperLogoAndWarningPanel, BorderLayout.NORTH);
 
-		
-		tempPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
-        PresentationPanel walletBalancePanel = new PresentationPanel();
-        walletBalancePanel.add(walletBalanceLabel = new JLabel());
-        tempPanel.add(walletBalancePanel);
+        PresentationPanel roundedLeftPanel = new PresentationPanel();
+        JPanel leftInsidePanel = new JPanel();
+        leftInsidePanel.setLayout(new BorderLayout(8, 8));
+        leftInsidePanel.add(walletBalanceLabel = new JLabel(), BorderLayout.NORTH);
+        leftInsidePanel.add(new JLabel(" "), BorderLayout.CENTER);
+        leftInsidePanel.add(this.exchangeRatePanel = new ExchangeRatePanel(errorReporter), BorderLayout.SOUTH);
+        roundedLeftPanel.add(leftInsidePanel);
+        tempPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+        tempPanel.add(roundedLeftPanel);
         dashboard.add(tempPanel, BorderLayout.WEST);
+        
+        
 
 		// Table of transactions 
 		// TODO: to be replaced with a detailed list of transacitons
@@ -559,6 +571,16 @@ public class DashboardPanel
 		String color2 = privateBalance.equals(privateUCBalance)         ? "" : "color:#cc3300;";
 		String color3 = totalBalance.equals(totalUCBalance)             ? "" : "color:#cc3300;";
 		
+		Double usdBalance = (this.exchangeRatePanel != null) ? this.exchangeRatePanel.getUsdPrice() : null;
+		String usdBalanceStr = "";
+		if (usdBalance != null)
+		{
+			usdBalance = usdBalance * balance.totalUnconfirmedBalance;
+			usdBalanceStr = "<br/>" + "<span style=\"font-family:monospace;font-size:1.8em;" + color3 + "\">" +
+			                "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + 
+		                    "<span style=\"font-weight:bold;font-size:2.1em;\">" + df.format(usdBalance) + " USD</span></span>";
+		}
+		
 		String text =
 			"<html>" + 
 		    "<span style=\"font-family:monospace;font-size:1.8em;font-weight:bold;" + color1 + "\">BALANCE:</span><br/> " +
@@ -570,10 +592,11 @@ public class DashboardPanel
 			"<hr/>" +
 		    "<span style=\"font-family:monospace;font-size:1.8em;" + color3 + "\">Total (Z+T): <span style=\"font-weight:bold;font-size:2.1em;\">" + 
 		    	totalUCBalance + " ZEN </span></span>" +
+		    usdBalanceStr +
 			"<br/>  </html>";
 		
 		this.walletBalanceLabel.setText(text);
-		
+				
 		String toolTip = null;
 		if ((!transparentBalance.equals(transparentUCBalance)) ||
 		    (!privateBalance.equals(privateUCBalance))         ||
@@ -756,14 +779,13 @@ public class DashboardPanel
 		private DataGatheringThread<JsonObject> zenDataGatheringThread = null;
 		
 		private DataTable table;
+		private JScrollPane tablePane;
+		
+		private Double lastUsdPrice;
 		
 		public ExchangeRatePanel(StatusUpdateErrorReporter errorReporter)
-		{
-			this.setLayout(new BorderLayout(3, 3));
-			
-			this.table = new DataTable(getExchangeDataInTableForm(), 
-					                   new String[] { "ZEN information", "Value" });
-			
+		{			
+			// Start the thread to gather the exchange data
 			this.zenDataGatheringThread = new DataGatheringThread<JsonObject>(
 				new DataGatheringThread.DataGatherer<JsonObject>() 
 				{
@@ -779,7 +801,45 @@ public class DashboardPanel
 					}
 				}, 
 				errorReporter, 60000, true);
-
+			
+			this.setLayout(new FlowLayout(FlowLayout.LEFT, 3, 3));
+			this.recreateExchangeTable();
+			
+			// Start the timer to update the table
+			ActionListener alExchange = new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e)
+				{
+					try
+					{					
+						ExchangeRatePanel.this.recreateExchangeTable();
+					} catch (Exception ex)
+					{
+						Log.error("Unexpected error: ", ex);
+						DashboardPanel.this.errorReporter.reportError(ex);
+					}
+				}
+			};
+			Timer t = new Timer(30000, alExchange);
+			t.setInitialDelay(1000);
+			t.start();
+		}
+		
+		
+		private void recreateExchangeTable()
+		{
+			if (this.table != null)
+			{
+				this.remove(this.tablePane);
+			}
+						
+			this.table = new DataTable(getExchangeDataInTableForm(), 
+	                                   new String[] { "Exchange information", "Value" });
+			Dimension d = this.table.getPreferredSize();
+			d.setSize((d.getWidth() * 26) / 10, d.getHeight()); // TODO: better sizing
+			this.table.setPreferredScrollableViewportSize(d);
+			this.table.setFillsViewportHeight(false);
+            this.add(this.tablePane = new JScrollPane(this.table));
 		}
 		
 		
@@ -792,16 +852,37 @@ public class DashboardPanel
 				data = new JsonObject();
 			}
 			
+			String usdPrice = data.getString("price_usd", "N/A");
+			try
+			{
+				Double usdPriceD = Double.parseDouble(usdPrice);
+				usdPrice = new DecimalFormat("########0.00").format(usdPriceD);
+				this.lastUsdPrice = usdPriceD;
+			} catch (NumberFormatException nfe) { /* Do nothing */ }
+			
+			String usdMarketCap = data.getString("market_cap_usd", "N/A");
+			try
+			{
+				Double usdMarketCapD = Double.parseDouble(usdMarketCap) / 1000000;
+				usdMarketCap = new DecimalFormat("########0.000").format(usdMarketCapD) + " million";
+			} catch (NumberFormatException nfe) { /* Do nothing */ }
+			
 			// Query the object for individual fields
 			String tableData[][] = new String[][]
 			{
-				{ "Current price in USD:",     data.getString("price_usd",          "N/A") },
+				{ "Current price in USD:",     usdPrice},
 				{ "Current price in BTC:",     data.getString("price_btc",          "N/A") },
-				{ "ZEN capitalization (USD):", data.getString("market_cap_usd",     "N/A") },
-				{ "Daily change (USD price):", data.getString("percent_change_24h", "N/A") },
+				{ "ZEN capitalization (USD):", usdMarketCap },
+				{ "Daily change (USD price):", data.getString("percent_change_24h", "N/A") + "%"},
 			};
 			
 			return tableData;
+		}
+		
+		
+		private Double getUsdPrice()
+		{
+			return this.lastUsdPrice;
 		}
 		
 				
@@ -814,8 +895,9 @@ public class DashboardPanel
 			{
 				URL u = new URL("https://api.coinmarketcap.com/v1/ticker/zencash");
 				Reader r = new InputStreamReader(u.openStream(), "UTF-8");
-				data = Util.parseJsonObject(r);
-			} catch (IOException ioe)
+				JsonArray ar = Json.parse(r).asArray();
+				data = ar.get(0).asObject();
+			} catch (Exception ioe)
 			{
 				Log.warning("Could not obtain ZEN exchange information from coinmarketcap.com due to: {0} {1}", 
 						    ioe.getClass().getName(), ioe.getMessage());
