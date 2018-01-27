@@ -168,7 +168,7 @@ public class ZCashUI
             	this, tabs, dashboard, addresses, sendPanel, 
             	installationObserver, clientCaller, errorReporter, backupTracker);
                 
-        this.setSize(new Dimension(1000, 600));
+        this.setSize(new Dimension(1000, 550));
 
         // Build menu
         JMenuBar mb = new JMenuBar();

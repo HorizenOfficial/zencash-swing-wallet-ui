@@ -30,8 +30,10 @@ package com.vaklinov.zcashui;
 
 
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -46,18 +48,23 @@ import java.util.Comparator;
 import java.util.Date;
 
 import javax.swing.BorderFactory;
-import javax.swing.BoxLayout;
+import javax.swing.DefaultListModel;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
+import javax.swing.ListCellRenderer;
+import javax.swing.ListSelectionModel;
+import javax.swing.SwingUtilities;
 import javax.swing.Timer;
+import javax.swing.border.EtchedBorder;
 
 import com.eclipsesource.json.Json;
 import com.eclipsesource.json.JsonArray;
 import com.eclipsesource.json.JsonObject;
+
 import com.vaklinov.zcashui.OSUtil.OS_TYPE;
 import com.vaklinov.zcashui.ZCashClientCaller.NetworkAndBlockchainInfo;
 import com.vaklinov.zcashui.ZCashClientCaller.WalletBalance;
@@ -74,6 +81,17 @@ import com.vaklinov.zcashui.ZCashInstallationObserver.DaemonInfo;
 public class DashboardPanel
 	extends WalletTabPanel
 {
+	// Static icon resources
+	private static ImageIcon inputTransactionIcon = new ImageIcon(
+		DashboardPanel.class.getClassLoader().getResource("images/tx_input.png"));
+	private static ImageIcon outputTransactionIcon = new ImageIcon(
+		DashboardPanel.class.getClassLoader().getResource("images/tx_output.png"));
+	private static ImageIcon inoutTransactionIcon = new ImageIcon(
+		DashboardPanel.class.getClassLoader().getResource("images/tx_inout.png"));
+	private static ImageIcon minedTransactionIcon = new ImageIcon(
+		DashboardPanel.class.getClassLoader().getResource("images/tx_mined.png"));
+	
+	
 	private JFrame parentFrame;
 	private ZCashInstallationObserver installationObserver;
 	private ZCashClientCaller clientCaller;
@@ -148,16 +166,11 @@ public class DashboardPanel
         tempPanel.add(roundedLeftPanel);
         dashboard.add(tempPanel, BorderLayout.WEST);
         
-        
-
-		// Table of transactions 
-		// TODO: to be replaced with a detailed list of transacitons
-		/*
-		lastTransactionsData = getTransactionsDataFromWallet();
-		dashboard.add(transactionsTablePane = new JScrollPane(
-				         transactionsTable = this.createTransactionsTable(lastTransactionsData)),
-				      BorderLayout.CENTER);
-        */
+		// List of transactions 
+        tempPanel = new JPanel(new BorderLayout(0, 0));
+        tempPanel.setBorder(BorderFactory.createEmptyBorder(0, 14, 8, 4));
+        tempPanel.add(new LatestTransactionsPanel(), BorderLayout.CENTER);
+		dashboard.add(tempPanel, BorderLayout.CENTER);
 
 		// Lower panel with installation status
 		JPanel installationStatusPanel = new JPanel();
@@ -820,7 +833,7 @@ public class DashboardPanel
 					}
 				}
 			};
-			Timer t = new Timer(30000, alExchange);
+			Timer t = new Timer(30000, alExchange); // TODO: add timer for disposal ???
 			t.setInitialDelay(1000);
 			t.start();
 		}
@@ -907,6 +920,139 @@ public class DashboardPanel
 		}
 	}
 	
+	
+	// Specific panel class for the latest transactions
+	class LatestTransactionsPanel
+		extends JPanel
+	{
+		LatestTransactionsList transactionList = null;
+		
+		public LatestTransactionsPanel()
+		{
+			final JPanel content = new JPanel();
+			content.setLayout(new BorderLayout(3,  3));
+			content.add(new JLabel("<html><span style=\"font-size:1.5em;font-weight:bold;font-style:italic;\">Latest transactions:</span></html>"),
+					    BorderLayout.NORTH);
+			transactionList = new LatestTransactionsList();
+			JPanel tempPanel = new JPanel(new BorderLayout(0,  0));
+			tempPanel.add(transactionList, BorderLayout.NORTH);
+			content.add(tempPanel, BorderLayout.CENTER); 
+			
+			ActionListener al = new ActionListener() 
+			{
+				@Override
+				public void actionPerformed(ActionEvent e) 
+				{
+					String[][] transactions = transactionGatheringThread.getLastData();
+					if (transactions != null)
+					{
+						transactionList.updateTransactions(transactions);
+					}
+				}
+			};
+			
+			Timer latestTransactionsTimer =  new Timer(8000, al);
+			latestTransactionsTimer.setInitialDelay(2000);
+			latestTransactionsTimer.start();
+						
+			this.setLayout(new GridLayout(1, 1));
+			this.add(content);
+		}
+		
+		
+		class LatestTransactionsList
+			extends JList<String[]>
+		{
+			public LatestTransactionsList()
+			{
+				super();
+				this.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+				this.setBackground(new JPanel().getBackground());
+			}
+			
+			
+			public void updateTransactions(String[][] transactions)
+			{
+				DefaultListModel<String[]> model = new DefaultListModel<String[]>();
+				
+				// By default only 5 transactions are shown
+				int i = 0;
+				for (String[] trans : transactions)
+				{
+					if (++i > 5)
+					{
+						break;
+					}
+					
+					model.addElement(trans);
+				}
+				
+				this.setModel(model);
+			}
+			
+			
+			@Override
+			public ListCellRenderer<String[]> getCellRenderer() 
+			{
+				return new ListCellRenderer<String[]>() 
+				{
+					@Override
+					public Component getListCellRendererComponent(
+							JList<? extends String[]> list,
+							String[] data, int index, boolean isSelected, boolean cellHasFocus) 
+					{					
+						return new SingleTransactionPanel(data);
+					}
+				};
+			}
+
+		}
+		
+		
+		class SingleTransactionPanel
+			extends JPanel
+		{			
+			// TODO: depends on the format of the gathering thread
+			public SingleTransactionPanel(String[] transactionFeilds)
+			{
+				this.setLayout(new FlowLayout(FlowLayout.LEFT, 3, 3));
+				this.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.RAISED));
+				
+				String destinationAddress = transactionFeilds[5];
+				if (destinationAddress.length() > 35)
+				{
+					destinationAddress = destinationAddress.substring(0, 33) + "...";
+				}
+				
+				
+				ImageIcon icon = inoutTransactionIcon;
+				if (transactionFeilds[1] != null)
+				{
+					if (transactionFeilds[1].contains("IN"))
+					{
+						icon = inputTransactionIcon;
+					} else if (transactionFeilds[1].contains("OUT"))
+					{
+						icon = outputTransactionIcon;
+					}
+				}
+				
+				JLabel imgLabel = new JLabel();
+				imgLabel.setIcon(icon);
+				this.add(imgLabel);
+				
+				JLabel transacitonInfo = new JLabel(
+						"<html><span>" +
+						"Type: " + transactionFeilds[0] + ",&nbsp;" +
+						"Direction: " + transactionFeilds[1] + "<br/>" +
+						"Amount: <span style=\"font-weight:bold\">" + transactionFeilds[3] + " ZEN</span>,&nbsp;" +
+						"Date: " + transactionFeilds[4] + "<br/>" +
+						"Destination: " + destinationAddress + "<br/>" +
+						"</span></html>");
+				this.add(transacitonInfo);
+			}
+		}
+	}
 	
 	
 } // End class
