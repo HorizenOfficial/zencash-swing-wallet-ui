@@ -90,6 +90,14 @@ public class DashboardPanel
 		DashboardPanel.class.getClassLoader().getResource("images/tx_inout.png"));
 	private static ImageIcon minedTransactionIcon = new ImageIcon(
 		DashboardPanel.class.getClassLoader().getResource("images/tx_mined.png"));
+	private static ImageIcon unConfirmedTXIcon = new ImageIcon(
+			DashboardPanel.class.getClassLoader().getResource("images/tr_unconfirmed.png"));
+	private static ImageIcon confirmedTXIcon = new ImageIcon(
+			DashboardPanel.class.getClassLoader().getResource("images/tr_confirmed.png"));
+	private static ImageIcon lockClosedIcon = new ImageIcon(
+			DashboardPanel.class.getClassLoader().getResource("images/lock_closed_s.png"));
+	private static ImageIcon lockOpenIcon = new ImageIcon(
+			DashboardPanel.class.getClassLoader().getResource("images/lock_opengreen_s.png"));
 	
 	
 	private JFrame parentFrame;
@@ -159,11 +167,10 @@ public class DashboardPanel
         JPanel leftInsidePanel = new JPanel();
         leftInsidePanel.setLayout(new BorderLayout(8, 8));
         leftInsidePanel.add(walletBalanceLabel = new JLabel(), BorderLayout.NORTH);
-        leftInsidePanel.add(new JLabel(" "), BorderLayout.CENTER);
-        leftInsidePanel.add(this.exchangeRatePanel = new ExchangeRatePanel(errorReporter), BorderLayout.SOUTH);
         roundedLeftPanel.add(leftInsidePanel);
-        tempPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
-        tempPanel.add(roundedLeftPanel);
+        tempPanel = new JPanel(new BorderLayout(0, 0));
+        tempPanel.add(roundedLeftPanel, BorderLayout.NORTH);
+        tempPanel.add(this.exchangeRatePanel = new ExchangeRatePanel(errorReporter), BorderLayout.CENTER);
         dashboard.add(tempPanel, BorderLayout.WEST);
         
 		// List of transactions 
@@ -175,7 +182,6 @@ public class DashboardPanel
 		// Lower panel with installation status
 		JPanel installationStatusPanel = new JPanel();
 		installationStatusPanel.setLayout(new BorderLayout(3, 3));
-		//installationStatusPanel.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
 		PresentationPanel daemonStatusPanel = new PresentationPanel();
 		daemonStatusPanel.add(daemonStatusLabel = new JLabel());
 		installationStatusPanel.add(daemonStatusPanel, BorderLayout.WEST);
@@ -815,7 +821,7 @@ public class DashboardPanel
 				}, 
 				errorReporter, 60000, true);
 			
-			this.setLayout(new FlowLayout(FlowLayout.LEFT, 3, 3));
+			this.setLayout(new FlowLayout(FlowLayout.LEFT, 3, 18));
 			this.recreateExchangeTable();
 			
 			// Start the timer to update the table
@@ -1024,30 +1030,43 @@ public class DashboardPanel
 					destinationAddress = destinationAddress.substring(0, 33) + "...";
 				}
 				
-				
-				ImageIcon icon = inoutTransactionIcon;
+				// Set the correct icon for input/output
+				ImageIcon inOutIcon = inoutTransactionIcon;
 				if (transactionFeilds[1] != null)
 				{
 					if (transactionFeilds[1].contains("IN"))
 					{
-						icon = inputTransactionIcon;
+						inOutIcon = inputTransactionIcon;
 					} else if (transactionFeilds[1].contains("OUT"))
 					{
-						icon = outputTransactionIcon;
+						inOutIcon = outputTransactionIcon;
 					}
 				}
 				
 				JLabel imgLabel = new JLabel();
-				imgLabel.setIcon(icon);
+				imgLabel.setIcon(inOutIcon);
 				this.add(imgLabel);
 				
+				// Set the two icons for public/private and confirmations
+				ImageIcon confirmationIcon = 
+					transactionFeilds[2].contains("Yes") ? confirmedTXIcon : unConfirmedTXIcon;
+				ImageIcon pubPrivIcon = 
+						transactionFeilds[0].contains("Private") ? lockClosedIcon : lockOpenIcon;
+				JPanel iconsPanel = new JPanel(new BorderLayout(0, 1));
+				iconsPanel.add(new JLabel(pubPrivIcon), BorderLayout.SOUTH);
+				iconsPanel.add(new JLabel(confirmationIcon), BorderLayout.NORTH);
+				this.add(iconsPanel);
+				
+				this.add(new JLabel("<html>&nbsp;</html>"));
+				
+				// Set the transaction information
 				JLabel transacitonInfo = new JLabel(
 						"<html><span>" +
 						"Type: " + transactionFeilds[0] + ",&nbsp;" +
 						"Direction: " + transactionFeilds[1] + "<br/>" +
 						"Amount: <span style=\"font-weight:bold\">" + transactionFeilds[3] + " ZEN</span>,&nbsp;" +
 						"Date: " + transactionFeilds[4] + "<br/>" +
-						"Destination: " + destinationAddress + "<br/>" +
+						"Destination: <span style=\"font-weight:bold\">" + destinationAddress + "</span><br/>" +
 						"</span></html>");
 				this.add(transacitonInfo);
 			}
