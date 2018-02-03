@@ -123,8 +123,6 @@ public class DashboardPanel
 	private JLabel walletBalanceLabel  = null;
 	private DataGatheringThread<WalletBalance> walletBalanceGatheringThread = null;
 	
-	private JScrollPane transactionsTablePane  = null;
-	private String[][] lastTransactionsData = null;
 	private DataGatheringThread<String[][]> transactionGatheringThread = null;
 	
 
@@ -153,17 +151,18 @@ public class DashboardPanel
 		upperLogoAndWarningPanel = new JPanel();
 		upperLogoAndWarningPanel.setLayout(new BorderLayout(3, 3)); 
 		
-		JPanel tempPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 9));
+		JPanel tempPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 14, 16));
 		JLabel logoLabel = new JLabel(new ImageIcon(
 			this.getClass().getClassLoader().getResource("images/ZEN-yellow.orange-logo-small.png")));
 		tempPanel.add(logoLabel);
-		JLabel zcLabel = new JLabel("<html><span style=\"font-size:3.3em;font-weight:bold;font-style:italic;\">&nbsp;ZENCash Wallet&nbsp;</span></html>");
+		JLabel zcLabel = new JLabel("<html><span style=\"font-size:3.3em;font-weight:bold;font-style:italic;\">ZENCash Wallet&nbsp;</span></html>");
 		tempPanel.add(zcLabel); 
 		tempPanel.setToolTipText("Powered by ZENCash");
 		upperLogoAndWarningPanel.add(tempPanel, BorderLayout.WEST);		
 		dashboard.add(upperLogoAndWarningPanel, BorderLayout.NORTH);
 
-        PresentationPanel roundedLeftPanel = new PresentationPanel();
+        JPanel roundedLeftPanel = new JPanel();
+        roundedLeftPanel.setLayout(new FlowLayout(FlowLayout.LEFT, 12, 0));
         JPanel leftInsidePanel = new JPanel();
         leftInsidePanel.setLayout(new BorderLayout(8, 8));
         leftInsidePanel.add(walletBalanceLabel = new JLabel(), BorderLayout.NORTH);
@@ -281,7 +280,7 @@ public class DashboardPanel
 					throws Exception
 				{
 					long start = System.currentTimeMillis();
-					String[][] data =  DashboardPanel.this.getTransactionsDataFromWallet();
+					String[][] data = DashboardPanel.this.getTransactionsDataFromWallet();
 					long end = System.currentTimeMillis();
 					Log.info("Gathering of dashboard wallet transactions table data done in " + (end - start) + "ms." );
 					
@@ -291,24 +290,6 @@ public class DashboardPanel
 			this.errorReporter, 20000);
 		this.threads.add(this.transactionGatheringThread);
 		
-		ActionListener alTransactions = new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e)
-			{
-				try
-				{					
-					DashboardPanel.this.updateWalletTransactionsTable();
-				} catch (Exception ex)
-				{
-					Log.error("Unexpected error: ", ex);
-					DashboardPanel.this.errorReporter.reportError(ex);
-				}
-			}
-		};
-		t = new Timer(5000, alTransactions);
-		t.start();
-		this.timers.add(t);
-
 		// Thread and timer to update the network and blockchain details
 		this.netInfoGatheringThread = new DataGatheringThread<NetworkAndBlockchainInfo>(
 			new DataGatheringThread.DataGatherer<NetworkAndBlockchainInfo>() 
@@ -602,8 +583,8 @@ public class DashboardPanel
 		
 		String text =
 			"<html>" + 
-		    "<span style=\"font-family:monospace;font-size:1.8em;font-weight:bold;" + color1 + "\">BALANCE:</span><br/> " +
-		    "<span style=\"font-family:monospace;font-size:0.7em;font-weight:bold;" + color1 + "\"></span><br/> " +
+		    "<span style=\"font-size:1.5em;font-weight:bold;font-style:italic;" + color1 + "\">Balance:</span><br/> " +
+		    "<span style=\"font-family:monospace;font-size:0.4em;font-weight:bold;" + color1 + "\"><br/></span> " +
 		    "<span style=\"font-family:monospace;font-size:1.8em;" + color1 + "\">Transparent: <span style=\"font-size:1.8em;\">" + 
 				transparentUCBalance + " ZEN </span></span><br/> " +
 			"<span style=\"font-family:monospace;font-size:1.8em;" + color2 + "\">Private (Z): <span style=\"font-weight:bold;font-size:1.8em;\">" + 
@@ -638,38 +619,7 @@ public class DashboardPanel
 			this.backupTracker.handleWalletBalanceUpdate(balance.totalBalance);
 		}
 	}
-
-
-	private void updateWalletTransactionsTable()
-		throws WalletCallException, IOException, InterruptedException
-	{
-		String[][] newTransactionsData = this.transactionGatheringThread.getLastData();
-		
-		// May be null - not even gathered once
-		if (newTransactionsData == null)
-		{
-			return;
-		}
-			
-		if (Util.arraysAreDifferent(lastTransactionsData, newTransactionsData))
-		{
-			Log.info("Updating table of transactions...");
-			// TODO: replace list model for transactions
-			/*
-			this.remove(transactionsTablePane);
-			this.add(transactionsTablePane = new JScrollPane(
-			             transactionsTable = this.createTransactionsTable(newTransactionsData)),
-			         BorderLayout.CENTER);
-		     */
-		}
-
-		lastTransactionsData = newTransactionsData;
-
-		this.validate();
-		this.repaint();
-	}
-
-
+	
 
 	private String[][] getTransactionsDataFromWallet()
 		throws WalletCallException, IOException, InterruptedException
@@ -893,6 +843,7 @@ public class DashboardPanel
 				{ "Current price in BTC:",     data.getString("price_btc",          "N/A") },
 				{ "ZEN capitalization (USD):", usdMarketCap },
 				{ "Daily change (USD price):", data.getString("percent_change_24h", "N/A") + "%"},
+				{ "Weekly change (USD price):", data.getString("percent_change_7d", "N/A") + "%"},
 			};
 			
 			return tableData;
@@ -932,8 +883,10 @@ public class DashboardPanel
 		extends JPanel
 	{
 		LatestTransactionsList transactionList = null;
+		String[][] transactions = null;
 		
 		public LatestTransactionsPanel()
+			throws InterruptedException, IOException, WalletCallException
 		{
 			final JPanel content = new JPanel();
 			content.setLayout(new BorderLayout(3,  3));
@@ -944,21 +897,25 @@ public class DashboardPanel
 			tempPanel.add(transactionList, BorderLayout.NORTH);
 			content.add(tempPanel, BorderLayout.CENTER); 
 			
+			// Pre-fill transaction list once
+			this.transactions = getTransactionsDataFromWallet();
+			transactionList.updateTransactions(this.transactions);
+			
 			ActionListener al = new ActionListener() 
 			{
 				@Override
 				public void actionPerformed(ActionEvent e) 
 				{
-					String[][] transactions = transactionGatheringThread.getLastData();
-					if (transactions != null)
+					LatestTransactionsPanel.this.transactions = transactionGatheringThread.getLastData();
+					if (LatestTransactionsPanel.this.transactions != null)
 					{
-						transactionList.updateTransactions(transactions);
+						transactionList.updateTransactions(LatestTransactionsPanel.this.transactions);
 					}
 				}
 			};
 			
 			Timer latestTransactionsTimer =  new Timer(8000, al);
-			latestTransactionsTimer.setInitialDelay(2000);
+			latestTransactionsTimer.setInitialDelay(8000);
 			latestTransactionsTimer.start();
 						
 			this.setLayout(new GridLayout(1, 1));
@@ -1027,7 +984,7 @@ public class DashboardPanel
 				String destinationAddress = transactionFeilds[5];
 				if (destinationAddress.length() > 35)
 				{
-					destinationAddress = destinationAddress.substring(0, 33) + "...";
+					destinationAddress = destinationAddress.substring(0, 37) + "...";
 				}
 				
 				// Set the correct icon for input/output

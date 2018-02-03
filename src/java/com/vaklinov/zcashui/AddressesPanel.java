@@ -270,7 +270,7 @@ public class AddressesPanel
 			JOptionPane.showMessageDialog(
 				this.getRootPane().getParent(), 
 				"A new " + (isZAddress ? "Z (Private)" : "T (Transparent)") 
-				+ " address has been created cuccessfully:\n" + address + backupMessage, 
+				+ " address has been created successfully:\n" + address + backupMessage, 
 				"Address created", JOptionPane.INFORMATION_MESSAGE);
 			
 			this.updateWalletAddressBalanceTableInteractive();
