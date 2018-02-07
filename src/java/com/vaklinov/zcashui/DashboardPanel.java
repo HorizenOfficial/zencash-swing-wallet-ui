@@ -538,6 +538,8 @@ public class DashboardPanel
 			{
 				this.upperLogoAndWarningPanel.remove(this.blockcahinWarningPanel);
 				this.upperLogoAndWarningPanel.revalidate();
+				this.upperLogoAndWarningPanel.repaint();
+				this.revalidate(); // The entire dashboard panel
 				this.blockcahinWarningPanel = null;
 				this.blockcahinWarningLabel = null;
 			}
@@ -575,10 +577,20 @@ public class DashboardPanel
 		String usdBalanceStr = "";
 		if (usdBalance != null)
 		{
+			DecimalFormat usdDF = new DecimalFormat("########0.00");
+			String formattedUSDVal = usdDF.format(usdBalance);
+			
+			// make sure the ZEN and USD are aligned
+			int diff = totalUCBalance.length() - formattedUSDVal.length();
+			while (diff-- > 0)
+			{
+				formattedUSDVal += "&nbsp;";
+			}
+			
 			usdBalance = usdBalance * balance.totalUnconfirmedBalance;
 			usdBalanceStr = "<br/>" + "<span style=\"font-family:monospace;font-size:1.8em;" + color3 + "\">" +
 			                "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + 
-		                    "<span style=\"font-weight:bold;font-size:2.1em;\">" + df.format(usdBalance) + " USD</span></span>";
+		                    "<span style=\"font-weight:bold;font-size:2.1em;\">" + formattedUSDVal + " USD</span></span>";
 		}
 		
 		String text =
@@ -1020,7 +1032,8 @@ public class DashboardPanel
 				JLabel transacitonInfo = new JLabel(
 						"<html><span>" +
 						"Type: " + transactionFeilds[0] + ",&nbsp;" +
-						"Direction: " + transactionFeilds[1] + "<br/>" +
+						"Direction: " + transactionFeilds[1] + ",&nbsp;" +
+						"Confirmed: " +	transactionFeilds[2] + "<br/>" +
 						"Amount: <span style=\"font-weight:bold\">" + transactionFeilds[3] + " ZEN</span>,&nbsp;" +
 						"Date: " + transactionFeilds[4] + "<br/>" +
 						"Destination: <span style=\"font-weight:bold\">" + destinationAddress + "</span><br/>" +
