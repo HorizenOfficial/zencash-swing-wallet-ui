@@ -27,7 +27,7 @@
  * THE SOFTWARE.                                    
  *
 -->
-<project name="ZENCashSwingWalletUI" basedir="../.." default="buildit">
+<project name="ZclassicSwingWalletUI" basedir="../.." default="buildit">
 	
     <property name="src.dir"     value="src"/>
 	<property name="lib.dir"     value="lib"/>

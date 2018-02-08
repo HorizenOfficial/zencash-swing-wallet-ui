@@ -75,7 +75,7 @@ public class ZCashInstallationObserver
 		if (!dir.exists() || dir.isFile())
 		{
 			throw new InstallationDetectionException(
-				"The ZENCash installation directory " + installDir + " does not exist or is not " +
+				"The Zclassic installation directory " + installDir + " does not exist or is not " +
 			    "a directory or is otherwise inaccessible to the wallet!");
 		}
 
@@ -88,16 +88,16 @@ public class ZCashInstallationObserver
 			zcashcli = OSUtil.findZCashCommand(OSUtil.getZCashCli());
 		}
 
-		Log.info("Using ZENCash utilities: " +
-		                   "zend: "    + ((zcashd != null) ? zcashd.getCanonicalPath() : "<MISSING>") + ", " +
-		                   "zen-cli: " + ((zcashcli != null) ? zcashcli.getCanonicalPath() : "<MISSING>"));
+		Log.info("Using Zclassic utilities: " +
+		                   "zcld: "    + ((zcashd != null) ? zcashd.getCanonicalPath() : "<MISSING>") + ", " +
+		                   "zcl-cli: " + ((zcashcli != null) ? zcashcli.getCanonicalPath() : "<MISSING>"));
 
 		if ((zcashd == null) || (zcashcli == null) || (!zcashd.exists()) || (!zcashcli.exists()))
 		{
 			throw new InstallationDetectionException(
-				"The ZENCash GUI Wallet installation directory " + installDir + " needs\nto contain " +
-				"the command line utilities zend and zen-cli. At least one of them is missing! \n" +
-				"Please place files ZENCashSwingWalletUI.jar, " + OSUtil.getZCashCli() + ", " + 
+				"The Zclassic GUI Wallet installation directory " + installDir + " needs\nto contain " +
+				"the command line utilities zcld and zcl-cli. At least one of them is missing! \n" +
+				"Please place files ZclassicSwingWalletUI.jar, " + OSUtil.getZCashCli() + ", " + 
 				OSUtil.getZCashd() + " in the same directory.");
 		}
 	}
@@ -121,7 +121,7 @@ public class ZCashInstallationObserver
 	private synchronized DaemonInfo getDaemonInfoForUNIXLikeOS()
 		throws IOException, InterruptedException
 	{
-		return getDaemonInfoForUNIXLikeOS("zend");
+		return getDaemonInfoForUNIXLikeOS("zcld");
 	}
 
 	// So far tested on Mac OS X and Linux - expected to work on other UNIXes as well
@@ -198,7 +198,7 @@ public class ZCashInstallationObserver
 	private synchronized DaemonInfo getDaemonInfoForWindowsOS()
 		throws IOException, InterruptedException
 	{
-		return getDaemonInfoForWindowsOS("zend");
+		return getDaemonInfoForWindowsOS("zcld");
 	}
 	
 	public static synchronized DaemonInfo getDaemonInfoForWindowsOS(String daemonName)
@@ -296,7 +296,7 @@ public class ZCashInstallationObserver
 		}
 		
 		String blockChainDir = OSUtil.getBlockchainDirectory();
-		File zenConf = new File(blockChainDir + File.separator + "zen.conf");
+		File zenConf = new File(blockChainDir + File.separator + "zclassic.conf");
 		if (zenConf.exists())
 		{
 			Properties confProps = new Properties();
