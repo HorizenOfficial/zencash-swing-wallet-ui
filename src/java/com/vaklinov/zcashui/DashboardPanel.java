@@ -342,6 +342,7 @@ public class DashboardPanel
 		if (daemonInfo.status != DAEMON_STATUS.RUNNING)
 		{
 			daemonStatus = "<span style=\"color:red;font-weight:bold\">NOT RUNNING</span>";
+			System.out.print(daemonInfo.status);	
 		}
 		
 		String runtimeInfo = "";
