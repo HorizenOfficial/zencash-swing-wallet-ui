@@ -102,7 +102,7 @@ public class OSUtil
 	// Returns the name of the zcashd server - may vary depending on the OS.
 	public static String getZCashd()
 	{
-		String zcashd = "zend";
+		String zcashd = "zcld";
 		
 		OS_TYPE os = getOSType();
 		if (os == OS_TYPE.WINDOWS)
@@ -117,7 +117,7 @@ public class OSUtil
 	// Returns the name of the zen-cli tool - may vary depending on the OS.
 	public static String getZCashCli()
 	{
-		String zcashcli = "zen-cli";
+		String zcashcli = "zcl-cli";
 		
 		OS_TYPE os = getOSType();
 		if (os == OS_TYPE.WINDOWS)
@@ -135,7 +135,7 @@ public class OSUtil
 	{
 		// TODO: this way of finding the dir is JAR name dependent - tricky, may not work
 		// if program is repackaged as different JAR!
-		final String JAR_NAME = "ZENCashSwingWalletUI.jar";
+		final String JAR_NAME = "ZclassicSwingWalletUI.jar";
 		String cp = System.getProperty("java.class.path");
 		if ((cp != null) && (cp.indexOf(File.pathSeparator) == -1) &&
 			(cp.endsWith(JAR_NAME)))
@@ -218,12 +218,14 @@ public class OSUtil
 		
 		if (os == OS_TYPE.MAC_OS)
 		{
-			return new File(System.getProperty("user.home") + "/Library/Application Support/Zen").getCanonicalPath();
+			return new File(System.getProperty("user.home") + "/Library/Application Support/Zlassic").getCanonicalPath();
 		} else if (os == OS_TYPE.WINDOWS)
 		{
+			//todo ch4ot1c?
 			return new File(System.getenv("APPDATA") + "\\Zen").getCanonicalPath();
 		} else
 		{
+			//todo ch4ot1c?
 			return new File(System.getProperty("user.home") + "/.zen").getCanonicalPath();
 		}
 	}
@@ -239,12 +241,14 @@ public class OSUtil
 	    
 	    if (os == OS_TYPE.MAC_OS)
 	    {
-	        dir = new File(userHome, "Library/Application Support/ZENCashSwingWalletUI");
+	        dir = new File(userHome, "Library/Application Support/ZclassicSwingWalletUI");
 	    } else if (os == OS_TYPE.WINDOWS)
 		{
+	    	//todo ch4ot1c?
 			dir = new File(System.getenv("LOCALAPPDATA") + "\\ZENCashSwingWalletUI");
 		} else
 	    {
+			//todo ch4ot1c?
 	        dir = new File(userHome.getCanonicalPath() + File.separator + ".ZENCashSwingWalletUI");
 	    }
 	    
