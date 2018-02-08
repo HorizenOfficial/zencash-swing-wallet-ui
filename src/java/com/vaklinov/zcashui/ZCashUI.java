@@ -112,7 +112,7 @@ public class ZCashUI
     public ZCashUI(StartupProgressDialog progressDialog)
         throws IOException, InterruptedException, WalletCallException
     {
-        super("ZENCash Desktop GUI Wallet 0.76.3");
+        super("Zclassic Desktop GUI Wallet 0.0.1");
         
         if (progressDialog != null)
         {
@@ -121,7 +121,7 @@ public class ZCashUI
         
         ClassLoader cl = this.getClass().getClassLoader();
 
-        this.setIconImage(new ImageIcon(cl.getResource("images/ZEN-yellow.orange-logo.png")).getImage());
+        this.setIconImage(new ImageIcon(cl.getResource("images/zclassic-logo.png")).getImage());
 
         Container contentPane = this.getContentPane();
 
