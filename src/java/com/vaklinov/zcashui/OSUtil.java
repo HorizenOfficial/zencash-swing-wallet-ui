@@ -218,15 +218,15 @@ public class OSUtil
 		
 		if (os == OS_TYPE.MAC_OS)
 		{
-			return new File(System.getProperty("user.home") + "/Library/Application Support/Zlassic").getCanonicalPath();
+			return new File(System.getProperty("user.home") + "/Library/Application Support/Zclassic").getCanonicalPath();
 		} else if (os == OS_TYPE.WINDOWS)
 		{
 			//todo ch4ot1c?
-			return new File(System.getenv("APPDATA") + "\\Zen").getCanonicalPath();
+			return new File(System.getenv("APPDATA") + "\\Zclassic").getCanonicalPath();
 		} else
 		{
 			//todo ch4ot1c?
-			return new File(System.getProperty("user.home") + "/.zen").getCanonicalPath();
+			return new File(System.getProperty("user.home") + "/.zclassic").getCanonicalPath();
 		}
 	}
 
