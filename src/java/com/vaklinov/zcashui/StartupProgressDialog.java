@@ -165,7 +165,7 @@ public class StartupProgressDialog extends JFrame {
 	                	long end = System.currentTimeMillis();
 	                	Log.info("Waiting for " + ((end - start) / 1000) + " seconds for zend to exit...");
 	                	
-	                	if (end - start > 10 * 1000)
+	                	if (end - start > 15 * 1000)
 	                	{
 	                		clientCaller.stopDaemon();
 	                		daemonProcess.destroy();

@@ -350,7 +350,7 @@ public class WalletOperations
 	
 	public void showPrivateKey()
 	{
-		if (this.tabs.getSelectedIndex() != 1)
+		if (this.tabs.getSelectedIndex() != 2)
 		{
 			JOptionPane.showMessageDialog(
 				this.parent, 

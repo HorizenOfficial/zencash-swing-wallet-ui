@@ -98,7 +98,16 @@ public class DashboardPanel
 			DashboardPanel.class.getClassLoader().getResource("images/lock_closed_s.png"));
 	private static ImageIcon lockOpenIcon = new ImageIcon(
 			DashboardPanel.class.getClassLoader().getResource("images/lock_opengreen_s.png"));
-	
+	private static ImageIcon connect_0_Icon = new ImageIcon(
+			DashboardPanel.class.getClassLoader().getResource("images/connect0_16.png"));
+	private static ImageIcon connect_1_Icon = new ImageIcon(
+			DashboardPanel.class.getClassLoader().getResource("images/connect1_16.png"));
+	private static ImageIcon connect_2_Icon = new ImageIcon(
+			DashboardPanel.class.getClassLoader().getResource("images/connect2_16.png"));
+	private static ImageIcon connect_3_Icon = new ImageIcon(
+			DashboardPanel.class.getClassLoader().getResource("images/connect3_16.png"));
+	private static ImageIcon connect_4_Icon = new ImageIcon(
+			DashboardPanel.class.getClassLoader().getResource("images/connect4_16.png"));
 	
 	private JFrame parentFrame;
 	private ZCashInstallationObserver installationObserver;
@@ -107,7 +116,11 @@ public class DashboardPanel
 	private BackupTracker backupTracker;
 	
 	private JPanel upperLogoAndWarningPanel = null;
+	
 	private JLabel networkAndBlockchainLabel = null;
+	private JLabel blockchain100PercentLabel = null;
+	private JLabel networkConnectionsIconLabel = null;
+	
 	private DataGatheringThread<NetworkAndBlockchainInfo> netInfoGatheringThread = null;
 	private JPanel blockcahinWarningPanel = null;
 	private JLabel blockcahinWarningLabel = null;
@@ -185,8 +198,20 @@ public class DashboardPanel
 		daemonStatusPanel.add(daemonStatusLabel = new JLabel());
 		installationStatusPanel.add(daemonStatusPanel, BorderLayout.WEST);
 		
+		// Build the network and blockchain labels - could be better!
+		JPanel netandBCPanel = new JPanel(new BorderLayout(0, 0));
+		netandBCPanel.setOpaque(false);
+		netandBCPanel.add(networkAndBlockchainLabel = new JLabel(), BorderLayout.CENTER);
+		JPanel netandBCIconsPanel = new JPanel(new BorderLayout(0, 0));
+		netandBCIconsPanel.setOpaque(false);
+		this.blockchain100PercentLabel = new JLabel(" ");
+		netandBCIconsPanel.add(this.blockchain100PercentLabel, BorderLayout.NORTH);
+		this.networkConnectionsIconLabel = new JLabel(" ");
+		this.networkConnectionsIconLabel.setIcon(this.connect_0_Icon);
+		netandBCIconsPanel.add(this.networkConnectionsIconLabel, BorderLayout.SOUTH);
+		netandBCPanel.add(netandBCIconsPanel, BorderLayout.EAST);
 		PresentationPanel networkAndBlockchainPanel = new PresentationPanel();
-		networkAndBlockchainPanel.add(networkAndBlockchainLabel = new JLabel());
+		networkAndBlockchainPanel.add(netandBCPanel);
 		installationStatusPanel.add(networkAndBlockchainPanel, BorderLayout.EAST);		
 		
 		dashboard.add(installationStatusPanel, BorderLayout.SOUTH);
@@ -463,50 +488,56 @@ public class DashboardPanel
 			// TODO: write log that we fix minimum date! - this condition should not occur
 			info.lastBlockDate = startDate;
 		}
-		
-		String connections = " \u26D7";
-		String tickSymbol = " \u2705";
-		OS_TYPE os = OSUtil.getOSType();
-		// Handling special symbols on Mac OS/Windows 
-		// TODO: isolate OS-specific symbol stuff in separate code
-		if ((os == OS_TYPE.MAC_OS) || (os == OS_TYPE.WINDOWS))
-		{
-			connections = " \u21D4";
-			tickSymbol = " \u2606";
-		}
-		
-		String tick = "";
-		if (percentage.equals("100"))
-		{
-			tick = "<span style=\"font-weight:bold;font-size:1.4em;color:green\">" + tickSymbol + "</span>";
-		}
-		
-		String netColor = "red";
-		if (info.numConnections > 0)
-		{
-			netColor = "#cc3300";
-		}
-		
-		if (info.numConnections > 2)
-		{
-			netColor = "black";
-		}	
-		
-		if (info.numConnections > 6)
-		{
-			netColor = "green";
-		}		
 				
 		String text =
 			"<html> " +
 		    "Blockchain synchronized: <span style=\"font-weight:bold\">" + 
-			percentage + "% </span> " + tick + " <br/>" +
+			percentage + "% </span> " + " <br/>" +
 			"Up to: <span style=\"font-size:0.8em;font-weight:bold\">" + 
 		    info.lastBlockDate.toLocaleString() + "</span>  <br/> " + 
-			"<span style=\"font-size:1px\"><br/></span>" + 
-			"Network: <span style=\"font-weight:bold\">" + info.numConnections + " connections</span>" +
-			"<span style=\"font-size:1.7em;color:" + netColor + "\">" + connections + "</span>";
+			"<span style=\"font-size:3px\"><br/><br/></span>" +
+			"Network peers: <span style=\"font-weight:bold\">" + info.numConnections + " connections&nbsp;&nbsp;</span>";
 		this.networkAndBlockchainLabel.setText(text);
+		
+		// Connections check (typically not an open node with more than 8)
+		int numConnections = info.numConnections;
+		if (numConnections > 8)
+		{
+			numConnections = 8;
+		}
+		
+		// Set the correct number of connections (icon)
+		switch (numConnections)
+		{
+		case 8:
+		case 7:
+			this.networkConnectionsIconLabel.setIcon(connect_4_Icon);
+			break;
+		case 6:
+		case 5:
+			this.networkConnectionsIconLabel.setIcon(connect_3_Icon);
+			break;
+		case 4:
+		case 3:
+			this.networkConnectionsIconLabel.setIcon(connect_2_Icon);
+			break;
+		case 2:
+		case 1:
+			this.networkConnectionsIconLabel.setIcon(connect_1_Icon);
+			break;
+		case 0:
+		default:
+			this.networkConnectionsIconLabel.setIcon(connect_0_Icon);
+		}
+		
+		// Set the blockchain synchronization icon
+		if (this.blockchainPercentage < 100)
+		{
+			this.blockchain100PercentLabel.setIcon(null);	
+		} else
+		{
+			this.blockchain100PercentLabel.setIcon(this.confirmedTXIcon);
+		}
 		
 		// Possibly show a blockchain synchronization warning
 		if (this.blockchainPercentage < 100)
