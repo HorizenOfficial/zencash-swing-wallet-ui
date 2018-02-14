@@ -71,6 +71,7 @@
     	    <fileset dir="${src.dir}/resources">  
     	        <include name="images/**"/>
     	        <include name="keys/**"/>
+				<include name="messages/**"/>
     	    </fileset>
     	</copy>
     </target>

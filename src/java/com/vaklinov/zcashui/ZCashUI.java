@@ -46,6 +46,7 @@ import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
 import java.util.Date;
 import java.util.Random;
+import java.util.ResourceBundle;
 
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
@@ -76,7 +77,7 @@ import com.vaklinov.zcashui.msg.MessagingPanel;
  * @author Ivan Vaklinov <ivan@vaklinov.com>
  */
 public class ZCashUI
-    extends JFrame
+    extends ZenFrame
 {
     private ZCashInstallationObserver installationObserver;
     private ZCashClientCaller         clientCaller;
@@ -112,8 +113,7 @@ public class ZCashUI
     public ZCashUI(StartupProgressDialog progressDialog)
         throws IOException, InterruptedException, WalletCallException
     {
-        super("ZENCash Desktop GUI Wallet 0.76.3");
-        
+
         if (progressDialog != null)
         {
         	progressDialog.setProgressText("Starting GUI wallet...");
