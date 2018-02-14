@@ -46,18 +46,8 @@ import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
 import java.util.Date;
 import java.util.Random;
-import java.util.ResourceBundle;
 
-import javax.swing.ImageIcon;
-import javax.swing.JFrame;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
-import javax.swing.JTabbedPane;
-import javax.swing.KeyStroke;
-import javax.swing.SwingUtilities;
-import javax.swing.UIManager;
+import javax.swing.*;
 import javax.swing.UIManager.LookAndFeelInfo;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -76,8 +66,7 @@ import com.vaklinov.zcashui.msg.MessagingPanel;
  *
  * @author Ivan Vaklinov <ivan@vaklinov.com>
  */
-public class ZCashUI
-    extends ZenFrame
+public class ZCashUI extends JFrame
 {
     private ZCashInstallationObserver installationObserver;
     private ZCashClientCaller         clientCaller;
@@ -113,6 +102,8 @@ public class ZCashUI
     public ZCashUI(StartupProgressDialog progressDialog)
         throws IOException, InterruptedException, WalletCallException
     {
+
+        this.setTitle(LanguageUtil.getString("label.main.frame.title"));
 
         if (progressDialog != null)
         {
