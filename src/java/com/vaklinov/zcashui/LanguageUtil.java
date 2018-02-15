@@ -8,6 +8,11 @@ import java.util.*;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
+/**
+ * Language Utility resource bundle loader.
+ *
+ * @author aballaci <aballaci@gmail.com>
+ */
 public class LanguageUtil {
 
 
@@ -32,12 +37,7 @@ public class LanguageUtil {
         return instance;
     }
 
-
-
-
-
     private void loadBundle(){
-
         Locale currentLocale = getUsersPrferedLocale();
         rb = ResourceBundle.getBundle("messages.zencash", currentLocale);
         Log.info("Loading locale: " + currentLocale.toString());

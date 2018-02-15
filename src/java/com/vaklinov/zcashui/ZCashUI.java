@@ -243,6 +243,11 @@ public class ZCashUI extends JFrame
                 try {
                     Log.info("Action ["+e.getActionCommand(  )+"] performed");
                     lu.updatePreferedLanguage(Locale.ITALY);
+                    JOptionPane.showMessageDialog(
+                            null,
+                            lu.getString("dialog.message.language.prefs.update"),
+                            lu.getString("dialog.message.language.prefs.update.title"),
+                            JOptionPane.INFORMATION_MESSAGE);
                 } catch (Exception ex) { ex.printStackTrace(  ); }
             }
         });
@@ -256,6 +261,11 @@ public class ZCashUI extends JFrame
                 try {
                     Log.info("Action ["+e.getActionCommand(  )+"] performed");
                     lu.updatePreferedLanguage(Locale.GERMANY);
+                    JOptionPane.showMessageDialog(
+                            null,
+                            lu.getString("dialog.message.language.prefs.update"),
+                            lu.getString("dialog.message.language.prefs.update.title"),
+                            JOptionPane.INFORMATION_MESSAGE);
                 } catch (Exception ex) { ex.printStackTrace(  ); }
             }
         });
@@ -268,6 +278,11 @@ public class ZCashUI extends JFrame
                 try {
                     Log.info("Action ["+e.getActionCommand(  )+"] performed");
                     lu.updatePreferedLanguage(Locale.US);
+                    JOptionPane.showMessageDialog(
+                            null,
+                            lu.getString("dialog.message.language.prefs.update"),
+                            lu.getString("dialog.message.language.prefs.update.title"),
+                            JOptionPane.INFORMATION_MESSAGE);
                 } catch (Exception ex) { ex.printStackTrace(  ); }
             }
         });
