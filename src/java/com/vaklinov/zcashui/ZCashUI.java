@@ -96,6 +96,7 @@ public class ZCashUI extends JFrame
     private SendCashPanel    sendPanel;
     private AddressBookPanel addressBookPanel;
     private MessagingPanel   messagingPanel;
+    private LanguageUtil lu;
     
     JTabbedPane tabs;
 
@@ -103,7 +104,9 @@ public class ZCashUI extends JFrame
         throws IOException, InterruptedException, WalletCallException
     {
 
-        this.setTitle(LanguageUtil.getString("label.main.frame.title"));
+        lu = LanguageUtil.instance();
+
+        this.setTitle(lu.getString("label.main.frame.title"));
 
         if (progressDialog != null)
         {
@@ -149,6 +152,9 @@ public class ZCashUI extends JFrame
 		            new ImageIcon(cl.getResource("images/messaging.png")),
 		            messagingPanel = new MessagingPanel(this, sendPanel, tabs, clientCaller, errorReporter));
         contentPane.add(tabs);
+
+        String[] langStrings = { "Deutsch", "Italiano", "English" };
+
 
         this.walletOps = new WalletOperations(
             	this, tabs, dashboard, addresses, sendPanel, 
@@ -222,7 +228,41 @@ public class ZCashUI extends JFrame
 
         // TODO: Temporarily disable encryption until further notice - Oct 24 2016
         menuItemEncrypt.setEnabled(false);
-                        
+
+        ActionListener actionPrinter = new ActionListener(  ) {
+            public void actionPerformed(ActionEvent e) {
+                try { Log.info("Action ["+e.getActionCommand(  )+"] performed");
+                } catch (Exception ex) { ex.printStackTrace(  ); }
+            }
+        };
+        JMenu languageMenu = new JMenu(lu.getString("menu.label.language"));
+        JRadioButtonMenuItem italian = new
+                JRadioButtonMenuItem("English", new ImageIcon(cl.getResource("images/italian.gif")));
+        italian.setHorizontalTextPosition(JMenuItem.RIGHT);
+
+        italian.addActionListener(actionPrinter);
+        JRadioButtonMenuItem deutsch = new
+                JRadioButtonMenuItem("Deutsch", new ImageIcon(cl.getResource("images/german.png")));
+        deutsch.setHorizontalTextPosition(JMenuItem.RIGHT);
+
+        deutsch.addActionListener(actionPrinter);
+        JRadioButtonMenuItem english = new
+                JRadioButtonMenuItem("Italiano", new ImageIcon(cl.getResource("images/german.png")));
+        english.setHorizontalTextPosition(JMenuItem.RIGHT);
+
+        english.addActionListener(actionPrinter);
+
+        ButtonGroup group = new ButtonGroup(  );
+        group.add(italian);
+        group.add(deutsch);
+        group.add(english);
+
+        languageMenu.add(italian);
+        languageMenu.add(deutsch);
+        languageMenu.add(english);
+
+        mb.add(languageMenu);
+
         this.setJMenuBar(mb);
 
         // Add listeners etc.
