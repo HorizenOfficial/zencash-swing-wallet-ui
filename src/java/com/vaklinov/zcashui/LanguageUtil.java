@@ -1,20 +1,26 @@
 package com.vaklinov.zcashui;
 
 import javax.swing.*;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Locale;
-import java.util.ResourceBundle;
+import java.io.File;
+import java.io.IOException;
+import java.text.MessageFormat;
+import java.util.*;
+import java.util.prefs.BackingStoreException;
+import java.util.prefs.Preferences;
 
 public class LanguageUtil {
 
 
-    private LanguageUtil(){}
+    private LanguageUtil(){
+        supportedLocale = new HashMap();
+        supportedLocale.put(Locale.US.getCountry(), Locale.US);
+        supportedLocale.put(Locale.ITALY.getCountry(), Locale.ITALY);
+        supportedLocale.put(Locale.GERMANY.getCountry(), Locale.GERMANY);
+    }
 
     private static LanguageUtil instance;
 
-    // locale selection in app settings to be implemented
-    int chosenLocale = 0;
+    private Map<String, Locale>  supportedLocale;
 
     private ResourceBundle rb;
 
@@ -27,25 +33,42 @@ public class LanguageUtil {
     }
 
 
-    static Locale[] supportedLocale = {
-            Locale.US, Locale.ITALY, Locale.GERMANY
-    };
 
 
 
     private void loadBundle(){
-        Locale defaultLocale = Locale.getDefault();
-        List<Locale> locales = Arrays.asList(supportedLocale);
-        Locale currentLocale;
-        if(locales.contains(defaultLocale)){
-            currentLocale = defaultLocale;
-        }else{
-            currentLocale = Locale.US;
-        }
+
+        Locale currentLocale = getUsersPrferedLocale();
         rb = ResourceBundle.getBundle("messages.zencash", currentLocale);
+        Log.info("Loading locale: " + currentLocale.toString());
+        Enumeration<String> keys = rb.getKeys();
+        while (keys.hasMoreElements()) {
+            String key = keys.nextElement();
+            Log.info(key + " : "  +  rb.getString(key));
+        }
     }
 
     public String getString(String key){
         return rb.getString(key);
     }
+
+    public  String getString(String key, Object... params  ) {
+        try {
+            return MessageFormat.format(rb.getString(key), params);
+        } catch (MissingResourceException e) {
+            return '!' + key + '!';
+        }
+    }
+
+    private Locale getUsersPrferedLocale(){
+        Preferences prefs = Preferences.userNodeForPackage(LanguageUtil.class);
+        String country = prefs.get("country", Locale.US.getCountry());
+        return supportedLocale.get(country);
+    }
+
+    public void updatePreferedLanguage(Locale locale){
+        Preferences prefs = Preferences.userNodeForPackage(LanguageUtil.class);
+        prefs.put("country", locale.getCountry());
+    }
+
 }

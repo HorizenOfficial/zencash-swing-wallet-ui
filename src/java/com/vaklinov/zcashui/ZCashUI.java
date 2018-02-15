@@ -29,11 +29,7 @@
 package com.vaklinov.zcashui;
 
 
-import java.awt.Container;
-import java.awt.Cursor;
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.Toolkit;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -45,6 +41,7 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
 import java.util.Date;
+import java.util.Locale;
 import java.util.Random;
 
 import javax.swing.*;
@@ -231,26 +228,49 @@ public class ZCashUI extends JFrame
 
         ActionListener actionPrinter = new ActionListener(  ) {
             public void actionPerformed(ActionEvent e) {
-                try { Log.info("Action ["+e.getActionCommand(  )+"] performed");
+                try {
+                    Log.info("Action ["+e.getActionCommand(  )+"] performed");
                 } catch (Exception ex) { ex.printStackTrace(  ); }
             }
         };
         JMenu languageMenu = new JMenu(lu.getString("menu.label.language"));
         JRadioButtonMenuItem italian = new
-                JRadioButtonMenuItem("English", new ImageIcon(cl.getResource("images/uk.png")));
+                JRadioButtonMenuItem(lu.getString("menu.label.language.italian"), new ImageIcon(cl.getResource("images/italian.png")));
         italian.setHorizontalTextPosition(JMenuItem.RIGHT);
 
-        italian.addActionListener(actionPrinter);
+        italian.addActionListener(new ActionListener(  ) {
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    Log.info("Action ["+e.getActionCommand(  )+"] performed");
+                    lu.updatePreferedLanguage(Locale.ITALY);
+                } catch (Exception ex) { ex.printStackTrace(  ); }
+            }
+        });
+
         JRadioButtonMenuItem deutsch = new
-                JRadioButtonMenuItem("Deutsch", new ImageIcon(cl.getResource("images/german.png")));
+                JRadioButtonMenuItem(lu.getString("menu.label.language.german"), new ImageIcon(cl.getResource("images/german.png")));
         deutsch.setHorizontalTextPosition(JMenuItem.RIGHT);
 
-        deutsch.addActionListener(actionPrinter);
+        deutsch.addActionListener(new ActionListener(  ) {
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    Log.info("Action ["+e.getActionCommand(  )+"] performed");
+                    lu.updatePreferedLanguage(Locale.GERMANY);
+                } catch (Exception ex) { ex.printStackTrace(  ); }
+            }
+        });
         JRadioButtonMenuItem english = new
-                JRadioButtonMenuItem("Italiano", new ImageIcon(cl.getResource("images/italian.png")));
+                JRadioButtonMenuItem(lu.getString("menu.label.language.english"), new ImageIcon(cl.getResource("images/uk.png")));
         english.setHorizontalTextPosition(JMenuItem.RIGHT);
 
-        english.addActionListener(actionPrinter);
+        english.addActionListener(new ActionListener(  ) {
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    Log.info("Action ["+e.getActionCommand(  )+"] performed");
+                    lu.updatePreferedLanguage(Locale.US);
+                } catch (Exception ex) { ex.printStackTrace(  ); }
+            }
+        });
 
         ButtonGroup group = new ButtonGroup(  );
         group.add(italian);
@@ -633,6 +653,7 @@ public class ZCashUI extends JFrame
             
             // Main GUI is created here
             ZCashUI ui = new ZCashUI(startupBar);
+
             ui.setVisible(true);
 
         } catch (InstallationDetectionException ide)
@@ -756,5 +777,7 @@ public class ZCashUI extends JFrame
 			configOut.close();
 		}
     }
+
+
     
 }

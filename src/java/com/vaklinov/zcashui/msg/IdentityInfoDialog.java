@@ -28,6 +28,8 @@
  **********************************************************************************/
 package com.vaklinov.zcashui.msg;
 
+import com.vaklinov.zcashui.LanguageUtil;
+
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
@@ -76,10 +78,11 @@ public class IdentityInfoDialog
 	
 	public IdentityInfoDialog(JFrame parentFrame, MessagingIdentity identity)
 	{
+		LanguageUtil lu = LanguageUtil.instance();
 		this.parentFrame = parentFrame;
 		this.identity    = identity;
 		
-		this.setTitle("Contact details for: " + identity.getDiplayString());
+		this.setTitle(lu.getString("dialog.identity.info.title",  identity.getDiplayString()));
 		this.setModal(true);
 		this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 			

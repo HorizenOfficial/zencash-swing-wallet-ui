@@ -41,6 +41,7 @@ import java.io.Writer;
 
 import com.eclipsesource.json.JsonObject;
 import com.eclipsesource.json.WriterConfig;
+import com.vaklinov.zcashui.LanguageUtil;
 import com.vaklinov.zcashui.Util;
 
 
@@ -68,6 +69,7 @@ public class MessagingIdentity
 	private boolean isAnonymous; // If the remote contact sends messages anonymously
 	private String threadID; // Thread ID for anonymous messages
 	private boolean isGroup; // If it represents a messaging group
+	private LanguageUtil lu;
 	
 	// TODO: automatically cut fields to XXX length to avoid issues with accidental big data
 	
@@ -76,7 +78,8 @@ public class MessagingIdentity
 		// By default it is not anonymous - filling the rest is the responsibility of the caller
 		this.isAnonymous = false;
 		this.isGroup     = false;
-		this.threadID    = "";	
+		this.threadID    = "";
+		lu = LanguageUtil.instance();
 	}
 	
 	
