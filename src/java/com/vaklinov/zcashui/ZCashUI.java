@@ -171,7 +171,7 @@ public class ZCashUI extends JFrame
 
         // Build menu
         JMenuBar mb = new JMenuBar();
-        JMenu file = new JMenu("Main");
+        JMenu file = new JMenu(lu.getString("menu.label.main"));
         file.setMnemonic(KeyEvent.VK_M);
         int accelaratorKeyMask = Toolkit.getDefaultToolkit ().getMenuShortcutKeyMask();
         file.add(menuItemAbout = new JMenuItem("About...", KeyEvent.VK_T));
@@ -181,7 +181,7 @@ public class ZCashUI extends JFrame
         menuItemExit.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Q, accelaratorKeyMask));
         mb.add(file);
 
-        JMenu wallet = new JMenu("Wallet");
+        JMenu wallet = new JMenu(lu.getString("menu.label.wallet"));
         wallet.setMnemonic(KeyEvent.VK_W);
         wallet.add(menuItemBackup = new JMenuItem("Backup...", KeyEvent.VK_B));
         menuItemBackup.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_B, accelaratorKeyMask));
@@ -199,7 +199,7 @@ public class ZCashUI extends JFrame
         menuItemExportToArizen.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_A, accelaratorKeyMask));
         mb.add(wallet);
 
-        JMenu messaging = new JMenu("Messaging");
+        JMenu messaging = new JMenu(lu.getString("menu.label.messaging"));
         messaging.setMnemonic(KeyEvent.VK_S);
         messaging.add(menuItemOwnIdentity = new JMenuItem("Own identity...", KeyEvent.VK_D));
         menuItemOwnIdentity.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_D, accelaratorKeyMask));        

@@ -49,7 +49,11 @@ public class LanguageUtil {
     }
 
     public String getString(String key){
-        return rb.getString(key);
+        try {
+            return rb.getString(key);
+        } catch (MissingResourceException e) {
+            return '!' + key + '!';
+        }
     }
 
     public  String getString(String key, Object... params  ) {
