@@ -237,7 +237,7 @@ public class ZCashUI extends JFrame
         };
         JMenu languageMenu = new JMenu(lu.getString("menu.label.language"));
         JRadioButtonMenuItem italian = new
-                JRadioButtonMenuItem("English", new ImageIcon(cl.getResource("images/italian.gif")));
+                JRadioButtonMenuItem("English", new ImageIcon(cl.getResource("images/uk.png")));
         italian.setHorizontalTextPosition(JMenuItem.RIGHT);
 
         italian.addActionListener(actionPrinter);
@@ -247,7 +247,7 @@ public class ZCashUI extends JFrame
 
         deutsch.addActionListener(actionPrinter);
         JRadioButtonMenuItem english = new
-                JRadioButtonMenuItem("Italiano", new ImageIcon(cl.getResource("images/german.png")));
+                JRadioButtonMenuItem("Italiano", new ImageIcon(cl.getResource("images/italian.png")));
         english.setHorizontalTextPosition(JMenuItem.RIGHT);
 
         english.addActionListener(actionPrinter);
