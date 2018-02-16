@@ -242,16 +242,14 @@ public class ZCashUI extends JFrame
         JMenu languageMenu = new JMenu(langUtil.getString("menu.label.language"));
         LanguageMenuItem italian = new
                 LanguageMenuItem(langUtil.getString("menu.label.language.italian"),
-                new ImageIcon(cl.getResource("images/italian.png")),
-                Locale.ITALY);
+                new ImageIcon(cl.getResource("images/italian.png")), Locale.ITALY);
         italian.setHorizontalTextPosition(JMenuItem.RIGHT);
 
         italian.addActionListener(languageSelectionAction);
 
         LanguageMenuItem deutsch = new
                 LanguageMenuItem(langUtil.getString("menu.label.language.german"),
-                new ImageIcon(cl.getResource("images/german.png")),
-                Locale.GERMANY);
+                new ImageIcon(cl.getResource("images/german.png")), Locale.GERMANY);
         deutsch.setHorizontalTextPosition(JMenuItem.RIGHT);
         deutsch.addActionListener(languageSelectionAction);
 
