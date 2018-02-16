@@ -91,6 +91,7 @@ public class DashboardPanel
 	private JScrollPane transactionsTablePane  = null;
 	private String[][] lastTransactionsData = null;
 	private DataGatheringThread<String[][]> transactionGatheringThread = null;
+	private LanguageUtil langUtil;
 	
 
 	public DashboardPanel(JFrame parentFrame,
@@ -109,6 +110,7 @@ public class DashboardPanel
 		this.timers = new ArrayList<Timer>();
 		this.threads = new ArrayList<DataGatheringThread<?>>();
 
+		this.langUtil = LanguageUtil.instance();
 		// Build content
 		JPanel dashboard = this;
 		dashboard.setBorder(BorderFactory.createEmptyBorder(3, 3, 3, 3));
@@ -125,14 +127,13 @@ public class DashboardPanel
 			this.getClass().getClassLoader().getResource("images/ZEN-yellow.orange-logo-small.png")));
 		tempPanel.add(logoLabel);
 		// TODO: use relative size
-		JLabel zcLabel = new JLabel(" ZENCash Wallet ");
+		JLabel zcLabel = new JLabel(langUtil.getString("panel.dashboard.main.label"));
 		zcLabel.setFont(new Font("Helvetica", Font.BOLD | Font.ITALIC, 28));
 		tempPanel.add(zcLabel);
 		tempPanel.setToolTipText("Powered by ZEN");
 		balanceStatusPanel.add(tempPanel, BorderLayout.WEST);
 		// TODO: use relative size - only!
-		JLabel transactionHeadingLabel = new JLabel(
-			"<html><span style=\"font-size:2em\"><br/></span>Transactions:</html>");
+		JLabel transactionHeadingLabel = new JLabel(langUtil.getString("panel.dashboard.transactions.label"));
 		tempPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 1, 1));
 		transactionHeadingLabel.setFont(new Font("Helvetica", Font.BOLD, 19));
 		tempPanel.add(transactionHeadingLabel);
@@ -338,10 +339,10 @@ public class DashboardPanel
 			return;
 		}
 		
-		String daemonStatus = "<span style=\"color:green;font-weight:bold\">RUNNING</span>";
+		String daemonStatus = "<span style=\"color:green;font-weight:bold\">"+ langUtil.getString("panel.dashboard.deamon.status.running")  +"</span>";
 		if (daemonInfo.status != DAEMON_STATUS.RUNNING)
 		{
-			daemonStatus = "<span style=\"color:red;font-weight:bold\">NOT RUNNING</span>";
+			daemonStatus = "<span style=\"color:red;font-weight:bold\">" + langUtil.getString("panel.dashboard.deamon.status.not.running")  + "</span>";
 		}
 		
 		String runtimeInfo = "";
@@ -482,15 +483,8 @@ public class DashboardPanel
 			netColor = "green";
 		}		
 				
-		String text =
-			"<html> " +
-		    "Blockchain synchronized: <span style=\"font-weight:bold\">" + 
-			percentage + "% </span> " + tick + " <br/>" +
-			"Up to: <span style=\"font-size:0.8em;font-weight:bold\">" + 
-		    info.lastBlockDate.toLocaleString() + "</span>  <br/> " + 
-			"<span style=\"font-size:1px\"><br/></span>" + 
-			"Network: <span style=\"font-weight:bold\">" + info.numConnections + " connections</span>" +
-			"<span style=\"font-size:1.7em;color:" + netColor + "\">" + connections + "</span>";
+		String text = langUtil.getString("panel.dashboard.network.blockchain.label",percentage,tick,
+		    info.lastBlockDate.toLocaleString(),info.numConnections,netColor,connections);
 		this.networkAndBlockchainLabel.setText(text);
 	}
 	
