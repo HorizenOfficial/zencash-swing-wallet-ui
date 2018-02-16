@@ -103,11 +103,11 @@ public class ZCashUI extends JFrame
 
         langUtil = LanguageUtil.instance();
 
-        this.setTitle(langUtil.getString("label.main.frame.title"));
+        this.setTitle(langUtil.getString("main.frame.title"));
 
         if (progressDialog != null)
         {
-        	progressDialog.setProgressText("Starting GUI wallet...");
+        	progressDialog.setProgressText(langUtil.getString("main.frame.progressbar"));
         }
         
         ClassLoader cl = this.getClass().getClassLoader();
@@ -122,7 +122,7 @@ public class ZCashUI extends JFrame
         
         if (installationObserver.isOnTestNet())
         {
-        	this.setTitle(this.getTitle() + " [using TESTNET]");
+        	this.setTitle(this.getTitle() + langUtil.getString("main.frame.title.testnet"));
         }
 
         // Build content
@@ -132,25 +132,24 @@ public class ZCashUI extends JFrame
         tabs.setFont(newTabFont);
         BackupTracker backupTracker = new BackupTracker(this);
         
-        tabs.addTab("Overview ",
+        tabs.addTab(langUtil.getString("main.frame.tab.overview.title"),
         		    new ImageIcon(cl.getResource("images/overview.png")),
         		    dashboard = new DashboardPanel(this, installationObserver, clientCaller, 
         		    		                       errorReporter, backupTracker));
-        tabs.addTab("Own addresses ",
+        tabs.addTab(langUtil.getString("main.frame.tab.own.address.title"),
         		    new ImageIcon(cl.getResource("images/own-addresses.png")),
         		    addresses = new AddressesPanel(this, clientCaller, errorReporter));
-        tabs.addTab("Send cash ",
+        tabs.addTab(langUtil.getString("main.frame.tab.send.cash.title"),
         		    new ImageIcon(cl.getResource("images/send.png")),
         		    sendPanel = new SendCashPanel(clientCaller, errorReporter, installationObserver, backupTracker));
-        tabs.addTab("Address book ",
+        tabs.addTab(langUtil.getString("main.frame.tab.address.book.title"),
     		        new ImageIcon(cl.getResource("images/address-book.png")),
     		        addressBookPanel = new AddressBookPanel(sendPanel, tabs));
-        tabs.addTab("Messaging ",
+        tabs.addTab(langUtil.getString("main.frame.tab.messaging.title"),
 		            new ImageIcon(cl.getResource("images/messaging.png")),
 		            messagingPanel = new MessagingPanel(this, sendPanel, tabs, clientCaller, errorReporter));
         contentPane.add(tabs);
 
-        String[] langStrings = { "Deutsch", "Italiano", "English" };
 
 
         this.walletOps = new WalletOperations(
