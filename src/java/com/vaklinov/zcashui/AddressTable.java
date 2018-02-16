@@ -54,7 +54,7 @@ public class AddressTable
 	{
 		super(rowData, columnNames);
 		int accelaratorKeyMask = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
-        
+		LanguageUtil langUtil = LanguageUtil.instance();
 		JMenuItem obtainPrivateKey = new JMenuItem("Obtain private key...");
 		obtainPrivateKey.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, accelaratorKeyMask));
         popupMenu.add(obtainPrivateKey);
@@ -100,22 +100,17 @@ public class AddressTable
 						
 						JOptionPane.showMessageDialog(
 							AddressTable.this.getRootPane().getParent(), 
-							(isZAddress ? "Z (Private)" : "T (Transparent)") +  " address:\n" +
-							address + "\n" + 
-							"has private key:\n" +
-							privateKey + "\n\n" +
-							"The private key has also been copied to the clipboard.", 
-							"Private key information", JOptionPane.INFORMATION_MESSAGE);
+							(isZAddress ? langUtil.getString("table.address.option.pane.text.private") : langUtil.getString("table.address.option.pane.text.transparent")) +
+								langUtil.getString("table.address.option.pane.text.rest", address, privateKey),
+							langUtil.getString("table.address.option.pane.title"), JOptionPane.INFORMATION_MESSAGE);
 
 						
-					} catch (Exception ex)
-					{
+					} catch (Exception ex){
 						Log.error("Unexpected error: ", ex);
 			            JOptionPane.showMessageDialog(
 			                AddressTable.this.getRootPane().getParent(),
-					        "Error in obtaining private key:" + "\n" +
-					         ex.getMessage() + "\n\n",
-					        "Error in obtaining private key!",
+					        langUtil.getString("table.address.option.pane.error.text", ex.getMessage()),
+					        langUtil.getString("table.address.option.pane.error.title"),
 					        JOptionPane.ERROR_MESSAGE);
 					}
 				} else
