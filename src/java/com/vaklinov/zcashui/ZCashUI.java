@@ -225,66 +225,42 @@ public class ZCashUI extends JFrame
         // TODO: Temporarily disable encryption until further notice - Oct 24 2016
         menuItemEncrypt.setEnabled(false);
 
-        ActionListener actionPrinter = new ActionListener(  ) {
+        ActionListener languageSelectionAction = new ActionListener(  ) {
             public void actionPerformed(ActionEvent e) {
                 try {
                     Log.info("Action ["+e.getActionCommand(  )+"] performed");
+                    LanguageMenuItem item = (LanguageMenuItem) e.getSource();
+                    langUtil.updatePreferedLanguage(item.getLocale());
+                    JOptionPane.showMessageDialog(
+                            ZCashUI.this.getRootPane().getParent(),
+                            langUtil.getString("dialog.message.language.prefs.update"),
+                            langUtil.getString("dialog.message.language.prefs.update.title"),
+                            JOptionPane.INFORMATION_MESSAGE);
                 } catch (Exception ex) { ex.printStackTrace(  ); }
             }
         };
         JMenu languageMenu = new JMenu(langUtil.getString("menu.label.language"));
-        JRadioButtonMenuItem italian = new
-                JRadioButtonMenuItem(langUtil.getString("menu.label.language.italian"), new ImageIcon(cl.getResource("images/italian.png")));
+        LanguageMenuItem italian = new
+                LanguageMenuItem(langUtil.getString("menu.label.language.italian"),
+                new ImageIcon(cl.getResource("images/italian.png")),
+                Locale.ITALY);
         italian.setHorizontalTextPosition(JMenuItem.RIGHT);
 
-        italian.addActionListener(new ActionListener(  ) {
-            public void actionPerformed(ActionEvent e) {
-                try {
-                    Log.info("Action ["+e.getActionCommand(  )+"] performed");
-                    langUtil.updatePreferedLanguage(Locale.ITALY);
-                    JOptionPane.showMessageDialog(
-                            ZCashUI.this.getRootPane().getParent(),
-                            langUtil.getString("dialog.message.language.prefs.update"),
-                            langUtil.getString("dialog.message.language.prefs.update.title"),
-                            JOptionPane.INFORMATION_MESSAGE);
-                } catch (Exception ex) { ex.printStackTrace(  ); }
-            }
-        });
+        italian.addActionListener(languageSelectionAction);
 
-        JRadioButtonMenuItem deutsch = new
-                JRadioButtonMenuItem(langUtil.getString("menu.label.language.german"), new ImageIcon(cl.getResource("images/german.png")));
+        LanguageMenuItem deutsch = new
+                LanguageMenuItem(langUtil.getString("menu.label.language.german"),
+                new ImageIcon(cl.getResource("images/german.png")),
+                Locale.GERMANY);
         deutsch.setHorizontalTextPosition(JMenuItem.RIGHT);
+        deutsch.addActionListener(languageSelectionAction);
 
-        deutsch.addActionListener(new ActionListener(  ) {
-            public void actionPerformed(ActionEvent e) {
-                try {
-                    Log.info("Action ["+e.getActionCommand(  )+"] performed");
-                    langUtil.updatePreferedLanguage(Locale.GERMANY);
-                    JOptionPane.showMessageDialog(
-                            ZCashUI.this.getRootPane().getParent(),
-                            langUtil.getString("dialog.message.language.prefs.update"),
-                            langUtil.getString("dialog.message.language.prefs.update.title"),
-                            JOptionPane.INFORMATION_MESSAGE);
-                } catch (Exception ex) { ex.printStackTrace(  ); }
-            }
-        });
-        JRadioButtonMenuItem english = new
-                JRadioButtonMenuItem(langUtil.getString("menu.label.language.english"), new ImageIcon(cl.getResource("images/uk.png")));
+        LanguageMenuItem english = new
+                LanguageMenuItem(langUtil.getString("menu.label.language.english"),
+                new ImageIcon(cl.getResource("images/uk.png")), Locale.US);
         english.setHorizontalTextPosition(JMenuItem.RIGHT);
 
-        english.addActionListener(new ActionListener(  ) {
-            public void actionPerformed(ActionEvent e) {
-                try {
-                    Log.info("Action ["+e.getActionCommand(  )+"] performed");
-                    langUtil.updatePreferedLanguage(Locale.US);
-                    JOptionPane.showMessageDialog(
-                            ZCashUI.this.getRootPane().getParent(),
-                            langUtil.getString("dialog.message.language.prefs.update"),
-                            langUtil.getString("dialog.message.language.prefs.update.title"),
-                            JOptionPane.INFORMATION_MESSAGE);
-                } catch (Exception ex) { ex.printStackTrace(  ); }
-            }
-        });
+        english.addActionListener(languageSelectionAction);
 
         ButtonGroup group = new ButtonGroup(  );
         group.add(italian);
