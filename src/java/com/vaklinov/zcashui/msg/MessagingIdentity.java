@@ -69,7 +69,7 @@ public class MessagingIdentity
 	private boolean isAnonymous; // If the remote contact sends messages anonymously
 	private String threadID; // Thread ID for anonymous messages
 	private boolean isGroup; // If it represents a messaging group
-	private LanguageUtil lu;
+	private LanguageUtil langUtil;
 	
 	// TODO: automatically cut fields to XXX length to avoid issues with accidental big data
 	
@@ -79,7 +79,7 @@ public class MessagingIdentity
 		this.isAnonymous = false;
 		this.isGroup     = false;
 		this.threadID    = "";
-		lu = LanguageUtil.instance();
+		langUtil = LanguageUtil.instance();
 	}
 	
 	

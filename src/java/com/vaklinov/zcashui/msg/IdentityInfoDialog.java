@@ -64,6 +64,7 @@ public class IdentityInfoDialog
 	
 	protected JPanel buttonPanel;
 	
+
 	protected JTextField nicknameTextField;
 	protected JTextArea sendreceiveaddressTextField;
 	protected JTextField senderidaddressTextField;
@@ -78,11 +79,11 @@ public class IdentityInfoDialog
 	
 	public IdentityInfoDialog(JFrame parentFrame, MessagingIdentity identity)
 	{
-		LanguageUtil lu = LanguageUtil.instance();
+		LanguageUtil langUtil = LanguageUtil.instance();
 		this.parentFrame = parentFrame;
 		this.identity    = identity;
 		
-		this.setTitle(lu.getString("dialog.identity.info.title",  identity.getDiplayString()));
+		this.setTitle(langUtil.getString("dialog.identity.info.title",  identity.getDiplayString()));
 		this.setModal(true);
 		this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 			

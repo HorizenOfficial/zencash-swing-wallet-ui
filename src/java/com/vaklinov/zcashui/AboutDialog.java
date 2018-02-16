@@ -60,7 +60,8 @@ public class AboutDialog
 	public AboutDialog(JFrame parent)
 		throws UnsupportedEncodingException
 	{
-		this.setTitle("About...");
+		LanguageUtil langUtil = LanguageUtil.instance();
+		this.setTitle(langUtil.getString("dialog.about.title"));
 		this.setSize(620, 440);
 	    this.setLocation(100, 100);
 		this.setLocationRelativeTo(parent);
@@ -221,45 +222,24 @@ public class AboutDialog
 		//copyrigthPanel.add(PD, BorderLayout.CENTER); - no donations stuff for ZEN
 
 		
-		tabs.add("About", copyrigthPanel);
+		tabs.add(langUtil.getString("dialog.about.tab.title"), copyrigthPanel);
 
 		JPanel licensePanel = new JPanel();
 		licensePanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 		licensePanel.setLayout(new BorderLayout(3, 3));
 		JLabel licenseLabel = new JLabel();
-		licenseLabel.setText(
-			"<html><body><pre>" +
-		    " Copyright (c) 2016-2017 Ivan Vaklinov &lt;ivan@vaklinov.com&gt; \n" +
-			"\n" +
-			" Permission is hereby granted, free of charge, to any person obtaining a copy\n" +
-			" of this software and associated documentation files (the \"Software\"), to deal\n" +
-			" in the Software without restriction, including without limitation the rights\n" +
-			" to use, copy, modify, merge, publish, distribute, sublicense, and/or sell\n" +
-			" copies of the Software, and to permit persons to whom the Software is\n" +
-			" furnished to do so, subject to the following conditions:\n" +
-			" \n" +
-			" The above copyright notice and this permission notice shall be included in\n" +
-			" all copies or substantial portions of the Software.\n" +
-			" \n" +
-			" THE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR\n" +
-			" IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,\n" +
-			" FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE\n" +
-			" AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER\n" +
-			" LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,\n" +
-			" OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN\n" +
-			" THE SOFTWARE.		\n" +
-			"</pre></body></html>");
+		licenseLabel.setText(langUtil.getString("dialog.about.licence"));
 		licenseLabel.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
 		licensePanel.add(licenseLabel, BorderLayout.NORTH);
 
-		tabs.add("License", licensePanel);
+		tabs.add(langUtil.getString("dialog.about.tab.title.licence"), licensePanel);
 
 		this.getContentPane().setLayout(new BorderLayout(0, 0));
 		this.getContentPane().add(tabs, BorderLayout.NORTH);
 
 		JPanel closePanel = new JPanel();
 		closePanel.setLayout(new FlowLayout(FlowLayout.CENTER, 3, 3));
-		JButton closeButon = new JButton("Close");
+		JButton closeButon = new JButton(langUtil.getString("dialog.about.button.close.text"));
 		closePanel.add(closeButon);
 		this.getContentPane().add(closePanel, BorderLayout.SOUTH);
 

@@ -93,7 +93,7 @@ public class ZCashUI extends JFrame
     private SendCashPanel    sendPanel;
     private AddressBookPanel addressBookPanel;
     private MessagingPanel   messagingPanel;
-    private LanguageUtil lu;
+    private LanguageUtil langUtil;
     
     JTabbedPane tabs;
 
@@ -101,9 +101,9 @@ public class ZCashUI extends JFrame
         throws IOException, InterruptedException, WalletCallException
     {
 
-        lu = LanguageUtil.instance();
+        langUtil = LanguageUtil.instance();
 
-        this.setTitle(lu.getString("label.main.frame.title"));
+        this.setTitle(langUtil.getString("label.main.frame.title"));
 
         if (progressDialog != null)
         {
@@ -171,7 +171,7 @@ public class ZCashUI extends JFrame
 
         // Build menu
         JMenuBar mb = new JMenuBar();
-        JMenu file = new JMenu(lu.getString("menu.label.main"));
+        JMenu file = new JMenu(langUtil.getString("menu.label.main"));
         file.setMnemonic(KeyEvent.VK_M);
         int accelaratorKeyMask = Toolkit.getDefaultToolkit ().getMenuShortcutKeyMask();
         file.add(menuItemAbout = new JMenuItem("About...", KeyEvent.VK_T));
@@ -181,7 +181,7 @@ public class ZCashUI extends JFrame
         menuItemExit.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Q, accelaratorKeyMask));
         mb.add(file);
 
-        JMenu wallet = new JMenu(lu.getString("menu.label.wallet"));
+        JMenu wallet = new JMenu(langUtil.getString("menu.label.wallet"));
         wallet.setMnemonic(KeyEvent.VK_W);
         wallet.add(menuItemBackup = new JMenuItem("Backup...", KeyEvent.VK_B));
         menuItemBackup.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_B, accelaratorKeyMask));
@@ -199,7 +199,7 @@ public class ZCashUI extends JFrame
         menuItemExportToArizen.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_A, accelaratorKeyMask));
         mb.add(wallet);
 
-        JMenu messaging = new JMenu(lu.getString("menu.label.messaging"));
+        JMenu messaging = new JMenu(langUtil.getString("menu.label.messaging"));
         messaging.setMnemonic(KeyEvent.VK_S);
         messaging.add(menuItemOwnIdentity = new JMenuItem("Own identity...", KeyEvent.VK_D));
         menuItemOwnIdentity.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_D, accelaratorKeyMask));        
@@ -233,55 +233,55 @@ public class ZCashUI extends JFrame
                 } catch (Exception ex) { ex.printStackTrace(  ); }
             }
         };
-        JMenu languageMenu = new JMenu(lu.getString("menu.label.language"));
+        JMenu languageMenu = new JMenu(langUtil.getString("menu.label.language"));
         JRadioButtonMenuItem italian = new
-                JRadioButtonMenuItem(lu.getString("menu.label.language.italian"), new ImageIcon(cl.getResource("images/italian.png")));
+                JRadioButtonMenuItem(langUtil.getString("menu.label.language.italian"), new ImageIcon(cl.getResource("images/italian.png")));
         italian.setHorizontalTextPosition(JMenuItem.RIGHT);
 
         italian.addActionListener(new ActionListener(  ) {
             public void actionPerformed(ActionEvent e) {
                 try {
                     Log.info("Action ["+e.getActionCommand(  )+"] performed");
-                    lu.updatePreferedLanguage(Locale.ITALY);
+                    langUtil.updatePreferedLanguage(Locale.ITALY);
                     JOptionPane.showMessageDialog(
-                            null,
-                            lu.getString("dialog.message.language.prefs.update"),
-                            lu.getString("dialog.message.language.prefs.update.title"),
+                            ZCashUI.this.getRootPane().getParent(),
+                            langUtil.getString("dialog.message.language.prefs.update"),
+                            langUtil.getString("dialog.message.language.prefs.update.title"),
                             JOptionPane.INFORMATION_MESSAGE);
                 } catch (Exception ex) { ex.printStackTrace(  ); }
             }
         });
 
         JRadioButtonMenuItem deutsch = new
-                JRadioButtonMenuItem(lu.getString("menu.label.language.german"), new ImageIcon(cl.getResource("images/german.png")));
+                JRadioButtonMenuItem(langUtil.getString("menu.label.language.german"), new ImageIcon(cl.getResource("images/german.png")));
         deutsch.setHorizontalTextPosition(JMenuItem.RIGHT);
 
         deutsch.addActionListener(new ActionListener(  ) {
             public void actionPerformed(ActionEvent e) {
                 try {
                     Log.info("Action ["+e.getActionCommand(  )+"] performed");
-                    lu.updatePreferedLanguage(Locale.GERMANY);
+                    langUtil.updatePreferedLanguage(Locale.GERMANY);
                     JOptionPane.showMessageDialog(
-                            null,
-                            lu.getString("dialog.message.language.prefs.update"),
-                            lu.getString("dialog.message.language.prefs.update.title"),
+                            ZCashUI.this.getRootPane().getParent(),
+                            langUtil.getString("dialog.message.language.prefs.update"),
+                            langUtil.getString("dialog.message.language.prefs.update.title"),
                             JOptionPane.INFORMATION_MESSAGE);
                 } catch (Exception ex) { ex.printStackTrace(  ); }
             }
         });
         JRadioButtonMenuItem english = new
-                JRadioButtonMenuItem(lu.getString("menu.label.language.english"), new ImageIcon(cl.getResource("images/uk.png")));
+                JRadioButtonMenuItem(langUtil.getString("menu.label.language.english"), new ImageIcon(cl.getResource("images/uk.png")));
         english.setHorizontalTextPosition(JMenuItem.RIGHT);
 
         english.addActionListener(new ActionListener(  ) {
             public void actionPerformed(ActionEvent e) {
                 try {
                     Log.info("Action ["+e.getActionCommand(  )+"] performed");
-                    lu.updatePreferedLanguage(Locale.US);
+                    langUtil.updatePreferedLanguage(Locale.US);
                     JOptionPane.showMessageDialog(
-                            null,
-                            lu.getString("dialog.message.language.prefs.update"),
-                            lu.getString("dialog.message.language.prefs.update.title"),
+                            ZCashUI.this.getRootPane().getParent(),
+                            langUtil.getString("dialog.message.language.prefs.update"),
+                            langUtil.getString("dialog.message.language.prefs.update.title"),
                             JOptionPane.INFORMATION_MESSAGE);
                 } catch (Exception ex) { ex.printStackTrace(  ); }
             }
