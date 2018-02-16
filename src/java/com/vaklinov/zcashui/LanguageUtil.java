@@ -41,11 +41,6 @@ public class LanguageUtil {
         Locale currentLocale = getUsersPrferedLocale();
         rb = ResourceBundle.getBundle("messages.zencash", currentLocale);
         Log.info("Loading locale: " + currentLocale.toString());
-        Enumeration<String> keys = rb.getKeys();
-        while (keys.hasMoreElements()) {
-            String key = keys.nextElement();
-            Log.info(key + " : "  +  rb.getString(key));
-        }
     }
 
     public String getString(String key){

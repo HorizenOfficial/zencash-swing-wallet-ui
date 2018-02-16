@@ -385,20 +385,21 @@ public class DashboardPanel
 		{
 			walletEncryption = 
 					"<span style=\"font-size:0.8em\">" + 
-			        " (" + (this.walletIsEncrypted ? "" : "not ") + "encrypted)" +
+			        " (" + (this.walletIsEncrypted ? "" : langUtil.getString("panel.dashboard.deamon.status.not")) +
+							langUtil.getString("panel.dashboard.deamon.status.encrypted") + ")" +
 			        "</span>";
 		}
 		
 		String text =
 			"<html><span style=\"font-weight:bold;color:#303030\">zend</span> status: " + 
 		    daemonStatus + ",  " + runtimeInfo + " <br/>" +
-			"Wallet: <span style=\"font-weight:bold;color:#303030\">" + walletDAT.getCanonicalPath() + "</span>" + 
+			langUtil.getString("panel.dashboard.deamon.status.wallet") + "<span style=\"font-weight:bold;color:#303030\">" + walletDAT.getCanonicalPath() + "</span>" +
 			walletEncryption + " <br/> " +
 			"<span style=\"font-size:3px\"><br/></span>" +
 			"<span style=\"font-size:0.8em\">" +
-			"Installation: " + OSUtil.getProgramDirectory() + ", " +
+			langUtil.getString("panel.dashboard.deamon.status.installation")  + OSUtil.getProgramDirectory() + ", " +
 	        "Blockchain: " + OSUtil.getBlockchainDirectory() + " <br/> " +
-		    "System: " + this.OSInfo + " </span> </html>";
+			langUtil.getString("panel.dashboard.deamon.status.system") + this.OSInfo + " </span> </html>";
 		this.daemonStatusLabel.setText(text);
 	}
 
@@ -517,11 +518,11 @@ public class DashboardPanel
 		
 		String text =
 			"<html>" + 
-		    "<span style=\"font-family:monospace;font-size:1em;" + color1 + "\">Transparent balance: <span style=\"font-size:1.1em;\">" + 
+		    "<span style=\"font-family:monospace;font-size:1em;" + color1 + "\">"+ langUtil.getString("panel.dashboard.balance.transparent") + "<span style=\"font-size:1.1em;\">" +
 				transparentUCBalance + " ZEN </span></span><br/> " +
-			"<span style=\"font-family:monospace;font-size:1em;" + color2 + "\">Private (Z) balance: <span style=\"font-weight:bold;font-size:1.1em;\">" + 
+			"<span style=\"font-family:monospace;font-size:1em;" + color2 + "\">"+ langUtil.getString("panel.dashboard.balance.private") + "<span style=\"font-weight:bold;font-size:1.1em;\">" +
 		    	privateUCBalance + " ZEN </span></span><br/> " +
-			"<span style=\"font-family:monospace;;font-size:1em;" + color3 + "\">Total (Z+T) balance: <span style=\"font-weight:bold;font-size:1.35em;\">" + 
+			"<span style=\"font-family:monospace;;font-size:1em;" + color3 + "\">"+ langUtil.getString("panel.dashboard.balance.total") + "<span style=\"font-weight:bold;font-size:1.35em;\">" +
 		    	totalUCBalance + " ZEN </span></span>" +
 			"<br/>  </html>";
 		
@@ -532,14 +533,7 @@ public class DashboardPanel
 		    (!privateBalance.equals(privateUCBalance))         ||
 		    (!totalBalance.equals(totalUCBalance)))
 		{
-			toolTip = "<html>" +
-					  "Unconfirmed (unspendable) balance is being shown due to an<br/>" + 
-		              "ongoing transaction! Actual confirmed (spendable) balance is:<br/>" +
-		              "<span style=\"font-size:5px\"><br/></span>" +
-					  "Transparent: " + transparentBalance + " ZEN<br/>" +
-		              "Private ( Z ): <span style=\"font-weight:bold\">" + privateBalance + " ZEN</span><br/>" +
-					  "Total ( Z+T ): <span style=\"font-weight:bold\">" + totalBalance + " ZEN</span>" +
-					  "</html>";
+			toolTip = langUtil.getString("panel.dashboard.balance.tooltip", transparentBalance, privateBalance, totalBalance);
 		}
 		
 		this.walletBalanceLabel.setToolTipText(toolTip);
@@ -581,7 +575,7 @@ public class DashboardPanel
 	private JTable createTransactionsTable(String rowData[][])
 		throws WalletCallException, IOException, InterruptedException
 	{
-		String columnNames[] = { "Type", "Direction", "Confirmed?", "Amount", "Date", "Destination Address"};
+		String columnNames[] = langUtil.getString("panel.dashboard.table.transactions.column.names").split(":");
         JTable table = new TransactionTable(
         	rowData, columnNames, this.parentFrame, this.clientCaller, this.installationObserver); 
         table.setAutoResizeMode(JTable.AUTO_RESIZE_SUBSEQUENT_COLUMNS);
