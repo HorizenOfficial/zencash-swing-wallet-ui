@@ -697,7 +697,9 @@ public class DashboardPanel
 			{
 				boolean isConfirmed = !trans[2].trim().equals("0"); 
 				
-				trans[2] = isConfirmed ? ("Yes " + confirmed) : ("No  " + notConfirmed);
+				trans[2] = isConfirmed ?
+						(langUtil.getString("panel.dashboard.table.transactions.confirmed.yes") + confirmed) :
+						(langUtil.getString("panel.dashboard.table.transactions.confirmed.no") + notConfirmed);
 			} catch (NumberFormatException nfe)
 			{
 				Log.error("Error occurred while formatting confirmations: " + trans[2] + 
