@@ -463,6 +463,11 @@ public class ZCashUI
                     "create watch-only addresses in the wallet.dat file that cause the GUI wallet to\n" +
                     "display a wrong balance and/or display addresses that do not belong to the wallet.\n\n" +
                     
+                    "Encryption of the wallet.dat file is not yet supported for ZENCash. Using the wallet \n" + 
+                    "on a system infected with malware may result in wallet data/funds being stolen. The \n" +
+                    "wallet.dat needs to be backed up regularly (not just once - e.g. after every 30-40 \n" +
+                    "outgoing transactions) and it must also be backed up after creating a new Z address.\n\n" +
+                    
                     "THE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR\n" +
                     "IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,\n" +
                     "FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE\n" +
