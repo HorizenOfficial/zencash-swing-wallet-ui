@@ -489,7 +489,7 @@ public class ZCashUI
     			public void stateChanged(ChangeEvent e) 
     			{
     				JTabbedPane tabs = (JTabbedPane)e.getSource();
-    				if (tabs.getSelectedIndex() == 4)
+    				if (tabs.getSelectedIndex() == 5)
     				{
     					ZCashUI.this.messagingPanel.tabSelected();
     				}
