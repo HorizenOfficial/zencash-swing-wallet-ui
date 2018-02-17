@@ -2,8 +2,6 @@
 
 ## Graphical user interface wrapper for the [ZENCash](https://zensystem.io/) command line tools
 
-### IMPORTANT: Please read the [security notice](docs/KnownSecurityIssues.md) about watch-only addresses before using the wallet!
-
 This program provides a Graphical User Interface (GUI) for the ZENCash client tools that acts as a wrapper and 
 presents the information in a user-friendly manner.
 
@@ -30,9 +28,8 @@ The details of how to build it are described below (easy to follow).
 
 1. Operating system and tools
 
-   As of June 2017 (ZENCash v1.0.9) this program is mostly tested on Linux and Mac OS X
-   (same limitation as [ZENCash](https://zensystem.io/)) with experimental support for Windows.
-   The Linux tools you need to build and run the Wallet GUI are Git, Java (JDK7 or later) and
+   As of January 2018 (ZENCash v1.0.10) this program supports Linux and Mac OS X and Windows.
+   The Linux tools you need to build and run the Wallet GUI are Git, Java (JDK8) and
    Ant. If using Ubuntu Linux, they may be installed via command: 
    ```
    user@ubuntu:~/build-dir$ sudo apt-get install git default-jdk ant
