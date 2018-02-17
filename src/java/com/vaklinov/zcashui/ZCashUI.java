@@ -113,7 +113,7 @@ public class ZCashUI
     public ZCashUI(StartupProgressDialog progressDialog)
         throws IOException, InterruptedException, WalletCallException
     {
-        super("ZENCash Desktop GUI Wallet 0.80.1");
+        super("ZENCash Desktop GUI Wallet 0.80.2");
         
         if (progressDialog != null)
         {
@@ -148,8 +148,11 @@ public class ZCashUI
         		    		                       errorReporter, backupTracker));
         tabs.addTab("Transactions ",
     		        new ImageIcon(cl.getResource("images/transactions.png")),
-    		        transactionDetailsPanel = new TransactionsDetailPanel(this, installationObserver, clientCaller, 
-    		    	errorReporter, dashboard.getTransactionGatheringThread()));
+    		        transactionDetailsPanel = new TransactionsDetailPanel(
+    		        	this, tabs, installationObserver, clientCaller, 
+    		    	    errorReporter, dashboard.getTransactionGatheringThread()));
+        this.dashboard.setDetailsPanelForSelection(this.transactionDetailsPanel);
+        
         tabs.addTab("Own addresses ",
         		    new ImageIcon(cl.getResource("images/own-addresses.png")),
         		    addresses = new AddressesPanel(this, clientCaller, errorReporter));
@@ -168,7 +171,7 @@ public class ZCashUI
             	this, tabs, dashboard, addresses, sendPanel, 
             	installationObserver, clientCaller, errorReporter, backupTracker);
                 
-        this.setSize(new Dimension(1000, 560));
+        this.setSize(new Dimension(1000, 570));
 
         // Build menu
         JMenuBar mb = new JMenuBar();

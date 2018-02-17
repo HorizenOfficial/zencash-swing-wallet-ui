@@ -43,6 +43,7 @@ import javax.swing.BorderFactory;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.Timer;
 
@@ -59,6 +60,8 @@ public class TransactionsDetailPanel
 	extends WalletTabPanel
 {
 	private JFrame parentFrame;
+	private JTabbedPane parentTabs;
+	
 	private ZCashClientCaller clientCaller;
 	private StatusUpdateErrorReporter errorReporter;
 	private ZCashInstallationObserver installationObserver;
@@ -72,6 +75,7 @@ public class TransactionsDetailPanel
 	
 
 	public TransactionsDetailPanel(JFrame parentFrame,
+		                  JTabbedPane parentTabs,
 			              ZCashInstallationObserver installationObserver,
 			              ZCashClientCaller clientCaller,
 			              StatusUpdateErrorReporter errorReporter,
@@ -79,6 +83,8 @@ public class TransactionsDetailPanel
 		throws IOException, InterruptedException, WalletCallException
 	{
 		this.parentFrame          = parentFrame;
+		this.parentTabs           = parentTabs;
+		
 		this.clientCaller  = clientCaller;
 		this.errorReporter = errorReporter;
 		this.installationObserver = installationObserver;
@@ -115,6 +121,33 @@ public class TransactionsDetailPanel
 		Timer t = new Timer(5000, alTransactions);
 		t.start();
 		this.timers.add(t);
+	}
+	
+	
+	// Called from outside when the user want to zoom on a transaction
+	public void selectTransactionWithID(String transactionID)
+	{
+		int index = -1;
+		
+		if (this.lastTransactionsData != null)
+		{
+			int i = 0;
+			for (String[] currentTX : this.lastTransactionsData)
+			{
+				if ((currentTX[6] != null) && (currentTX[6].equals(transactionID)))
+				{
+					index = i;
+					break;
+				}
+				i++;
+			}
+			
+			this.transactionsTable.clearSelection();
+			this.transactionsTable.setRowSelectionInterval(index, index);
+			
+			// Switch TABs
+			this.parentTabs.setSelectedIndex(1);
+		}
 	}
 	
 	

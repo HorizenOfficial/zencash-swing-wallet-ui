@@ -36,6 +36,8 @@ import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -74,7 +76,7 @@ import com.vaklinov.zcashui.ZCashInstallationObserver.DaemonInfo;
 
 
 /**
- * Dashboard ...
+ * Dashboard panel - shows summary information.
  *
  * @author Ivan Vaklinov <ivan@vaklinov.com>
  */
@@ -110,6 +112,8 @@ public class DashboardPanel
 			DashboardPanel.class.getClassLoader().getResource("images/connect4_16.png"));
 	
 	private JFrame parentFrame;
+	private TransactionsDetailPanel detailsPabelForSelection = null;
+	
 	private ZCashInstallationObserver installationObserver;
 	private ZCashClientCaller clientCaller;
 	private StatusUpdateErrorReporter errorReporter;
@@ -351,6 +355,12 @@ public class DashboardPanel
 		netAndBlockchainTimer.setInitialDelay(1000);
 		netAndBlockchainTimer.start();
 		this.timers.add(netAndBlockchainTimer);
+	}
+	
+	
+	public void setDetailsPanelForSelection(TransactionsDetailPanel detailsPanel)
+	{
+		this.detailsPabelForSelection = detailsPanel;
 	}
 	
 	
@@ -608,6 +618,7 @@ public class DashboardPanel
 		String usdBalanceStr = "";
 		if (usdBalance != null)
 		{
+			usdBalance = usdBalance * balance.totalUnconfirmedBalance;
 			DecimalFormat usdDF = new DecimalFormat("########0.00");
 			String formattedUSDVal = usdDF.format(usdBalance);
 			
@@ -618,7 +629,6 @@ public class DashboardPanel
 				formattedUSDVal += "&nbsp;";
 			}
 			
-			usdBalance = usdBalance * balance.totalUnconfirmedBalance;
 			usdBalanceStr = "<br/>" + "<span style=\"font-family:monospace;font-size:1.8em;" + color3 + "\">" +
 			                "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + 
 		                    "<span style=\"font-weight:bold;font-size:2.1em;\">" + formattedUSDVal + " USD</span></span>";
@@ -974,6 +984,48 @@ public class DashboardPanel
 				super();
 				this.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 				this.setBackground(new JPanel().getBackground());
+				
+				this.addMouseListener(new MouseAdapter()
+		        {
+		        	public void mousePressed(MouseEvent e)
+		        	{
+		                if ((!e.isConsumed()) && (e.isPopupTrigger() || (e.getClickCount() == 2))) 
+		                {
+		                	LatestTransactionsList list = (LatestTransactionsList)e.getSource();
+		                    
+		                	// Select also via the right mouse button - seems not to work well
+		                    /*{
+		                        if (SwingUtilities.isRightMouseButton(e))
+		                        {
+		                            int row = list.locationToIndex(e.getPoint());
+		                            if (row > 0)
+		                            {
+		                            	list.setSelectedIndex(row);
+		                            }
+		                        }
+		                    }*/
+		                	
+		                	if (list.getSelectedValue() != null)
+		                    {
+		                    	String[] transaction = list.getSelectedValue();
+		                    	// Select the right transaction here
+		                    	if (detailsPabelForSelection != null)
+		                    	{
+		                    		detailsPabelForSelection.selectTransactionWithID(transaction[6]);
+		                    	}
+		                    	e.consume();
+		                    } 		                    
+		                }
+		        	}
+		        	
+		            public void mouseReleased(MouseEvent e)
+		            {
+		            	if ((!e.isConsumed()) && e.isPopupTrigger())
+		            	{
+		            		mousePressed(e);
+		            	}
+		            }
+		        });
 			}
 			
 			
