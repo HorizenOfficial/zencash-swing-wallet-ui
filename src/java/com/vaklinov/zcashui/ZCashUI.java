@@ -141,7 +141,18 @@ public class ZCashUI
         tabs.addTab(langUtil.getString("main.frame.tab.overview.title"),
         		    new ImageIcon(cl.getResource("images/overview.png")),
         		    dashboard = new DashboardPanel(this, installationObserver, clientCaller,
-        		    		                       errorReporter, backupTracker));
+                            errorReporter, backupTracker));
+        tabs.addTab(langUtil.getString("main.frame.tab.transactions.title"),
+                new ImageIcon(cl.getResource("images/transactions.png")),
+                transactionDetailsPanel = new TransactionsDetailPanel(
+                        this, tabs, installationObserver, clientCaller,
+                        errorReporter, dashboard.getTransactionGatheringThread()));
+        tabs.addTab(langUtil.getString("main.frame.tab.transactions.title"),
+                new ImageIcon(cl.getResource("images/transactions.png")),
+                transactionDetailsPanel = new TransactionsDetailPanel(
+                        this, tabs, installationObserver, clientCaller,
+                        errorReporter, dashboard.getTransactionGatheringThread()));
+        this.dashboard.setDetailsPanelForSelection(this.transactionDetailsPanel);
         tabs.addTab(langUtil.getString("main.frame.tab.own.address.title"),
         		    new ImageIcon(cl.getResource("images/own-addresses.png")),
         		    addresses = new AddressesPanel(this, clientCaller, errorReporter));
