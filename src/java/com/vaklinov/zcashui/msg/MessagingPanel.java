@@ -579,7 +579,7 @@ public class MessagingPanel
 					    JOptionPane.INFORMATION_MESSAGE);
 					        
 						sendCashPanel.prepareForSending(ownIdentity.getSendreceiveaddress());
-			            parentTabs.setSelectedIndex(2);				
+			            parentTabs.setSelectedIndex(3);				
 				}
 			} else
 			{
@@ -1226,7 +1226,7 @@ public class MessagingPanel
 				this.writeMessageTextArea.setEnabled(true);
 				
 				sendCashPanel.prepareForSending(ownIdentity.getSendreceiveaddress());
-	            parentTabs.setSelectedIndex(2);				
+	            parentTabs.setSelectedIndex(3);				
 				return;
 		}
 		

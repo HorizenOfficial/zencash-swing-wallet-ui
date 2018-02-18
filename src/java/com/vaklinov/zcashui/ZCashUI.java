@@ -29,7 +29,11 @@
 package com.vaklinov.zcashui;
 
 
-import java.awt.*;
+import java.awt.Container;
+import java.awt.Cursor;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -63,7 +67,8 @@ import com.vaklinov.zcashui.msg.MessagingPanel;
  *
  * @author Ivan Vaklinov <ivan@vaklinov.com>
  */
-public class ZCashUI extends JFrame
+public class ZCashUI
+        extends JFrame
 {
     private ZCashInstallationObserver installationObserver;
     private ZCashClientCaller         clientCaller;
@@ -89,16 +94,17 @@ public class ZCashUI extends JFrame
     private JMenuItem menuItemExportToArizen;
 
     private DashboardPanel   dashboard;
+    private TransactionsDetailPanel transactionDetailsPanel;
     private AddressesPanel   addresses;
     private SendCashPanel    sendPanel;
     private AddressBookPanel addressBookPanel;
     private MessagingPanel   messagingPanel;
     private LanguageUtil langUtil;
-    
+
     JTabbedPane tabs;
 
     public ZCashUI(StartupProgressDialog progressDialog)
-        throws IOException, InterruptedException, WalletCallException
+            throws IOException, InterruptedException, WalletCallException
     {
 
         langUtil = LanguageUtil.instance();
@@ -109,7 +115,7 @@ public class ZCashUI extends JFrame
         {
         	progressDialog.setProgressText(langUtil.getString("main.frame.progressbar"));
         }
-        
+
         ClassLoader cl = this.getClass().getClassLoader();
 
         this.setIconImage(new ImageIcon(cl.getResource("images/ZEN-yellow.orange-logo.png")).getImage());
@@ -119,7 +125,7 @@ public class ZCashUI extends JFrame
         errorReporter = new StatusUpdateErrorReporter(this);
         installationObserver = new ZCashInstallationObserver(OSUtil.getProgramDirectory());
         clientCaller = new ZCashClientCaller(OSUtil.getProgramDirectory());
-        
+
         if (installationObserver.isOnTestNet())
         {
         	this.setTitle(this.getTitle() + langUtil.getString("main.frame.title.testnet"));
@@ -131,10 +137,10 @@ public class ZCashUI extends JFrame
         Font newTabFont  = new Font(oldTabFont.getName(), Font.BOLD | Font.ITALIC, oldTabFont.getSize() * 57 / 50);
         tabs.setFont(newTabFont);
         BackupTracker backupTracker = new BackupTracker(this);
-        
+
         tabs.addTab(langUtil.getString("main.frame.tab.overview.title"),
         		    new ImageIcon(cl.getResource("images/overview.png")),
-        		    dashboard = new DashboardPanel(this, installationObserver, clientCaller, 
+        		    dashboard = new DashboardPanel(this, installationObserver, clientCaller,
         		    		                       errorReporter, backupTracker));
         tabs.addTab(langUtil.getString("main.frame.tab.own.address.title"),
         		    new ImageIcon(cl.getResource("images/own-addresses.png")),
@@ -150,23 +156,11 @@ public class ZCashUI extends JFrame
 		            messagingPanel = new MessagingPanel(this, sendPanel, tabs, clientCaller, errorReporter));
         contentPane.add(tabs);
 
-
-
         this.walletOps = new WalletOperations(
-            	this, tabs, dashboard, addresses, sendPanel, 
-            	installationObserver, clientCaller, errorReporter, backupTracker);
+                this, tabs, dashboard, addresses, sendPanel,
+                installationObserver, clientCaller, errorReporter, backupTracker);
 
-        int width = 870;
-        
-        OS_TYPE os = OSUtil.getOSType();
-    	
-        // Window needs to be larger on Mac/Windows - typically
-    	if ((os == OS_TYPE.WINDOWS) || (os == OS_TYPE.MAC_OS))
-    	{
-    		width += 100;
-    	}
-        
-        this.setSize(new Dimension(width, 440));
+        this.setSize(new Dimension(1000, 570));
 
         // Build menu
         JMenuBar mb = new JMenuBar();
@@ -201,9 +195,9 @@ public class ZCashUI extends JFrame
         JMenu messaging = new JMenu(langUtil.getString("menu.label.messaging"));
         messaging.setMnemonic(KeyEvent.VK_S);
         messaging.add(menuItemOwnIdentity = new JMenuItem("Own identity...", KeyEvent.VK_D));
-        menuItemOwnIdentity.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_D, accelaratorKeyMask));        
+        menuItemOwnIdentity.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_D, accelaratorKeyMask));
         messaging.add(menuItemExportOwnIdentity = new JMenuItem("Export own identity...", KeyEvent.VK_X));
-        menuItemExportOwnIdentity.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_X, accelaratorKeyMask));        
+        menuItemExportOwnIdentity.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_X, accelaratorKeyMask));
         messaging.add(menuItemAddMessagingGroup = new JMenuItem("Add messaging group...", KeyEvent.VK_G));
         menuItemAddMessagingGroup.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_G, accelaratorKeyMask));
         messaging.add(menuItemImportContactIdentity = new JMenuItem("Import contact identity...", KeyEvent.VK_Y));
@@ -212,14 +206,14 @@ public class ZCashUI extends JFrame
         menuItemRemoveContactIdentity.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R, accelaratorKeyMask));
         messaging.add(menuItemMessagingOptions = new JMenuItem("Options...", KeyEvent.VK_O));
         menuItemMessagingOptions.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, accelaratorKeyMask));
-        
+
         JMenu shareFileVia = new JMenu("Share file via:");
         shareFileVia.setMnemonic(KeyEvent.VK_V);
         // TODO: uncomment this for IPFS integration
         //messaging.add(shareFileVia);
         shareFileVia.add(menuItemShareFileViaIPFS = new JMenuItem("IPFS", KeyEvent.VK_F));
         menuItemShareFileViaIPFS.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F, accelaratorKeyMask));
-        
+
         mb.add(messaging);
 
         // TODO: Temporarily disable encryption until further notice - Oct 24 2016
@@ -275,177 +269,177 @@ public class ZCashUI extends JFrame
 
         // Add listeners etc.
         menuItemExit.addActionListener(
-            new ActionListener()
-            {
-                @Override
-                public void actionPerformed(ActionEvent e)
+                new ActionListener()
                 {
-                    ZCashUI.this.exitProgram();
+                    @Override
+                    public void actionPerformed(ActionEvent e)
+                    {
+                        ZCashUI.this.exitProgram();
+                    }
                 }
-            }
         );
 
         menuItemAbout.addActionListener(
-            new ActionListener()
-            {
-                @Override
-                public void actionPerformed(ActionEvent e)
+                new ActionListener()
                 {
-                	try
-                	{
-                		AboutDialog ad = new AboutDialog(ZCashUI.this);
-                		ad.setVisible(true);
-                	} catch (UnsupportedEncodingException uee)
-                	{
-                		Log.error("Unexpected error: ", uee);
-                		ZCashUI.this.errorReporter.reportError(uee);
-                	}
+                    @Override
+                    public void actionPerformed(ActionEvent e)
+                    {
+                        try
+                        {
+                            AboutDialog ad = new AboutDialog(ZCashUI.this);
+                            ad.setVisible(true);
+                        } catch (UnsupportedEncodingException uee)
+                        {
+                            Log.error("Unexpected error: ", uee);
+                            ZCashUI.this.errorReporter.reportError(uee);
+                        }
+                    }
                 }
-            }
         );
 
-        menuItemBackup.addActionListener(   
-        	new ActionListener()
-            {
-                @Override
-                public void actionPerformed(ActionEvent e)
+        menuItemBackup.addActionListener(
+                new ActionListener()
                 {
-                    ZCashUI.this.walletOps.backupWallet();
+                    @Override
+                    public void actionPerformed(ActionEvent e)
+                    {
+                        ZCashUI.this.walletOps.backupWallet();
+                    }
                 }
-            }
         );
-        
+
         menuItemEncrypt.addActionListener(
-            new ActionListener()
-            {
-                @Override
-                public void actionPerformed(ActionEvent e)
+                new ActionListener()
                 {
-                    ZCashUI.this.walletOps.encryptWallet();
+                    @Override
+                    public void actionPerformed(ActionEvent e)
+                    {
+                        ZCashUI.this.walletOps.encryptWallet();
+                    }
                 }
-            }
         );
 
-        menuItemExportKeys.addActionListener(   
-            new ActionListener()
-            {
-                @Override
-                public void actionPerformed(ActionEvent e)
+        menuItemExportKeys.addActionListener(
+                new ActionListener()
                 {
-                    ZCashUI.this.walletOps.exportWalletPrivateKeys();
+                    @Override
+                    public void actionPerformed(ActionEvent e)
+                    {
+                        ZCashUI.this.walletOps.exportWalletPrivateKeys();
+                    }
                 }
-            }
-       );
-        
-       menuItemImportKeys.addActionListener(   
-            new ActionListener()
-            {
-                @Override
-                public void actionPerformed(ActionEvent e)
-                {
-                    ZCashUI.this.walletOps.importWalletPrivateKeys();
-                }
-            }
-       );
-       
-       menuItemShowPrivateKey.addActionListener(   
-            new ActionListener()
-            {
-                @Override
-                public void actionPerformed(ActionEvent e)
-                {
-                    ZCashUI.this.walletOps.showPrivateKey();
-                }
-            }
-       );
-       
-       menuItemImportOnePrivateKey.addActionListener(   
-           new ActionListener()
-           {
-               @Override
-               public void actionPerformed(ActionEvent e)
-               {
-                   ZCashUI.this.walletOps.importSinglePrivateKey();
-               }
-           }
-       );
-       
-       menuItemOwnIdentity.addActionListener(   
-               new ActionListener()
-               {
-                   @Override
-                   public void actionPerformed(ActionEvent e)
-                   {
-            			ZCashUI.this.messagingPanel.openOwnIdentityDialog();
-                   }
-               }
-        );
-       
-       menuItemExportOwnIdentity.addActionListener(   
-               new ActionListener()
-               {
-                   @Override
-                   public void actionPerformed(ActionEvent e)
-                   {
-            			ZCashUI.this.messagingPanel.exportOwnIdentity();
-                   }
-               }
         );
 
-       menuItemImportContactIdentity.addActionListener(   
-               new ActionListener()
-               {
-                   @Override
-                   public void actionPerformed(ActionEvent e)
-                   {
-            			ZCashUI.this.messagingPanel.importContactIdentity();
-                   }
-               }
+        menuItemImportKeys.addActionListener(
+                new ActionListener()
+                {
+                    @Override
+                    public void actionPerformed(ActionEvent e)
+                    {
+                        ZCashUI.this.walletOps.importWalletPrivateKeys();
+                    }
+                }
         );
-              
-       menuItemAddMessagingGroup.addActionListener(   
-               new ActionListener()
-               {
-                   @Override
-                   public void actionPerformed(ActionEvent e)
-                   {
-            			ZCashUI.this.messagingPanel.addMessagingGroup();
-                   }
-               }
+
+        menuItemShowPrivateKey.addActionListener(
+                new ActionListener()
+                {
+                    @Override
+                    public void actionPerformed(ActionEvent e)
+                    {
+                        ZCashUI.this.walletOps.showPrivateKey();
+                    }
+                }
         );
-       
-       menuItemRemoveContactIdentity.addActionListener(   
-               new ActionListener()
-               {
-                   @Override
-                   public void actionPerformed(ActionEvent e)
-                   {
-            			ZCashUI.this.messagingPanel.removeSelectedContact();
-                   }
-               }
+
+        menuItemImportOnePrivateKey.addActionListener(
+                new ActionListener()
+                {
+                    @Override
+                    public void actionPerformed(ActionEvent e)
+                    {
+                        ZCashUI.this.walletOps.importSinglePrivateKey();
+                    }
+                }
         );
-       
-       menuItemMessagingOptions.addActionListener(   
-               new ActionListener()
-               {
-                   @Override
-                   public void actionPerformed(ActionEvent e)
-                   {
-            			ZCashUI.this.messagingPanel.openOptionsDialog();
-                   }
-               }
-       );
-       
-       menuItemShareFileViaIPFS.addActionListener(   
-               new ActionListener()
-               {
-                   @Override
-                   public void actionPerformed(ActionEvent e)
-                   {
-            			ZCashUI.this.messagingPanel.shareFileViaIPFS();
-                   }
-               }
-       );
+
+        menuItemOwnIdentity.addActionListener(
+                new ActionListener()
+                {
+                    @Override
+                    public void actionPerformed(ActionEvent e)
+                    {
+                        ZCashUI.this.messagingPanel.openOwnIdentityDialog();
+                    }
+                }
+        );
+
+        menuItemExportOwnIdentity.addActionListener(
+                new ActionListener()
+                {
+                    @Override
+                    public void actionPerformed(ActionEvent e)
+                    {
+                        ZCashUI.this.messagingPanel.exportOwnIdentity();
+                    }
+                }
+        );
+
+        menuItemImportContactIdentity.addActionListener(
+                new ActionListener()
+                {
+                    @Override
+                    public void actionPerformed(ActionEvent e)
+                    {
+                        ZCashUI.this.messagingPanel.importContactIdentity();
+                    }
+                }
+        );
+
+        menuItemAddMessagingGroup.addActionListener(
+                new ActionListener()
+                {
+                    @Override
+                    public void actionPerformed(ActionEvent e)
+                    {
+                        ZCashUI.this.messagingPanel.addMessagingGroup();
+                    }
+                }
+        );
+
+        menuItemRemoveContactIdentity.addActionListener(
+                new ActionListener()
+                {
+                    @Override
+                    public void actionPerformed(ActionEvent e)
+                    {
+                        ZCashUI.this.messagingPanel.removeSelectedContact();
+                    }
+                }
+        );
+
+        menuItemMessagingOptions.addActionListener(
+                new ActionListener()
+                {
+                    @Override
+                    public void actionPerformed(ActionEvent e)
+                    {
+                        ZCashUI.this.messagingPanel.openOptionsDialog();
+                    }
+                }
+        );
+
+        menuItemShareFileViaIPFS.addActionListener(
+                new ActionListener()
+                {
+                    @Override
+                    public void actionPerformed(ActionEvent e)
+                    {
+                        ZCashUI.this.messagingPanel.shareFileViaIPFS();
+                    }
+                }
+        );
 
         menuItemExportToArizen.addActionListener(
                 new ActionListener()
@@ -477,7 +471,7 @@ public class ZCashUI extends JFrame
                 try
                 {
                     String userDir = OSUtil.getSettingsDirectory();
-                    File warningFlagFile = new File(userDir + File.separator + "initialInfoShown_0.75.flag");
+                    File warningFlagFile = new File(userDir + File.separator + "initialInfoShown_0.80.flag");
                     if (warningFlagFile.exists())
                     {
                         return;
@@ -489,61 +483,74 @@ public class ZCashUI extends JFrame
                 } catch (IOException ioe)
                 {
                     /* TODO: report exceptions to the user */
-                	Log.error("Unexpected error: ", ioe);
+                    Log.error("Unexpected error: ", ioe);
                 }
 
                 JOptionPane.showMessageDialog(
-                    ZCashUI.this.getRootPane().getParent(),
-                    "The ZENCash GUI Wallet is currently considered experimental. Use of this software\n" +
-                    "comes at your own risk! Be sure to read the list of known issues and limitations\n" +
-                    "at this page: https://github.com/ZencashOfficial/zencash-swing-wallet-ui\n\n" +
-                    "THE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR\n" +
-                    "IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,\n" +
-                    "FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE\n" +
-                    "AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER\n" +
-                    "LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,\n" +
-                    "OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN\n" +
-                    "THE SOFTWARE.\n\n" +
-                    "(This message will be shown only once, per release)",
-                    "Disclaimer", JOptionPane.INFORMATION_MESSAGE);
+                        ZCashUI.this.getRootPane().getParent(),
+                        "The ZENCash GUI Wallet is currently considered experimental. Use of this software\n" +
+                                "comes at your own risk! Be sure to read the list of known issues and limitations\n" +
+                                "at this page: https://github.com/ZencashOfficial/zencash-swing-wallet-ui\n\n" +
+
+                                "The ZENCash Desktop GUI Wallet is not compatible with applications that modify\n" +
+                                "the ZEN wallet.dat file. The wallet should not be used with such applications\n" +
+                                "on the same PC. For instance some distributed exchange applications are known to\n" +
+                                "create watch-only addresses in the wallet.dat file that cause the GUI wallet to\n" +
+                                "display a wrong balance and/or display addresses that do not belong to the wallet.\n\n" +
+
+                                "Encryption of the wallet.dat file is not yet supported for ZENCash. Using the wallet \n" +
+                                "on a system infected with malware may result in wallet data/funds being stolen. The \n" +
+                                "wallet.dat needs to be backed up regularly (not just once - e.g. after every 30-40 \n" +
+                                "outgoing transactions) and it must also be backed up after creating a new Z address.\n\n" +
+
+                                "THE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR\n" +
+                                "IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,\n" +
+                                "FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE\n" +
+                                "AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER\n" +
+                                "LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,\n" +
+                                "OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN\n" +
+                                "THE SOFTWARE.\n\n" +
+                                "(This message will be shown only once, per release)",
+                        "Disclaimer", JOptionPane.INFORMATION_MESSAGE);
             }
         });
-        
+
         // Finally dispose of the progress dialog
         if (progressDialog != null)
         {
-        	progressDialog.doDispose();
+            progressDialog.doDispose();
         }
-        
+
         // Notify the messaging TAB that it is being selected - every time
         tabs.addChangeListener(
-            new ChangeListener() 
-            {	
-    			@Override
-    			public void stateChanged(ChangeEvent e) 
-    			{
-    				JTabbedPane tabs = (JTabbedPane)e.getSource();
-    				if (tabs.getSelectedIndex() == 4)
-    				{
-    					ZCashUI.this.messagingPanel.tabSelected();
-    				}
-    			}
-    		}
+                new ChangeListener()
+                {
+                    @Override
+                    public void stateChanged(ChangeEvent e)
+                    {
+                        JTabbedPane tabs = (JTabbedPane)e.getSource();
+                        if (tabs.getSelectedIndex() == 5)
+                        {
+                            ZCashUI.this.messagingPanel.tabSelected();
+                        }
+                    }
+                }
         );
-  
+
     }
 
     public void exitProgram()
     {
-    	Log.info("Exiting ...");
+        Log.info("Exiting ...");
 
         this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-        
+
         this.dashboard.stopThreadsAndTimers();
+        this.transactionDetailsPanel.stopThreadsAndTimers();
         this.addresses.stopThreadsAndTimers();
         this.sendPanel.stopThreadsAndTimers();
         this.messagingPanel.stopThreadsAndTimers();
-        
+
         ZCashUI.this.setVisible(false);
         ZCashUI.this.dispose();
 
@@ -551,221 +558,218 @@ public class ZCashUI extends JFrame
     }
 
     public static void main(String argv[])
-        throws IOException
+            throws IOException
     {
         try
         {
-        	OS_TYPE os = OSUtil.getOSType();
-        	
-        	if ((os == OS_TYPE.WINDOWS) || (os == OS_TYPE.MAC_OS))
-        	{
-        		possiblyCreateZENConfigFile();
-        	}
-        	
-        	Log.info("Starting ZENCash Swing Wallet ...");
-        	Log.info("OS: " + System.getProperty("os.name") + " = " + os);
-        	Log.info("Current directory: " + new File(".").getCanonicalPath());
-        	Log.info("Class path: " + System.getProperty("java.class.path"));
-        	Log.info("Environment PATH: " + System.getenv("PATH"));
+            OS_TYPE os = OSUtil.getOSType();
+
+            if ((os == OS_TYPE.WINDOWS) || (os == OS_TYPE.MAC_OS))
+            {
+                possiblyCreateZENConfigFile();
+            }
+
+            Log.info("Starting ZENCash Swing Wallet ...");
+            Log.info("OS: " + System.getProperty("os.name") + " = " + os);
+            Log.info("Current directory: " + new File(".").getCanonicalPath());
+            Log.info("Class path: " + System.getProperty("java.class.path"));
+            Log.info("Environment PATH: " + System.getenv("PATH"));
 
             // Look and feel settings - a custom OS-look and feel is set for Windows
             if (os == OS_TYPE.WINDOWS)
             {
-            	// Custom Windows L&F and font settings
-            	UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
-            	
-            	// This font looks good but on Windows 7 it misses some chars like the stars...
-            	//FontUIResource font = new FontUIResource("Lucida Sans Unicode", Font.PLAIN, 11);
-            	//UIManager.put("Table.font", font);
+                // Custom Windows L&F and font settings
+                UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
+
+                // This font looks good but on Windows 7 it misses some chars like the stars...
+                //FontUIResource font = new FontUIResource("Lucida Sans Unicode", Font.PLAIN, 11);
+                //UIManager.put("Table.font", font);
             } else if (os == OS_TYPE.MAC_OS)
             {
-            	// The MacOS L&F is active by default - the property sets the menu bar Mac style
-            	System.setProperty("apple.laf.useScreenMenuBar", "true");
+                // The MacOS L&F is active by default - the property sets the menu bar Mac style
+                System.setProperty("apple.laf.useScreenMenuBar", "true");
             }
             else
-            {            
-	            for (LookAndFeelInfo ui : UIManager.getInstalledLookAndFeels())
-	            {
-	            	Log.info("Available look and feel: " + ui.getName() + " " + ui.getClassName());
-	                if (ui.getName().equals("Nimbus"))
-	                {
-	                	Log.info("Setting look and feel: {0}", ui.getClassName());
-	                    UIManager.setLookAndFeel(ui.getClassName());
-	                    break;
-	                };
-	            }
+            {
+                for (LookAndFeelInfo ui : UIManager.getInstalledLookAndFeels())
+                {
+                    Log.info("Available look and feel: " + ui.getName() + " " + ui.getClassName());
+                    if (ui.getName().equals("Nimbus"))
+                    {
+                        Log.info("Setting look and feel: {0}", ui.getClassName());
+                        UIManager.setLookAndFeel(ui.getClassName());
+                        break;
+                    };
+                }
             }
-            
+
             // If zend is currently not running, do a startup of the daemon as a child process
             // It may be started but not ready - then also show dialog
-            ZCashInstallationObserver initialInstallationObserver = 
-            	new ZCashInstallationObserver(OSUtil.getProgramDirectory());
+            ZCashInstallationObserver initialInstallationObserver =
+                    new ZCashInstallationObserver(OSUtil.getProgramDirectory());
             DaemonInfo zcashdInfo = initialInstallationObserver.getDaemonInfo();
             initialInstallationObserver = null;
-            
+
             ZCashClientCaller initialClientCaller = new ZCashClientCaller(OSUtil.getProgramDirectory());
             boolean daemonStartInProgress = false;
             try
             {
-            	if (zcashdInfo.status == DAEMON_STATUS.RUNNING)
-            	{
-            		NetworkAndBlockchainInfo info = initialClientCaller.getNetworkAndBlockchainInfo();
-            		// If more than 20 minutes behind in the blockchain - startup in progress
-            		if ((System.currentTimeMillis() - info.lastBlockDate.getTime()) > (20 * 60 * 1000))
-            		{
-            			Log.info("Current blockchain synchronization date is "  + 
-            		                       new Date(info.lastBlockDate.getTime()));
-            			daemonStartInProgress = true;
-            		}
-            	}
+                if (zcashdInfo.status == DAEMON_STATUS.RUNNING)
+                {
+                    NetworkAndBlockchainInfo info = initialClientCaller.getNetworkAndBlockchainInfo();
+                    // If more than 20 minutes behind in the blockchain - startup in progress
+                    if ((System.currentTimeMillis() - info.lastBlockDate.getTime()) > (20 * 60 * 1000))
+                    {
+                        Log.info("Current blockchain synchronization date is "  +
+                                new Date(info.lastBlockDate.getTime()));
+                        daemonStartInProgress = true;
+                    }
+                }
             } catch (WalletCallException wce)
             {
                 if ((wce.getMessage().indexOf("{\"code\":-28") != -1) || // Started but not ready
-                	(wce.getMessage().indexOf("error code: -28") != -1))
+                        (wce.getMessage().indexOf("error code: -28") != -1))
                 {
-                	Log.info("zend is currently starting...");
-                	daemonStartInProgress = true;
+                    Log.info("zend is currently starting...");
+                    daemonStartInProgress = true;
                 }
             }
-            
+
             StartupProgressDialog startupBar = null;
             if ((zcashdInfo.status != DAEMON_STATUS.RUNNING) || (daemonStartInProgress))
             {
-            	Log.info(
-            		"zend is not runing at the moment or has not started/synchronized 100% - showing splash...");
-	            startupBar = new StartupProgressDialog(initialClientCaller);
-	            startupBar.setVisible(true);
-	            startupBar.waitForStartup();
+                Log.info(
+                        "zend is not runing at the moment or has not started/synchronized 100% - showing splash...");
+                startupBar = new StartupProgressDialog(initialClientCaller);
+                startupBar.setVisible(true);
+                startupBar.waitForStartup();
             }
             initialClientCaller = null;
-            
+
             // Main GUI is created here
             ZCashUI ui = new ZCashUI(startupBar);
-
             ui.setVisible(true);
 
         } catch (InstallationDetectionException ide)
         {
-        	Log.error("Unexpected error: ", ide);
+            Log.error("Unexpected error: ", ide);
             JOptionPane.showMessageDialog(
-                null,
-                "This program was started in directory: " + OSUtil.getProgramDirectory() + "\n" +
-                ide.getMessage() + "\n" +
-                "See the console/logfile output for more detailed error information!",
-                "Installation error",
-                JOptionPane.ERROR_MESSAGE);
+                    null,
+                    "This program was started in directory: " + OSUtil.getProgramDirectory() + "\n" +
+                            ide.getMessage() + "\n" +
+                            "See the console/logfile output for more detailed error information!",
+                    "Installation error",
+                    JOptionPane.ERROR_MESSAGE);
             System.exit(1);
         } catch (WalletCallException wce)
         {
-        	Log.error("Unexpected error: ", wce);
+            Log.error("Unexpected error: ", wce);
 
             if ((wce.getMessage().indexOf("{\"code\":-28,\"message\"") != -1) ||
-            	(wce.getMessage().indexOf("error code: -28") != -1))
+                    (wce.getMessage().indexOf("error code: -28") != -1))
             {
                 JOptionPane.showMessageDialog(
                         null,
                         "It appears that zend has been started but is not ready to accept wallet\n" +
-                        "connections. It is still loading the wallet and blockchain. Please try to \n" +
-                        "start the GUI wallet later...",
+                                "connections. It is still loading the wallet and blockchain. Please try to \n" +
+                                "start the GUI wallet later...",
                         "Wallet communication error",
                         JOptionPane.ERROR_MESSAGE);
             } else
             {
                 JOptionPane.showMessageDialog(
-                    null,
-                    "There was a problem communicating with the ZENCash daemon/wallet. \n" +
-                    "Please ensure that the ZENCash server zend is started (e.g. via \n" + 
-                    "command  \"zend --daemon\"). Error message is: \n" +
-                     wce.getMessage() +
-                    "See the console/logfile output for more detailed error information!",
-                    "Wallet communication error",
-                    JOptionPane.ERROR_MESSAGE);
+                        null,
+                        "There was a problem communicating with the ZENCash daemon/wallet. \n" +
+                                "Please ensure that the ZENCash server zend is started (e.g. via \n" +
+                                "command  \"zend --daemon\"). Error message is: \n" +
+                                wce.getMessage() +
+                                "See the console/logfile output for more detailed error information!",
+                        "Wallet communication error",
+                        JOptionPane.ERROR_MESSAGE);
             }
 
             System.exit(2);
         } catch (Exception e)
         {
-        	Log.error("Unexpected error: ", e);
+            Log.error("Unexpected error: ", e);
             JOptionPane.showMessageDialog(
-                null,
-                "A general unexpected critical error has occurred: \n" + e.getMessage() + "\n" +
-                "See the console/logfile output for more detailed error information!",
-                "Error",
-                JOptionPane.ERROR_MESSAGE);
+                    null,
+                    "A general unexpected critical error has occurred: \n" + e.getMessage() + "\n" +
+                            "See the console/logfile output for more detailed error information!",
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE);
             System.exit(3);
         } catch (Error err)
         {
-        	// Last resort catch for unexpected problems - just to inform the user
+            // Last resort catch for unexpected problems - just to inform the user
             err.printStackTrace();
             JOptionPane.showMessageDialog(
-                null,
-                "A general unexpected critical/unrecoverable error has occurred: \n" + err.getMessage() + "\n" +
-                "See the console/logfile output for more detailed error information!",
-                "Error",
-                JOptionPane.ERROR_MESSAGE);
+                    null,
+                    "A general unexpected critical/unrecoverable error has occurred: \n" + err.getMessage() + "\n" +
+                            "See the console/logfile output for more detailed error information!",
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE);
             System.exit(4);
         }
     }
-    
-    
-     public static void possiblyCreateZENConfigFile()
-        throws IOException
+
+
+    public static void possiblyCreateZENConfigFile()
+            throws IOException
     {
-    	String blockchainDir = OSUtil.getBlockchainDirectory();
-    	File dir = new File(blockchainDir);
-    	
-		if (!dir.exists())
-		{
-			if (!dir.mkdirs())
-			{
-				Log.error("ERROR: Could not create settings directory: " + dir.getCanonicalPath());
-				throw new IOException("Could not create settings directory: " + dir.getCanonicalPath());
-			}
-		}
-		
-		File zenConfigFile = new File(dir, "zen.conf");
-		
-		if (!zenConfigFile.exists())
-		{
-			Log.info("ZEN configuration file " + zenConfigFile.getCanonicalPath() + 
-					 " does not exist. It will be created with default settings.");
-			
-			Random r = new Random(System.currentTimeMillis());
-			
-			PrintStream configOut = new PrintStream(new FileOutputStream(zenConfigFile));
-			
-			configOut.println("#############################################################################");
-			configOut.println("#                         ZEN configuration file                            #");
-			configOut.println("#############################################################################");
-			configOut.println("# This file has been automatically generated by the ZENCash GUI wallet with #");
-			configOut.println("# default settings. It may be further cutsomized by hand only.              #");
-			configOut.println("#############################################################################");
-			configOut.println("# Creation date: " + new Date().toString());
-			configOut.println("#############################################################################");
-			configOut.println("");
-			configOut.println("# The rpcuser/rpcpassword are used for the local call to zend");
-			configOut.println("rpcuser=User" + Math.abs(r.nextInt()));
-			configOut.println("rpcpassword=Pass" + Math.abs(r.nextInt()) + "" + 
-			                                       Math.abs(r.nextInt()) + "" + 
-					                               Math.abs(r.nextInt()));
-			configOut.println("");
-			
+        String blockchainDir = OSUtil.getBlockchainDirectory();
+        File dir = new File(blockchainDir);
+
+        if (!dir.exists())
+        {
+            if (!dir.mkdirs())
+            {
+                Log.error("ERROR: Could not create settings directory: " + dir.getCanonicalPath());
+                throw new IOException("Could not create settings directory: " + dir.getCanonicalPath());
+            }
+        }
+
+        File zenConfigFile = new File(dir, "zen.conf");
+
+        if (!zenConfigFile.exists())
+        {
+            Log.info("ZEN configuration file " + zenConfigFile.getCanonicalPath() +
+                    " does not exist. It will be created with default settings.");
+
+            Random r = new Random(System.currentTimeMillis());
+
+            PrintStream configOut = new PrintStream(new FileOutputStream(zenConfigFile));
+
+            configOut.println("#############################################################################");
+            configOut.println("#                         ZEN configuration file                            #");
+            configOut.println("#############################################################################");
+            configOut.println("# This file has been automatically generated by the ZENCash GUI wallet with #");
+            configOut.println("# default settings. It may be further cutsomized by hand only.              #");
+            configOut.println("#############################################################################");
+            configOut.println("# Creation date: " + new Date().toString());
+            configOut.println("#############################################################################");
+            configOut.println("");
+            configOut.println("# The rpcuser/rpcpassword are used for the local call to zend");
+            configOut.println("rpcuser=User" + Math.abs(r.nextInt()));
+            configOut.println("rpcpassword=Pass" + Math.abs(r.nextInt()) + "" +
+                    Math.abs(r.nextInt()) + "" +
+                    Math.abs(r.nextInt()));
+            configOut.println("");
+
 			/*
 			 * This is not necessary as of release:
 			 *  https://github.com/ZencashOfficial/zen/releases/tag/v2.0.9-3-b8d2ebf
 			configOut.println("# Well-known nodes to connect to - to speed up acquiring initial connections");
-			configOut.println("addnode=zpool.blockoperations.com"); 
+			configOut.println("addnode=zpool.blockoperations.com");
 			configOut.println("addnode=luckpool.org:8333");
 			configOut.println("addnode=zencash.cloud");
 			configOut.println("addnode=zen.suprnova.cc");
 			configOut.println("addnode=zen.bitfire.one");
 			configOut.println("addnode=zenmine.pro");
 			*/
-			
-			configOut.close();
-		}
+
+            configOut.close();
+        }
     }
 
-
-    
 }

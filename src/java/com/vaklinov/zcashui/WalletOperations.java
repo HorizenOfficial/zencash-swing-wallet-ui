@@ -350,14 +350,14 @@ public class WalletOperations
 	
 	public void showPrivateKey()
 	{
-		if (this.tabs.getSelectedIndex() != 1)
+		if (this.tabs.getSelectedIndex() != 2)
 		{
 			JOptionPane.showMessageDialog(
 				this.parent, 
 				"Please select an address in the \"Own addresses\" tab " +
 				"to view its private key",
 				"Please select an address...", JOptionPane.INFORMATION_MESSAGE);
-			this.tabs.setSelectedIndex(1);
+			this.tabs.setSelectedIndex(2);
 			return;
 		}
 		

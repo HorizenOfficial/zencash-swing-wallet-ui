@@ -30,27 +30,42 @@ package com.vaklinov.zcashui;
 
 
 import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
-import java.awt.Font;
+import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.net.URL;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Date;
-import java.util.List;
 
 import javax.swing.BorderFactory;
+import javax.swing.DefaultListModel;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JTable;
+import javax.swing.ListCellRenderer;
+import javax.swing.ListSelectionModel;
+import javax.swing.SwingUtilities;
 import javax.swing.Timer;
+import javax.swing.border.EtchedBorder;
+
+import com.eclipsesource.json.Json;
+import com.eclipsesource.json.JsonArray;
+import com.eclipsesource.json.JsonObject;
 
 import com.vaklinov.zcashui.OSUtil.OS_TYPE;
 import com.vaklinov.zcashui.ZCashClientCaller.NetworkAndBlockchainInfo;
@@ -61,21 +76,59 @@ import com.vaklinov.zcashui.ZCashInstallationObserver.DaemonInfo;
 
 
 /**
- * Dashboard ...
+ * Dashboard panel - shows summary information.
  *
  * @author Ivan Vaklinov <ivan@vaklinov.com>
  */
 public class DashboardPanel
 	extends WalletTabPanel
 {
+	// Static icon resources
+	private static ImageIcon inputTransactionIcon = new ImageIcon(
+		DashboardPanel.class.getClassLoader().getResource("images/tx_input.png"));
+	private static ImageIcon outputTransactionIcon = new ImageIcon(
+		DashboardPanel.class.getClassLoader().getResource("images/tx_output.png"));
+	private static ImageIcon inoutTransactionIcon = new ImageIcon(
+		DashboardPanel.class.getClassLoader().getResource("images/tx_inout.png"));
+	private static ImageIcon minedTransactionIcon = new ImageIcon(
+		DashboardPanel.class.getClassLoader().getResource("images/tx_mined.png"));
+	private static ImageIcon unConfirmedTXIcon = new ImageIcon(
+			DashboardPanel.class.getClassLoader().getResource("images/tr_unconfirmed.png"));
+	private static ImageIcon confirmedTXIcon = new ImageIcon(
+			DashboardPanel.class.getClassLoader().getResource("images/tr_confirmed.png"));
+	private static ImageIcon lockClosedIcon = new ImageIcon(
+			DashboardPanel.class.getClassLoader().getResource("images/lock_closed_s.png"));
+	private static ImageIcon lockOpenIcon = new ImageIcon(
+			DashboardPanel.class.getClassLoader().getResource("images/lock_opengreen_s.png"));
+	private static ImageIcon connect_0_Icon = new ImageIcon(
+			DashboardPanel.class.getClassLoader().getResource("images/connect0_16.png"));
+	private static ImageIcon connect_1_Icon = new ImageIcon(
+			DashboardPanel.class.getClassLoader().getResource("images/connect1_16.png"));
+	private static ImageIcon connect_2_Icon = new ImageIcon(
+			DashboardPanel.class.getClassLoader().getResource("images/connect2_16.png"));
+	private static ImageIcon connect_3_Icon = new ImageIcon(
+			DashboardPanel.class.getClassLoader().getResource("images/connect3_16.png"));
+	private static ImageIcon connect_4_Icon = new ImageIcon(
+			DashboardPanel.class.getClassLoader().getResource("images/connect4_16.png"));
+	
 	private JFrame parentFrame;
+	private TransactionsDetailPanel detailsPabelForSelection = null;
+	
 	private ZCashInstallationObserver installationObserver;
 	private ZCashClientCaller clientCaller;
 	private StatusUpdateErrorReporter errorReporter;
 	private BackupTracker backupTracker;
 	
+	private JPanel upperLogoAndWarningPanel = null;
+	
 	private JLabel networkAndBlockchainLabel = null;
+	private JLabel blockchain100PercentLabel = null;
+	private JLabel networkConnectionsIconLabel = null;
+	
 	private DataGatheringThread<NetworkAndBlockchainInfo> netInfoGatheringThread = null;
+	private JPanel blockcahinWarningPanel = null;
+	private JLabel blockcahinWarningLabel = null;
+	private ExchangeRatePanel exchangeRatePanel = null;
 
 	private Boolean walletIsEncrypted   = null;
 	private Integer blockchainPercentage = null;
@@ -87,12 +140,9 @@ public class DashboardPanel
 	private JLabel walletBalanceLabel  = null;
 	private DataGatheringThread<WalletBalance> walletBalanceGatheringThread = null;
 	
-	private JTable transactionsTable   = null;
-	private JScrollPane transactionsTablePane  = null;
-	private String[][] lastTransactionsData = null;
 	private DataGatheringThread<String[][]> transactionGatheringThread = null;
 	private LanguageUtil langUtil;
-	
+
 
 	public DashboardPanel(JFrame parentFrame,
 			              ZCashInstallationObserver installationObserver,
@@ -117,50 +167,57 @@ public class DashboardPanel
 		dashboard.setLayout(new BorderLayout(0, 0));
 
 		// Upper panel with wallet balance
-		JPanel balanceStatusPanel = new JPanel();
-		// Use border layout to have balances to the left
-		balanceStatusPanel.setLayout(new BorderLayout(3, 3)); 
-		//balanceStatusPanel.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
-		
-		JPanel tempPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 9));
-		JLabel logoLabel = new JLabel(new ImageIcon(
-			this.getClass().getClassLoader().getResource("images/ZEN-yellow.orange-logo-small.png")));
-		tempPanel.add(logoLabel);
-		// TODO: use relative size
-		JLabel zcLabel = new JLabel(langUtil.getString("panel.dashboard.main.label"));
-		zcLabel.setFont(new Font("Helvetica", Font.BOLD | Font.ITALIC, 28));
-		tempPanel.add(zcLabel);
-		tempPanel.setToolTipText("Powered by ZEN");
-		balanceStatusPanel.add(tempPanel, BorderLayout.WEST);
-		// TODO: use relative size - only!
-		JLabel transactionHeadingLabel = new JLabel(langUtil.getString("panel.dashboard.transactions.label"));
-		tempPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 1, 1));
-		transactionHeadingLabel.setFont(new Font("Helvetica", Font.BOLD, 19));
-		tempPanel.add(transactionHeadingLabel);
-		balanceStatusPanel.add(tempPanel, BorderLayout.CENTER);
-						
-		PresentationPanel walletBalancePanel = new PresentationPanel();
-		walletBalancePanel.add(walletBalanceLabel = new JLabel());
-		balanceStatusPanel.add(walletBalancePanel, BorderLayout.EAST);
-		
-		dashboard.add(balanceStatusPanel, BorderLayout.NORTH);
+		upperLogoAndWarningPanel = new JPanel();
+		upperLogoAndWarningPanel.setLayout(new BorderLayout(3, 3));
 
-		// Table of transactions
-		lastTransactionsData = getTransactionsDataFromWallet();
-		dashboard.add(transactionsTablePane = new JScrollPane(
-				         transactionsTable = this.createTransactionsTable(lastTransactionsData)),
-				      BorderLayout.CENTER);
+		JPanel tempPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 14, 16));
+		JLabel logoLabel = new JLabel(new ImageIcon(
+				this.getClass().getClassLoader().getResource("images/ZEN-yellow.orange-logo-small.png")));
+		tempPanel.add(logoLabel);
+		JLabel zcLabel = new JLabel("<html><span style=\"font-size:3.3em;font-weight:bold;font-style:italic;\">ZENCash Wallet&nbsp;</span></html>");
+		tempPanel.add(zcLabel);
+		tempPanel.setToolTipText("Powered by ZENCash");
+		upperLogoAndWarningPanel.add(tempPanel, BorderLayout.WEST);
+		dashboard.add(upperLogoAndWarningPanel, BorderLayout.NORTH);
+
+		JPanel roundedLeftPanel = new JPanel();
+		roundedLeftPanel.setLayout(new FlowLayout(FlowLayout.LEFT, 12, 0));
+		JPanel leftInsidePanel = new JPanel();
+		leftInsidePanel.setLayout(new BorderLayout(8, 8));
+		leftInsidePanel.add(walletBalanceLabel = new JLabel(), BorderLayout.NORTH);
+		roundedLeftPanel.add(leftInsidePanel);
+		tempPanel = new JPanel(new BorderLayout(0, 0));
+		tempPanel.add(roundedLeftPanel, BorderLayout.NORTH);
+		tempPanel.add(this.exchangeRatePanel = new ExchangeRatePanel(errorReporter), BorderLayout.CENTER);
+		dashboard.add(tempPanel, BorderLayout.WEST);
+        
+		// List of transactions 
+        tempPanel = new JPanel(new BorderLayout(0, 0));
+        tempPanel.setBorder(BorderFactory.createEmptyBorder(0, 14, 8, 4));
+        tempPanel.add(new LatestTransactionsPanel(), BorderLayout.CENTER);
+		dashboard.add(tempPanel, BorderLayout.CENTER);
 
 		// Lower panel with installation status
 		JPanel installationStatusPanel = new JPanel();
 		installationStatusPanel.setLayout(new BorderLayout(3, 3));
-		//installationStatusPanel.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
 		PresentationPanel daemonStatusPanel = new PresentationPanel();
 		daemonStatusPanel.add(daemonStatusLabel = new JLabel());
 		installationStatusPanel.add(daemonStatusPanel, BorderLayout.WEST);
 		
+		// Build the network and blockchain labels - could be better!
+		JPanel netandBCPanel = new JPanel(new BorderLayout(0, 0));
+		netandBCPanel.setOpaque(false);
+		netandBCPanel.add(networkAndBlockchainLabel = new JLabel(), BorderLayout.CENTER);
+		JPanel netandBCIconsPanel = new JPanel(new BorderLayout(0, 0));
+		netandBCIconsPanel.setOpaque(false);
+		this.blockchain100PercentLabel = new JLabel(" ");
+		netandBCIconsPanel.add(this.blockchain100PercentLabel, BorderLayout.NORTH);
+		this.networkConnectionsIconLabel = new JLabel(" ");
+		this.networkConnectionsIconLabel.setIcon(this.connect_0_Icon);
+		netandBCIconsPanel.add(this.networkConnectionsIconLabel, BorderLayout.SOUTH);
+		netandBCPanel.add(netandBCIconsPanel, BorderLayout.EAST);
 		PresentationPanel networkAndBlockchainPanel = new PresentationPanel();
-		networkAndBlockchainPanel.add(networkAndBlockchainLabel = new JLabel());
+		networkAndBlockchainPanel.add(netandBCPanel);
 		installationStatusPanel.add(networkAndBlockchainPanel, BorderLayout.EAST);		
 		
 		dashboard.add(installationStatusPanel, BorderLayout.SOUTH);
@@ -254,7 +311,7 @@ public class DashboardPanel
 					throws Exception
 				{
 					long start = System.currentTimeMillis();
-					String[][] data =  DashboardPanel.this.getTransactionsDataFromWallet();
+					String[][] data = DashboardPanel.this.getTransactionsDataFromWallet();
 					long end = System.currentTimeMillis();
 					Log.info("Gathering of dashboard wallet transactions table data done in " + (end - start) + "ms." );
 					
@@ -264,24 +321,6 @@ public class DashboardPanel
 			this.errorReporter, 20000);
 		this.threads.add(this.transactionGatheringThread);
 		
-		ActionListener alTransactions = new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e)
-			{
-				try
-				{					
-					DashboardPanel.this.updateWalletTransactionsTable();
-				} catch (Exception ex)
-				{
-					Log.error("Unexpected error: ", ex);
-					DashboardPanel.this.errorReporter.reportError(ex);
-				}
-			}
-		};
-		t = new Timer(5000, alTransactions);
-		t.start();
-		this.timers.add(t);
-
 		// Thread and timer to update the network and blockchain details
 		this.netInfoGatheringThread = new DataGatheringThread<NetworkAndBlockchainInfo>(
 			new DataGatheringThread.DataGatherer<NetworkAndBlockchainInfo>() 
@@ -321,10 +360,22 @@ public class DashboardPanel
 	}
 	
 	
+	public void setDetailsPanelForSelection(TransactionsDetailPanel detailsPanel)
+	{
+		this.detailsPabelForSelection = detailsPanel;
+	}
+	
+	
 	// May be null!
 	public Integer getBlockchainPercentage()
 	{
 		return this.blockchainPercentage;
+	}
+	
+	
+	public DataGatheringThread<String[][]> getTransactionGatheringThread()
+	{
+		return this.transactionGatheringThread;
 	}
 	
 
@@ -450,43 +501,93 @@ public class DashboardPanel
 			// TODO: write log that we fix minimum date! - this condition should not occur
 			info.lastBlockDate = startDate;
 		}
-		
-		String connections = " \u26D7";
-		String tickSymbol = " \u2705";
-		OS_TYPE os = OSUtil.getOSType();
-		// Handling special symbols on Mac OS/Windows 
-		// TODO: isolate OS-specific symbol stuff in separate code
-		if ((os == OS_TYPE.MAC_OS) || (os == OS_TYPE.WINDOWS))
-		{
-			connections = " \u21D4";
-			tickSymbol = " \u2606";
-		}
-		
-		String tick = "";
-		if (percentage.equals("100"))
-		{
-			tick = "<span style=\"font-weight:bold;font-size:1.4em;color:green\">" + tickSymbol + "</span>";
-		}
-		
-		String netColor = "red";
-		if (info.numConnections > 0)
-		{
-			netColor = "#cc3300";
-		}
-		
-		if (info.numConnections > 2)
-		{
-			netColor = "black";
-		}	
-		
-		if (info.numConnections > 6)
-		{
-			netColor = "green";
-		}		
 				
-		String text = langUtil.getString("panel.dashboard.network.blockchain.label",percentage,tick,
-		    info.lastBlockDate.toLocaleString(),info.numConnections,netColor,connections);
+		String text =
+			"<html> " +
+		    "Blockchain synchronized: <span style=\"font-weight:bold\">" + 
+			percentage + "% </span> " + " <br/>" +
+			"Up to: <span style=\"font-size:0.8em;font-weight:bold\">" + 
+		    info.lastBlockDate.toLocaleString() + "</span>  <br/> " + 
+			"<span style=\"font-size:3px\"><br/><br/></span>" +
+			"Network peers: <span style=\"font-weight:bold\">" + info.numConnections + " connections&nbsp;&nbsp;</span>";
 		this.networkAndBlockchainLabel.setText(text);
+		
+		// Connections check (typically not an open node with more than 8)
+		int numConnections = info.numConnections;
+		if (numConnections > 8)
+		{
+			numConnections = 8;
+		}
+		
+		// Set the correct number of connections (icon)
+		switch (numConnections)
+		{
+		case 8:
+		case 7:
+			this.networkConnectionsIconLabel.setIcon(connect_4_Icon);
+			break;
+		case 6:
+		case 5:
+			this.networkConnectionsIconLabel.setIcon(connect_3_Icon);
+			break;
+		case 4:
+		case 3:
+			this.networkConnectionsIconLabel.setIcon(connect_2_Icon);
+			break;
+		case 2:
+		case 1:
+			this.networkConnectionsIconLabel.setIcon(connect_1_Icon);
+			break;
+		case 0:
+		default:
+			this.networkConnectionsIconLabel.setIcon(connect_0_Icon);
+		}
+		
+		// Set the blockchain synchronization icon
+		if (this.blockchainPercentage < 100)
+		{
+			this.blockchain100PercentLabel.setIcon(null);	
+		} else
+		{
+			this.blockchain100PercentLabel.setIcon(this.confirmedTXIcon);
+		}
+		
+		// Possibly show a blockchain synchronization warning
+		if (this.blockchainPercentage < 100)
+		{
+			String warningText = 					
+					"<html><span style=\"font-size:1em;font-weight:bold;color:red;\">" +
+				    "WARNING: The blockchain is not 100% synchronized. The visible<br/>" +
+				    "transactions and wallet balaance reflect an old state of the<br/>" +
+				    "wallet as of " + info.lastBlockDate.toLocaleString() + " !" +
+				    "</span></html>";
+			
+			if (this.blockcahinWarningPanel == null)
+			{
+				// Create a new warning panel
+				JPanel tempPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+		        PresentationPanel warningPanel = new PresentationPanel();
+		        this.blockcahinWarningLabel = new JLabel(warningText);
+				warningPanel.add(this.blockcahinWarningLabel);
+				tempPanel.add(warningPanel);
+				this.blockcahinWarningPanel = tempPanel;
+				this.upperLogoAndWarningPanel.add(this.blockcahinWarningPanel, BorderLayout.EAST);
+			} else if (this.blockcahinWarningLabel != null)
+			{
+				this.blockcahinWarningLabel.setText(warningText);
+			}
+		} else
+		{
+			if (this.blockcahinWarningPanel != null)
+			{
+				this.upperLogoAndWarningPanel.remove(this.blockcahinWarningPanel);
+				this.upperLogoAndWarningPanel.revalidate();
+				this.upperLogoAndWarningPanel.repaint();
+				this.revalidate(); // The entire dashboard panel
+				this.blockcahinWarningPanel = null;
+				this.blockcahinWarningLabel = null;
+			}
+		}
 	}
 	
 
@@ -516,18 +617,42 @@ public class DashboardPanel
 		String color2 = privateBalance.equals(privateUCBalance)         ? "" : "color:#cc3300;";
 		String color3 = totalBalance.equals(totalUCBalance)             ? "" : "color:#cc3300;";
 		
+		Double usdBalance = (this.exchangeRatePanel != null) ? this.exchangeRatePanel.getUsdPrice() : null;
+		String usdBalanceStr = "";
+		if (usdBalance != null)
+		{
+			usdBalance = usdBalance * balance.totalUnconfirmedBalance;
+			DecimalFormat usdDF = new DecimalFormat("########0.00");
+			String formattedUSDVal = usdDF.format(usdBalance);
+			
+			// make sure the ZEN and USD are aligned
+			int diff = totalUCBalance.length() - formattedUSDVal.length();
+			while (diff-- > 0)
+			{
+				formattedUSDVal += "&nbsp;";
+			}
+			
+			usdBalanceStr = "<br/>" + "<span style=\"font-family:monospace;font-size:1.8em;" + color3 + "\">" +
+			                "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + 
+		                    "<span style=\"font-weight:bold;font-size:2.1em;\">" + formattedUSDVal + " USD</span></span>";
+		}
+		
 		String text =
 			"<html>" + 
-		    "<span style=\"font-family:monospace;font-size:1em;" + color1 + "\">"+ langUtil.getString("panel.dashboard.balance.transparent") + "<span style=\"font-size:1.1em;\">" +
+		    "<span style=\"font-size:1.5em;font-weight:bold;font-style:italic;" + color1 + "\">Balance:</span><br/> " +
+		    "<span style=\"font-family:monospace;font-size:0.4em;font-weight:bold;" + color1 + "\"><br/></span> " +
+		    "<span style=\"font-family:monospace;font-size:1.8em;" + color1 + "\">Transparent: <span style=\"font-size:1.8em;\">" + 
 				transparentUCBalance + " ZEN </span></span><br/> " +
-			"<span style=\"font-family:monospace;font-size:1em;" + color2 + "\">"+ langUtil.getString("panel.dashboard.balance.private") + "<span style=\"font-weight:bold;font-size:1.1em;\">" +
+			"<span style=\"font-family:monospace;font-size:1.8em;" + color2 + "\">Private (Z): <span style=\"font-weight:bold;font-size:1.8em;\">" + 
 		    	privateUCBalance + " ZEN </span></span><br/> " +
-			"<span style=\"font-family:monospace;;font-size:1em;" + color3 + "\">"+ langUtil.getString("panel.dashboard.balance.total") + "<span style=\"font-weight:bold;font-size:1.35em;\">" +
+			"<hr/>" +
+		    "<span style=\"font-family:monospace;font-size:1.8em;" + color3 + "\">Total (Z+T): <span style=\"font-weight:bold;font-size:2.1em;\">" + 
 		    	totalUCBalance + " ZEN </span></span>" +
+		    usdBalanceStr +
 			"<br/>  </html>";
 		
 		this.walletBalanceLabel.setText(text);
-		
+				
 		String toolTip = null;
 		if ((!transparentBalance.equals(transparentUCBalance)) ||
 		    (!privateBalance.equals(privateUCBalance))         ||
@@ -543,52 +668,7 @@ public class DashboardPanel
 			this.backupTracker.handleWalletBalanceUpdate(balance.totalBalance);
 		}
 	}
-
-
-	private void updateWalletTransactionsTable()
-		throws WalletCallException, IOException, InterruptedException
-	{
-		String[][] newTransactionsData = this.transactionGatheringThread.getLastData();
-		
-		// May be null - not even gathered once
-		if (newTransactionsData == null)
-		{
-			return;
-		}
-			
-		if (Util.arraysAreDifferent(lastTransactionsData, newTransactionsData))
-		{
-			Log.info("Updating table of transactions...");
-			this.remove(transactionsTablePane);
-			this.add(transactionsTablePane = new JScrollPane(
-			             transactionsTable = this.createTransactionsTable(newTransactionsData)),
-			         BorderLayout.CENTER);
-		}
-
-		lastTransactionsData = newTransactionsData;
-
-		this.validate();
-		this.repaint();
-	}
-
-
-	private JTable createTransactionsTable(String rowData[][])
-		throws WalletCallException, IOException, InterruptedException
-	{
-		String columnNames[] = langUtil.getString("panel.dashboard.table.transactions.column.names").split(":");
-        JTable table = new TransactionTable(
-        	rowData, columnNames, this.parentFrame, this.clientCaller, this.installationObserver); 
-        table.setAutoResizeMode(JTable.AUTO_RESIZE_SUBSEQUENT_COLUMNS);
-        table.getColumnModel().getColumn(0).setPreferredWidth(190);
-        table.getColumnModel().getColumn(1).setPreferredWidth(145);
-        table.getColumnModel().getColumn(2).setPreferredWidth(170);
-        table.getColumnModel().getColumn(3).setPreferredWidth(210);
-        table.getColumnModel().getColumn(4).setPreferredWidth(405);
-        table.getColumnModel().getColumn(5).setPreferredWidth(800);
-
-        return table;
-	}
-
+	
 
 	private String[][] getTransactionsDataFromWallet()
 		throws WalletCallException, IOException, InterruptedException
@@ -710,5 +790,339 @@ public class DashboardPanel
 
 		return allTransactions;
 	}
+	
+	
+	// Specific panel class for showing the exchange rates and values in FIAT
+	class ExchangeRatePanel
+		extends JPanel
+	{
+		private DataGatheringThread<JsonObject> zenDataGatheringThread = null;
+		
+		private DataTable table;
+		private JScrollPane tablePane;
+		
+		private Double lastUsdPrice;
+		
+		public ExchangeRatePanel(StatusUpdateErrorReporter errorReporter)
+		{			
+			// Start the thread to gather the exchange data
+			this.zenDataGatheringThread = new DataGatheringThread<JsonObject>(
+				new DataGatheringThread.DataGatherer<JsonObject>() 
+				{
+					public JsonObject gatherData()
+						throws Exception
+					{
+						long start = System.currentTimeMillis();
+						JsonObject exchangeData = ExchangeRatePanel.this.getExchangeDataFromRemoteService();
+						long end = System.currentTimeMillis();
+						Log.info("Gathering of ZEN Exchange data done in " + (end - start) + "ms." );
+							
+						return exchangeData;
+					}
+				}, 
+				errorReporter, 60000, true);
+			
+			this.setLayout(new FlowLayout(FlowLayout.LEFT, 3, 18));
+			this.recreateExchangeTable();
+			
+			// Start the timer to update the table
+			ActionListener alExchange = new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e)
+				{
+					try
+					{					
+						ExchangeRatePanel.this.recreateExchangeTable();
+					} catch (Exception ex)
+					{
+						Log.error("Unexpected error: ", ex);
+						DashboardPanel.this.errorReporter.reportError(ex);
+					}
+				}
+			};
+			Timer t = new Timer(30000, alExchange); // TODO: add timer for disposal ???
+			t.setInitialDelay(1000);
+			t.start();
+		}
+		
+		
+		private void recreateExchangeTable()
+		{
+			if (this.table != null)
+			{
+				this.remove(this.tablePane);
+			}
+						
+			this.table = new DataTable(getExchangeDataInTableForm(), 
+	                                   new String[] { "Exchange information", "Value" });
+			Dimension d = this.table.getPreferredSize();
+			d.setSize((d.getWidth() * 26) / 10, d.getHeight()); // TODO: better sizing
+			this.table.setPreferredScrollableViewportSize(d);
+			this.table.setFillsViewportHeight(false);
+            this.add(this.tablePane = new JScrollPane(this.table));
+		}
+		
+		
+		// Forms the exchange data for a table
+		private Object[][] getExchangeDataInTableForm()
+		{
+			JsonObject data = this.zenDataGatheringThread.getLastData();
+			if (data == null)
+			{
+				data = new JsonObject();
+			}
+			
+			String usdPrice = data.getString("price_usd", "N/A");
+			try
+			{
+				Double usdPriceD = Double.parseDouble(usdPrice);
+				usdPrice = new DecimalFormat("########0.00").format(usdPriceD);
+				this.lastUsdPrice = usdPriceD;
+			} catch (NumberFormatException nfe) { /* Do nothing */ }
+			
+			String usdMarketCap = data.getString("market_cap_usd", "N/A");
+			try
+			{
+				Double usdMarketCapD = Double.parseDouble(usdMarketCap) / 1000000;
+				usdMarketCap = new DecimalFormat("########0.000").format(usdMarketCapD) + " million";
+			} catch (NumberFormatException nfe) { /* Do nothing */ }
+			
+			// Query the object for individual fields
+			String tableData[][] = new String[][]
+			{
+				{ "Current price in USD:",     usdPrice},
+				{ "Current price in BTC:",     data.getString("price_btc",          "N/A") },
+				{ "ZEN capitalization (USD):", usdMarketCap },
+				{ "Daily change (USD price):", data.getString("percent_change_24h", "N/A") + "%"},
+				{ "Weekly change (USD price):", data.getString("percent_change_7d", "N/A") + "%"},
+			};
+			
+			return tableData;
+		}
+		
+		
+		private Double getUsdPrice()
+		{
+			return this.lastUsdPrice;
+		}
+		
+				
+		// Obtains the ZEN exchange data as a JsonObject
+		private JsonObject getExchangeDataFromRemoteService()
+		{
+			JsonObject data = new JsonObject();
+			
+			try
+			{
+				URL u = new URL("https://api.coinmarketcap.com/v1/ticker/zencash");
+				Reader r = new InputStreamReader(u.openStream(), "UTF-8");
+				JsonArray ar = Json.parse(r).asArray();
+				data = ar.get(0).asObject();
+			} catch (Exception ioe)
+			{
+				Log.warning("Could not obtain ZEN exchange information from coinmarketcap.com due to: {0} {1}", 
+						    ioe.getClass().getName(), ioe.getMessage());
+			}
+			
+			return data;
+		}
+	}
+	
+	
+	// Specific panel class for the latest transactions
+	class LatestTransactionsPanel
+		extends JPanel
+	{
+		LatestTransactionsList transactionList = null;
+		String[][] transactions = null;
+		
+		public LatestTransactionsPanel()
+			throws InterruptedException, IOException, WalletCallException
+		{
+			final JPanel content = new JPanel();
+			content.setLayout(new BorderLayout(3,  3));
+			content.add(new JLabel("<html><span style=\"font-size:1.5em;font-weight:bold;font-style:italic;\">Latest transactions:</span></html>"),
+					    BorderLayout.NORTH);
+			transactionList = new LatestTransactionsList();
+			JPanel tempPanel = new JPanel(new BorderLayout(0,  0));
+			tempPanel.add(transactionList, BorderLayout.NORTH);
+			content.add(tempPanel, BorderLayout.CENTER); 
+			
+			// Pre-fill transaction list once
+			this.transactions = getTransactionsDataFromWallet();
+			transactionList.updateTransactions(this.transactions);
+			
+			ActionListener al = new ActionListener() 
+			{
+				@Override
+				public void actionPerformed(ActionEvent e) 
+				{
+					LatestTransactionsPanel.this.transactions = transactionGatheringThread.getLastData();
+					if (LatestTransactionsPanel.this.transactions != null)
+					{
+						transactionList.updateTransactions(LatestTransactionsPanel.this.transactions);
+					}
+				}
+			};
+			
+			Timer latestTransactionsTimer =  new Timer(8000, al);
+			latestTransactionsTimer.setInitialDelay(8000);
+			latestTransactionsTimer.start();
+						
+			this.setLayout(new GridLayout(1, 1));
+			this.add(content);
+		}
+		
+		
+		class LatestTransactionsList
+			extends JList<String[]>
+		{
+			public LatestTransactionsList()
+			{
+				super();
+				this.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+				this.setBackground(new JPanel().getBackground());
+				
+				this.addMouseListener(new MouseAdapter()
+		        {
+		        	public void mousePressed(MouseEvent e)
+		        	{
+		                if ((!e.isConsumed()) && (e.isPopupTrigger() || (e.getClickCount() == 2))) 
+		                {
+		                	LatestTransactionsList list = (LatestTransactionsList)e.getSource();
+		                    
+		                	// Select also via the right mouse button - seems not to work well
+		                    /*{
+		                        if (SwingUtilities.isRightMouseButton(e))
+		                        {
+		                            int row = list.locationToIndex(e.getPoint());
+		                            if (row > 0)
+		                            {
+		                            	list.setSelectedIndex(row);
+		                            }
+		                        }
+		                    }*/
+		                	
+		                	if (list.getSelectedValue() != null)
+		                    {
+		                    	String[] transaction = list.getSelectedValue();
+		                    	// Select the right transaction here
+		                    	if (detailsPabelForSelection != null)
+		                    	{
+		                    		detailsPabelForSelection.selectTransactionWithID(transaction[6]);
+		                    	}
+		                    	e.consume();
+		                    } 		                    
+		                }
+		        	}
+		        	
+		            public void mouseReleased(MouseEvent e)
+		            {
+		            	if ((!e.isConsumed()) && e.isPopupTrigger())
+		            	{
+		            		mousePressed(e);
+		            	}
+		            }
+		        });
+			}
+			
+			
+			public void updateTransactions(String[][] transactions)
+			{
+				DefaultListModel<String[]> model = new DefaultListModel<String[]>();
+				
+				// By default only 5 transactions are shown
+				int i = 0;
+				for (String[] trans : transactions)
+				{
+					if (++i > 5)
+					{
+						break;
+					}
+					
+					model.addElement(trans);
+				}
+				
+				this.setModel(model);
+			}
+			
+			
+			@Override
+			public ListCellRenderer<String[]> getCellRenderer() 
+			{
+				return new ListCellRenderer<String[]>() 
+				{
+					@Override
+					public Component getListCellRendererComponent(
+							JList<? extends String[]> list,
+							String[] data, int index, boolean isSelected, boolean cellHasFocus) 
+					{					
+						return new SingleTransactionPanel(data);
+					}
+				};
+			}
+
+		}
+		
+		
+		class SingleTransactionPanel
+			extends JPanel
+		{			
+			// TODO: depends on the format of the gathering thread
+			public SingleTransactionPanel(String[] transactionFeilds)
+			{
+				this.setLayout(new FlowLayout(FlowLayout.LEFT, 3, 3));
+				this.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.RAISED));
+				
+				String destinationAddress = transactionFeilds[5];
+				if (destinationAddress.length() > 35)
+				{
+					destinationAddress = destinationAddress.substring(0, 37) + "...";
+				}
+				
+				// Set the correct icon for input/output
+				ImageIcon inOutIcon = inoutTransactionIcon;
+				if (transactionFeilds[1] != null)
+				{
+					if (transactionFeilds[1].contains("IN"))
+					{
+						inOutIcon = inputTransactionIcon;
+					} else if (transactionFeilds[1].contains("OUT"))
+					{
+						inOutIcon = outputTransactionIcon;
+					}
+				}
+				
+				JLabel imgLabel = new JLabel();
+				imgLabel.setIcon(inOutIcon);
+				this.add(imgLabel);
+				
+				// Set the two icons for public/private and confirmations
+				ImageIcon confirmationIcon = 
+					transactionFeilds[2].contains("Yes") ? confirmedTXIcon : unConfirmedTXIcon;
+				ImageIcon pubPrivIcon = 
+						transactionFeilds[0].contains("Private") ? lockClosedIcon : lockOpenIcon;
+				JPanel iconsPanel = new JPanel(new BorderLayout(0, 1));
+				iconsPanel.add(new JLabel(pubPrivIcon), BorderLayout.SOUTH);
+				iconsPanel.add(new JLabel(confirmationIcon), BorderLayout.NORTH);
+				this.add(iconsPanel);
+				
+				this.add(new JLabel("<html>&nbsp;</html>"));
+				
+				// Set the transaction information
+				JLabel transacitonInfo = new JLabel(
+						"<html><span>" +
+						"Type: " + transactionFeilds[0] + ",&nbsp;" +
+						"Direction: " + transactionFeilds[1] + ",&nbsp;" +
+						"Confirmed: " +	transactionFeilds[2] + "<br/>" +
+						"Amount: <span style=\"font-weight:bold\">" + transactionFeilds[3] + " ZEN</span>,&nbsp;" +
+						"Date: " + transactionFeilds[4] + "<br/>" +
+						"Destination: <span style=\"font-weight:bold\">" + destinationAddress + "</span><br/>" +
+						"</span></html>");
+				this.add(transacitonInfo);
+			}
+		}
+	}
+	
 	
 } // End class
