@@ -55,7 +55,7 @@ public class AddressTable
 		super(rowData, columnNames);
 		int accelaratorKeyMask = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
 		LanguageUtil langUtil = LanguageUtil.instance();
-		JMenuItem obtainPrivateKey = new JMenuItem("Obtain private key...");
+		JMenuItem obtainPrivateKey = new JMenuItem(langUtil.getString("table.address.option.obtain.private.key.label"));
 		obtainPrivateKey.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, accelaratorKeyMask));
         popupMenu.add(obtainPrivateKey);
         
@@ -102,7 +102,7 @@ public class AddressTable
 							AddressTable.this.getRootPane().getParent(), 
 							(isZAddress ? langUtil.getString("table.address.option.pane.text.private") : langUtil.getString("table.address.option.pane.text.transparent")) +
 								langUtil.getString("table.address.option.pane.text.rest", address, privateKey),
-							langUtil.getString("table.address.option.pane.title"), JOptionPane.INFORMATION_MESSAGE);
+								langUtil.getString("table.address.option.pane.title"), JOptionPane.INFORMATION_MESSAGE);
 
 						
 					} catch (Exception ex){

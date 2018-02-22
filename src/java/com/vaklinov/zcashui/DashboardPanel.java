@@ -619,25 +619,13 @@ public class DashboardPanel
 				formattedUSDVal += "&nbsp;";
 			}
 			
-			usdBalanceStr = "<br/>" + "<span style=\"font-family:monospace;font-size:1.8em;" + color3 + "\">" +
-			                "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + 
-		                    "<span style=\"font-weight:bold;font-size:2.1em;\">" + formattedUSDVal + " USD</span></span>";
+			usdBalanceStr = langUtil.getString("panel.dashboard.marketcap.usd.balance.string", color3, formattedUSDVal);
 		}
 		
-		String text =
-			"<html>" + 
-		    "<span style=\"font-size:1.5em;font-weight:bold;font-style:italic;" + color1 + "\">Balance:</span><br/> " +
-		    "<span style=\"font-family:monospace;font-size:0.4em;font-weight:bold;" + color1 + "\"><br/></span> " +
-		    "<span style=\"font-family:monospace;font-size:1.8em;" + color1 + "\">Transparent: <span style=\"font-size:1.8em;\">" + 
-				transparentUCBalance + " ZEN </span></span><br/> " +
-			"<span style=\"font-family:monospace;font-size:1.8em;" + color2 + "\">Private (Z): <span style=\"font-weight:bold;font-size:1.8em;\">" + 
-		    	privateUCBalance + " ZEN </span></span><br/> " +
-			"<hr/>" +
-		    "<span style=\"font-family:monospace;font-size:1.8em;" + color3 + "\">Total (Z+T): <span style=\"font-weight:bold;font-size:2.1em;\">" + 
-		    	totalUCBalance + " ZEN </span></span>" +
-		    usdBalanceStr +
-			"<br/>  </html>";
-		
+		String text = langUtil.getString("panel.dashboard.marketcap.usd.balance.text",
+				color1, transparentUCBalance, color2, privateUCBalance,
+				color3, totalUCBalance, usdBalanceStr);
+
 		this.walletBalanceLabel.setText(text);
 				
 		String toolTip = null;
