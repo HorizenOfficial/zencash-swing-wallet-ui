@@ -174,9 +174,9 @@ public class DashboardPanel
 		JLabel logoLabel = new JLabel(new ImageIcon(
 				this.getClass().getClassLoader().getResource("images/ZEN-yellow.orange-logo-small.png")));
 		tempPanel.add(logoLabel);
-		JLabel zcLabel = new JLabel("<html><span style=\"font-size:3.3em;font-weight:bold;font-style:italic;\">ZENCash Wallet&nbsp;</span></html>");
+		JLabel zcLabel = new JLabel(langUtil.getString("panel.dashboard.main.label"));
 		tempPanel.add(zcLabel);
-		tempPanel.setToolTipText("Powered by ZENCash");
+		tempPanel.setToolTipText(langUtil.getString("panel.dashboard.tooltip"));
 		upperLogoAndWarningPanel.add(tempPanel, BorderLayout.WEST);
 		dashboard.add(upperLogoAndWarningPanel, BorderLayout.NORTH);
 
@@ -390,10 +390,10 @@ public class DashboardPanel
 			return;
 		}
 		
-		String daemonStatus = "<span style=\"color:green;font-weight:bold\">"+ langUtil.getString("panel.dashboard.deamon.status.running")  +"</span>";
+		String daemonStatus = langUtil.getString("panel.dashboard.deamon.status.running");
 		if (daemonInfo.status != DAEMON_STATUS.RUNNING)
 		{
-			daemonStatus = "<span style=\"color:red;font-weight:bold\">" + langUtil.getString("panel.dashboard.deamon.status.not.running")  + "</span>";
+			daemonStatus = langUtil.getString("panel.dashboard.deamon.status.not.running");
 		}
 		
 		String runtimeInfo = "";
@@ -402,20 +402,19 @@ public class DashboardPanel
 		String virtual = "";
 		if (daemonInfo.virtualSizeMB > 0)
 		{
-			virtual = ", Virtual: " + daemonInfo.virtualSizeMB + " MB";
+			virtual = langUtil.getString("panel.dashboard.deamon.info.virtual", daemonInfo.virtualSizeMB);
 		}
 		
 		String cpuPercentage = "";
 		if (daemonInfo.cpuPercentage > 0)
 		{
-			cpuPercentage = ", CPU: " + daemonInfo.cpuPercentage + "%";
+			cpuPercentage = langUtil.getString("panel.dashboard.deamon.info.cpu", daemonInfo.cpuPercentage);
 		}
 		
 		if (daemonInfo.status == DAEMON_STATUS.RUNNING)
 		{
-			runtimeInfo = "<span style=\"font-size:0.8em\">" +
-					      "Resident: " + daemonInfo.residentSizeMB + " MB" + virtual +
-					       cpuPercentage + "</span>";
+			runtimeInfo = langUtil.getString("panel.dashboard.deamon.runtime.info",
+					daemonInfo.residentSizeMB, virtual, cpuPercentage);
 		}
 
 		// TODO: what if ZCash directory is non-default...
@@ -434,23 +433,20 @@ public class DashboardPanel
 		// TODO: Use a one-off data gathering thread - better design
 		if (this.walletIsEncrypted != null)
 		{
-			walletEncryption = 
-					"<span style=\"font-size:0.8em\">" + 
-			        " (" + (this.walletIsEncrypted ? "" : langUtil.getString("panel.dashboard.deamon.status.not")) +
-							langUtil.getString("panel.dashboard.deamon.status.encrypted") + ")" +
-			        "</span>";
+			String encryptionText =
+					(this.walletIsEncrypted ? "" :
+							langUtil.getString("panel.dashboard.deamon.status.not")) +
+							langUtil.getString("panel.dashboard.deamon.status.encrypted");
+
+			walletEncryption =langUtil.getString("panel.dashboard.deamon.status.walletencrypted.text", encryptionText);
+
 		}
 		
-		String text =
-			"<html><span style=\"font-weight:bold;color:#303030\">zend</span> status: " + 
-		    daemonStatus + ",  " + runtimeInfo + " <br/>" +
-			langUtil.getString("panel.dashboard.deamon.status.wallet") + "<span style=\"font-weight:bold;color:#303030\">" + walletDAT.getCanonicalPath() + "</span>" +
-			walletEncryption + " <br/> " +
-			"<span style=\"font-size:3px\"><br/></span>" +
-			"<span style=\"font-size:0.8em\">" +
-			langUtil.getString("panel.dashboard.deamon.status.installation")  + OSUtil.getProgramDirectory() + ", " +
-	        "Blockchain: " + OSUtil.getBlockchainDirectory() + " <br/> " +
-			langUtil.getString("panel.dashboard.deamon.status.system") + this.OSInfo + " </span> </html>";
+		String text =langUtil.getString("panel.dashboard.deamon.status.text",
+				daemonStatus, runtimeInfo, walletDAT.getCanonicalPath(),
+				walletEncryption, OSUtil.getProgramDirectory(),	OSUtil.getBlockchainDirectory(),
+				this.OSInfo);
+
 		this.daemonStatusLabel.setText(text);
 	}
 
@@ -502,14 +498,9 @@ public class DashboardPanel
 			info.lastBlockDate = startDate;
 		}
 				
-		String text =
-			"<html> " +
-		    "Blockchain synchronized: <span style=\"font-weight:bold\">" + 
-			percentage + "% </span> " + " <br/>" +
-			"Up to: <span style=\"font-size:0.8em;font-weight:bold\">" + 
-		    info.lastBlockDate.toLocaleString() + "</span>  <br/> " + 
-			"<span style=\"font-size:3px\"><br/><br/></span>" +
-			"Network peers: <span style=\"font-weight:bold\">" + info.numConnections + " connections&nbsp;&nbsp;</span>";
+		String text =langUtil.getString("panel.dashboard.network.blockchain.label",
+				percentage, info.lastBlockDate.toLocaleString(), info.numConnections );
+
 		this.networkAndBlockchainLabel.setText(text);
 		
 		// Connections check (typically not an open node with more than 8)
@@ -555,13 +546,9 @@ public class DashboardPanel
 		// Possibly show a blockchain synchronization warning
 		if (this.blockchainPercentage < 100)
 		{
-			String warningText = 					
-					"<html><span style=\"font-size:1em;font-weight:bold;color:red;\">" +
-				    "WARNING: The blockchain is not 100% synchronized. The visible<br/>" +
-				    "transactions and wallet balaance reflect an old state of the<br/>" +
-				    "wallet as of " + info.lastBlockDate.toLocaleString() + " !" +
-				    "</span></html>";
-			
+			String warningText = langUtil.getString("panel.dashboard.synchronisation.warning",
+					info.lastBlockDate.toLocaleString());
+
 			if (this.blockcahinWarningPanel == null)
 			{
 				// Create a new warning panel
@@ -941,7 +928,7 @@ public class DashboardPanel
 		{
 			final JPanel content = new JPanel();
 			content.setLayout(new BorderLayout(3,  3));
-			content.add(new JLabel("<html><span style=\"font-size:1.5em;font-weight:bold;font-style:italic;\">Latest transactions:</span></html>"),
+			content.add(new JLabel(langUtil.getString("panel.dashboard.transactions.label")),
 					    BorderLayout.NORTH);
 			transactionList = new LatestTransactionsList();
 			JPanel tempPanel = new JPanel(new BorderLayout(0,  0));
