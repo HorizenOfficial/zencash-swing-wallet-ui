@@ -841,7 +841,10 @@ public class DashboardPanel
 			}
 						
 			this.table = new DataTable(getExchangeDataInTableForm(), 
-	                                   new String[] { "Exchange information", "Value" });
+	                                   new String[] {
+														langUtil.getString("panel.dashboard.marketcap.column.exchange.info"),
+											   			langUtil.getString("panel.dashboard.marketcap.column.exchange.value")
+													});
 			Dimension d = this.table.getPreferredSize();
 			d.setSize((d.getWidth() * 26) / 10, d.getHeight()); // TODO: better sizing
 			this.table.setPreferredScrollableViewportSize(d);
@@ -877,13 +880,13 @@ public class DashboardPanel
 			// Query the object for individual fields
 			String tableData[][] = new String[][]
 			{
-				{ "Current price in USD:",     usdPrice},
-				{ "Current price in BTC:",     data.getString("price_btc",          "N/A") },
-				{ "ZEN capitalization (USD):", usdMarketCap },
-				{ "Daily change (USD price):", data.getString("percent_change_24h", "N/A") + "%"},
-				{ "Weekly change (USD price):", data.getString("percent_change_7d", "N/A") + "%"},
+				{ langUtil.getString("panel.dashboard.marketcap.price.usd"),     usdPrice},
+				{ langUtil.getString("panel.dashboard.marketcap.price.btc"),     data.getString("price_btc",          "N/A") },
+				{ langUtil.getString("panel.dashboard.marketcap.capitalisation"), usdMarketCap },
+				{ langUtil.getString("panel.dashboard.marketcap.daily.change"), data.getString("percent_change_24h", "N/A") + "%"},
+				{ langUtil.getString("panel.dashboard.marketcap.weekly.change"), data.getString("percent_change_7d", "N/A") + "%"},
 			};
-			
+
 			return tableData;
 		}
 		
@@ -1098,14 +1101,15 @@ public class DashboardPanel
 				
 				// Set the transaction information
 				JLabel transacitonInfo = new JLabel(
-						"<html><span>" +
-						"Type: " + transactionFeilds[0] + ",&nbsp;" +
-						"Direction: " + transactionFeilds[1] + ",&nbsp;" +
-						"Confirmed: " +	transactionFeilds[2] + "<br/>" +
-						"Amount: <span style=\"font-weight:bold\">" + transactionFeilds[3] + " ZEN</span>,&nbsp;" +
-						"Date: " + transactionFeilds[4] + "<br/>" +
-						"Destination: <span style=\"font-weight:bold\">" + destinationAddress + "</span><br/>" +
-						"</span></html>");
+						langUtil.getString("panel.dashboard.transactions.info",
+								transactionFeilds[0],
+								transactionFeilds[1],
+								transactionFeilds[2],
+								transactionFeilds[3],
+								transactionFeilds[4],
+								destinationAddress
+						)
+				);
 				this.add(transacitonInfo);
 			}
 		}
