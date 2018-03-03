@@ -34,11 +34,19 @@ import java.awt.Cursor;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.text.DecimalFormat;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 
 import javax.swing.BorderFactory;
@@ -81,6 +89,8 @@ public class AddressesPanel
 	// and should be remembered as invalid here
 	private Map<String, Boolean> validationMap = new HashMap<String, Boolean>();
 	
+	// Storage of labels
+	private LabelStorage labelStorgae;
 
 	public AddressesPanel(JFrame parentFrame, ZCashClientCaller clientCaller, StatusUpdateErrorReporter errorReporter)
 		throws IOException, InterruptedException, WalletCallException
@@ -88,6 +98,8 @@ public class AddressesPanel
 		this.parentFrame = parentFrame;
 		this.clientCaller = clientCaller;
 		this.errorReporter = errorReporter;
+		
+		this.labelStorgae = new LabelStorage();
 		
 		this.lastInteractiveRefresh = System.currentTimeMillis();
 
@@ -223,7 +235,7 @@ public class AddressesPanel
 		
 		if (selectedRow != -1)
 		{
-			address = this.addressBalanceTable.getModel().getValueAt(selectedRow, 2).toString();
+			address = this.addressBalanceTable.getModel().getValueAt(selectedRow, 3).toString();
 		}
 		
 		return address;
@@ -266,6 +278,14 @@ public class AddressesPanel
 				"is currenly located. Not backing up the wallet may result in loss of funds in case of data\n" +
 				"loss on the current PC. To backup the wallet, use menu option: Wallet >> Backup\n";
 			}			
+			
+			
+            String label = (String) JOptionPane.showInputDialog(AddressesPanel.this,
+                    "Please enter a label for the newly created address:",
+                    "Label of the address...",
+                    JOptionPane.PLAIN_MESSAGE, null, null, "");
+			
+            this.labelStorgae.setLabel(address, label);
 			
 			JOptionPane.showMessageDialog(
 				this.getRootPane().getParent(), 
@@ -334,12 +354,13 @@ public class AddressesPanel
 	private JTable createAddressBalanceTable(String rowData[][])
 		throws WalletCallException, IOException, InterruptedException
 	{
-		String columnNames[] = { "Balance", "Confirmed?", "Address" };
-        JTable table = new AddressTable(rowData, columnNames, this.clientCaller);
+		String columnNames[] = { "Label", "Balance", "Confirmed?", "Address" };
+        JTable table = new AddressTable(rowData, columnNames, this.clientCaller, this.labelStorgae);
         table.setAutoResizeMode(JTable.AUTO_RESIZE_SUBSEQUENT_COLUMNS);
-        table.getColumnModel().getColumn(0).setPreferredWidth(160);
-        table.getColumnModel().getColumn(1).setPreferredWidth(140);
-        table.getColumnModel().getColumn(2).setPreferredWidth(1000);
+        table.getColumnModel().getColumn(0).setPreferredWidth(220);
+        table.getColumnModel().getColumn(1).setPreferredWidth(160);
+        table.getColumnModel().getColumn(2).setPreferredWidth(140);
+        table.getColumnModel().getColumn(3).setPreferredWidth(1000);
 
         return table;
 	}
@@ -430,6 +451,7 @@ public class AddressesPanel
 			
 			addressBalances[i++] = new String[] 
 			{  
+				this.labelStorgae.getLabel(addressToDisplay),
 				balanceToShow,
 				isConfirmed ? ("Yes " + confirmed) : ("No  " + notConfirmed),
 				addressToDisplay
@@ -446,6 +468,7 @@ public class AddressesPanel
 			
 			addressBalances[i++] = new String[] 
 			{  
+				this.labelStorgae.getLabel(address),
 				balanceToShow,
 				isConfirmed ? ("Yes " + confirmed) : ("No  " + notConfirmed),
 				address
@@ -455,4 +478,90 @@ public class AddressesPanel
 		return addressBalances;
 	}	
 
+	
+	// Manages the load/store operations for address labels
+	public static class LabelStorage
+	{
+		private static final String LABELS_FILE_NAME = "wallet.dat.labels";
+		
+		// Address -> label
+		private Properties labels;
+		
+		public LabelStorage()
+			throws IOException
+		{
+			this.labels = new Properties();
+			this.loadLabels();
+		}
+		
+		
+		public String getLabel(String address)
+		{
+			String label = "";
+			
+			if (this.labels.containsKey(address))
+			{
+				label = this.labels.getProperty(address);
+			}
+			
+			return label;
+		}
+		
+		
+		public void setLabel(String address, String label)
+			throws IOException
+		{
+			if (!this.getLabel(address).equals(label))
+			{
+				this.labels.setProperty(address, label);
+				this.storeLabels();
+			}
+		}
+		
+		
+		private void loadLabels()
+			throws IOException
+		{
+			File labelsFile = new File(OSUtil.getSettingsDirectory() + File.separator + LABELS_FILE_NAME);
+			if (!labelsFile.exists())
+			{
+				Log.info("Wallet labels file does not exist: {0}", labelsFile.getCanonicalPath());
+				return;
+			}
+			
+		    InputStream in = null;
+			try
+			{
+				in = new BufferedInputStream(new FileInputStream(labelsFile));
+				this.labels.load(in);
+			} finally
+			{
+				if (in != null)
+				{
+					in.close();
+				}
+			}
+		}
+		
+		
+		private void storeLabels()
+			throws IOException
+		{
+			Util.renameFileForMultiVersionBackup(new File(OSUtil.getSettingsDirectory()), LABELS_FILE_NAME);
+			
+			File newLabelsFile = new File(OSUtil.getSettingsDirectory() + File.separator + LABELS_FILE_NAME);
+			OutputStream out = null;
+			try
+			{
+				out = new BufferedOutputStream(new FileOutputStream(newLabelsFile));
+				this.labels.store(out, "ZENCash GUI wallet address labels");
+			} finally
+			{
+				if (out != null)
+				{
+					out.close();
+				}
+			}
+		}
+	}
 }
