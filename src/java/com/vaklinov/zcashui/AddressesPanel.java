@@ -90,7 +90,7 @@ public class AddressesPanel
 	private Map<String, Boolean> validationMap = new HashMap<String, Boolean>();
 	
 	// Storage of labels
-	private LabelStorage labelStorgae;
+	private LabelStorage labelStorage;
 
 	public AddressesPanel(JFrame parentFrame, ZCashClientCaller clientCaller, StatusUpdateErrorReporter errorReporter)
 		throws IOException, InterruptedException, WalletCallException
@@ -99,7 +99,7 @@ public class AddressesPanel
 		this.clientCaller = clientCaller;
 		this.errorReporter = errorReporter;
 		
-		this.labelStorgae = new LabelStorage();
+		this.labelStorage = new LabelStorage();
 		
 		this.lastInteractiveRefresh = System.currentTimeMillis();
 
@@ -285,7 +285,7 @@ public class AddressesPanel
                     "Label of the address...",
                     JOptionPane.PLAIN_MESSAGE, null, null, "");
 			
-            this.labelStorgae.setLabel(address, label);
+            this.labelStorage.setLabel(address, label);
 			
 			JOptionPane.showMessageDialog(
 				this.getRootPane().getParent(), 
@@ -355,7 +355,7 @@ public class AddressesPanel
 		throws WalletCallException, IOException, InterruptedException
 	{
 		String columnNames[] = { "Label", "Balance", "Confirmed?", "Address" };
-        JTable table = new AddressTable(rowData, columnNames, this.clientCaller, this.labelStorgae);
+        JTable table = new AddressTable(rowData, columnNames, this.clientCaller, this.labelStorage);
         table.setAutoResizeMode(JTable.AUTO_RESIZE_SUBSEQUENT_COLUMNS);
         table.getColumnModel().getColumn(0).setPreferredWidth(220);
         table.getColumnModel().getColumn(1).setPreferredWidth(160);
@@ -451,7 +451,7 @@ public class AddressesPanel
 			
 			addressBalances[i++] = new String[] 
 			{  
-				this.labelStorgae.getLabel(addressToDisplay),
+				this.labelStorage.getLabel(addressToDisplay),
 				balanceToShow,
 				isConfirmed ? ("Yes " + confirmed) : ("No  " + notConfirmed),
 				addressToDisplay
@@ -468,7 +468,7 @@ public class AddressesPanel
 			
 			addressBalances[i++] = new String[] 
 			{  
-				this.labelStorgae.getLabel(address),
+				this.labelStorage.getLabel(address),
 				balanceToShow,
 				isConfirmed ? ("Yes " + confirmed) : ("No  " + notConfirmed),
 				address

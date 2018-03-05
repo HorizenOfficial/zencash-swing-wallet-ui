@@ -135,6 +135,51 @@ public class AddressTable
 			}
 		});
         
+        
+		JMenuItem setLabel = new JMenuItem("Set label...");
+		setLabel.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_L, accelaratorKeyMask));
+        popupMenu.add(setLabel);
+        
+        setLabel.addActionListener(new ActionListener() 
+        {	
+			@Override
+			public void actionPerformed(ActionEvent e) 
+			{
+				if ((lastRow >= 0) && (lastColumn >= 0))
+				{
+					try
+					{
+			            TableModel model = AddressTable.this.getModel();
+			            
+			            String oldLabel = (String)model.getValueAt(lastRow, 0);
+						String label = (String) JOptionPane.showInputDialog(AddressTable.this,
+			                    "Please enter a label for the address:",
+			                    "Label of the address...",
+			                    JOptionPane.PLAIN_MESSAGE, null, null, oldLabel);
+
+			            model.setValueAt(label, lastRow, 0);
+			            
+			            AddressTable.this.invalidate();
+			            AddressTable.this.repaint();
+						
+					} catch (Exception ex)
+					{
+						Log.error("Unexpected error: ", ex);
+			            JOptionPane.showMessageDialog(
+			                AddressTable.this.getRootPane().getParent(),
+					        "Error in setting label:" + "\n" + ex.getMessage() + "\n\n",
+					        "Error in obtaining private key!",
+					        JOptionPane.ERROR_MESSAGE);
+					}
+				} else
+				{
+					// Log perhaps
+				}
+			}
+		});
+
+
+        
         // Model listener for labels
         this.getModel().addTableModelListener(new TableModelListener() 
         {	
@@ -170,7 +215,6 @@ public class AddressTable
         
 	} // End constructor
 
-	
 	
 	// Make sure labels may be edited
 	@Override
