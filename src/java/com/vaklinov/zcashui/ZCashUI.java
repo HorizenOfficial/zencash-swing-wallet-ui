@@ -113,7 +113,7 @@ public class ZCashUI
     public ZCashUI(StartupProgressDialog progressDialog)
         throws IOException, InterruptedException, WalletCallException
     {
-        super("ZENCash Desktop GUI Wallet 0.80.3");
+        super("ZENCash Desktop GUI Wallet 0.80.4");
         
         if (progressDialog != null)
         {
@@ -504,9 +504,18 @@ public class ZCashUI
         this.validate();
 		this.repaint();
 		
+		
 		this.pack();
 		Dimension currentSize = this.getSize();
-		this.setSize(new Dimension(1000, currentSize.height));
+		
+		OS_TYPE os = OSUtil.getOSType();
+		int width = 1040;
+		if (os == OS_TYPE.MAC_OS)
+		{
+			width += 100; // Needs to be wider on Mac OS
+		}
+		
+		this.setSize(new Dimension(width, currentSize.height));
         this.validate();
 		this.repaint();
     }
