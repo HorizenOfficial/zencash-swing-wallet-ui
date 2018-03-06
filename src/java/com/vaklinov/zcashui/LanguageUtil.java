@@ -83,7 +83,7 @@ public class LanguageUtil {
         if (!languagePrefsFile.exists()) {
             return DEFAULT_LOCALE;
         }
-            BufferedReader bufferedReader = new BufferedReader(new FileReader(languagePrefsFile))
+            BufferedReader bufferedReader = new BufferedReader(new FileReader(languagePrefsFile));
             String country = bufferedReader.readLine().trim();
             return supportedLocale.get(country);
         } catch (FileNotFoundException e) {
