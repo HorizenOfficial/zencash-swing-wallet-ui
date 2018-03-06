@@ -1,8 +1,7 @@
 package com.vaklinov.zcashui;
 
 import javax.swing.*;
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.text.MessageFormat;
 import java.util.*;
 import java.util.prefs.BackingStoreException;
@@ -14,6 +13,12 @@ import java.util.prefs.Preferences;
  * @author aballaci <aballaci@gmail.com>
  */
 public class LanguageUtil {
+
+    private static final String PREFERED_LOCALE_FILE_NAME = "lnguage_preferences.txt";
+
+    private static final String RESOURCE_BUNDLE_FILE_NAME = "messages.zencash";
+
+    private static final Locale DEFAULT_LOCALE = Locale.US;
 
 
     private LanguageUtil(){
@@ -39,7 +44,7 @@ public class LanguageUtil {
 
     private void loadBundle(){
         Locale currentLocale = getUsersPrferedLocale();
-        rb = ResourceBundle.getBundle("messages.zencash", currentLocale);
+        rb = ResourceBundle.getBundle(RESOURCE_BUNDLE_FILE_NAME, currentLocale);
         Log.info("Loading locale: " + currentLocale.toString());
     }
 
@@ -59,15 +64,35 @@ public class LanguageUtil {
         }
     }
 
-    private Locale getUsersPrferedLocale(){
-        Preferences prefs = Preferences.userNodeForPackage(LanguageUtil.class);
-        String country = prefs.get("country", Locale.US.getCountry());
-        return supportedLocale.get(country);
+    public void updatePreferedLanguage(Locale locale) {
+        try {
+            File languagePrefsFile = new File(OSUtil.getSettingsDirectory(),PREFERED_LOCALE_FILE_NAME );
+            try (PrintWriter printWriter = new PrintWriter(new FileWriter(languagePrefsFile))) {
+                    printWriter.println(locale.getCountry());
+            }
+        } catch (IOException e) {
+            Log.error("Saving Prefered Locale Failed!!!!", e);
+        }
     }
 
-    public void updatePreferedLanguage(Locale locale){
-        Preferences prefs = Preferences.userNodeForPackage(LanguageUtil.class);
-        prefs.put("country", locale.getCountry());
+    public Locale getUsersPrferedLocale() {
+        File languagePrefsFile;
+        try {
+            languagePrefsFile = new File(OSUtil.getSettingsDirectory(),PREFERED_LOCALE_FILE_NAME);
+
+        if (!languagePrefsFile.exists()) {
+            return DEFAULT_LOCALE;
+        }
+            BufferedReader bufferedReader = new BufferedReader(new FileReader(languagePrefsFile))
+            String country = bufferedReader.readLine().trim();
+            return supportedLocale.get(country);
+        } catch (FileNotFoundException e) {
+            Log.error("Loading Locale Failed!!!!", e);
+            return DEFAULT_LOCALE;
+        } catch (IOException e) {
+            Log.error("Loading Locale Failed!!!!", e);
+            return DEFAULT_LOCALE;
+        }
     }
 
 }
