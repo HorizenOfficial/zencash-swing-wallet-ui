@@ -1,7 +1,10 @@
-## [ZENCash](https://zensystem.io/) Desktop GUI Wallet binary release 0.75.9 for Mac OS
+## [ZENCash](https://zensystem.io/) Desktop GUI Wallet binary release 0.75.9a for Mac OS
 
-This is a [ZENCash](https://zensystem.io/) Desktop GUI Wallet binary release 0.75.9 for Mac OS. 
-It includes [ZENCash 2.0.10-1 binaries](https://github.com/ZencashOfficial/zen/releases/tag/v2.0.10-1)
+This is a [ZENCash](https://zensystem.io/) Desktop GUI Wallet binary release 0.75.9a for Mac OS. 
+It includes [ZENCash 2.0.11 binaries](https://github.com/ZencashOfficial/zen/releases/tag/v2.0.11).
+Originally the release was created with ZENCash 2.0.10-1 binaries but was upgraded to 2.0.11 due to
+stability issues.
+
 One notable new feature is the ability to send encrypted text messages in group conversations on the ZEN blockchain. It is also possible to block/ignore other users if they are spamming the conversation.
 
 ### IMPORTANT: Please read the [security notice](KnownSecurityIssues.md) about watch-only addresses before using the wallet!
@@ -9,22 +12,22 @@ One notable new feature is the ability to send encrypted text messages in group 
 ### Installing the ZENCash Desktop GUI Wallet on Mac OS
 
 1. Download the Wallet image file 
-[ZENCashWallet-0.75.9.dmg](https://github.com/ZencashOfficial/zencash-swing-wallet-ui/releases/download/0.75.9/ZENCashWallet-0.75.9.dmg). 
+[ZENCashWallet-0.75.9a.dmg](https://github.com/ZencashOfficial/zencash-swing-wallet-ui/releases/download/0.75.9/ZENCashWallet-0.75.9a.dmg). 
 
 2. Security check: You may decide to run a virus scan on it before proceeding... In addition using a tool 
 such as [http://quickhash-gui.org/](http://quickhash-gui.org/) you may calculate the its SHA256 checksum. The 
 result should be:
 ```
-056dd920b740ccc087204c003886074005ad2187f68aa2ae9f6201e6e07a83c6  ZENCashWallet-0.75.9.dmg
+10c68899f23055eaa036f83f8a0f1799ee057103080585ce3dc12779df760ffc  ZENCashWallet-0.75.9a.dmg
 ```
-**If the resulting checksum is not `056dd920b740ccc087204c003886074005ad2187f68aa2ae9f6201e6e07a83c6` then**
+**If the resulting checksum is not `10c68899f23055eaa036f83f8a0f1799ee057103080585ce3dc12779df760ffc` then**
 **something is wrong and you should discard the downloaded wallet!**
 
 3. You need to (at least temporarily) allow the installation of "apps downloaded from anywhere" on your Mac. 
 [This article](http://osxdaily.com/2016/09/27/allow-apps-from-anywhere-macos-gatekeeper/) is a good description
 of how to do this. This step will not be necessary in future releases. 
 
-4. Install the wallet like any other downloaded Mac OS application: Open the disk image `ZENCashWallet-0.75.9.dmg`
+4. Install the wallet like any other downloaded Mac OS application: Open the disk image `ZENCashWallet-0.75.9a.dmg`
 and copy the ZENCashWallet application to the Applications folder. You can then discard the disk image.
    
 ### Running the ZENCash Desktop GUI Wallet on Mac OS
