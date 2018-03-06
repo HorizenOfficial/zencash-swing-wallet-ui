@@ -58,6 +58,7 @@ import javax.swing.JTable;
 import javax.swing.KeyStroke;
 import javax.swing.border.EtchedBorder;
 
+//TODO
 
 /**
  * Table to be used for transactions - specifically.
@@ -73,7 +74,7 @@ public class TransactionTable
 	{
 		super(rowData, columnNames);
 		int accelaratorKeyMask = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
-		
+		LanguageUtil langUtil = LanguageUtil.instance();
 		JMenuItem showDetails = new JMenuItem("Show details...");
 		showDetails.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, accelaratorKeyMask));
         popupMenu.add(showDetails);
@@ -109,7 +110,7 @@ public class TransactionTable
 		});
         
         
-		JMenuItem showInExplorer = new JMenuItem("Show in block explorer");
+		JMenuItem showInExplorer = new JMenuItem(langUtil.getString("transactions.table.show.in.explorer"));
 		showInExplorer.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_X, accelaratorKeyMask));
         popupMenu.add(showInExplorer);
         
@@ -146,7 +147,7 @@ public class TransactionTable
 			}
 		});
 		
-        JMenuItem showMemoField = new JMenuItem("Get transaction memo");
+        JMenuItem showMemoField = new JMenuItem(langUtil.getString("transactions.table.memo.field"));
         showMemoField.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R, accelaratorKeyMask));
 	    popupMenu.add(showMemoField);
     
@@ -171,10 +172,8 @@ public class TransactionTable
 						{
 					        JOptionPane.showMessageDialog(
 						            parent,
-						            "The selected transaction does not have as destination a Z (private) \n" +
-						            "address or it is unkonwn (not listed) and thus no memo information \n" +
-						            "about this transaction is available.",
-						            "Memo information is unavailable",
+						            langUtil.getString("transactions.table.memo.unavailable.text"),
+						            langUtil.getString("transactions.table.memo.unavailable.title"),
 						            JOptionPane.ERROR_MESSAGE);
 						    return;
 						}
@@ -196,16 +195,15 @@ public class TransactionTable
  							MemoField = Util.blockWrapString(MemoField, 80);
  							JOptionPane.showMessageDialog(
  								parent, 
- 								"The memo contained in the transaction is: \n" + MemoField +
- 								"\n\n" +
- 								"(The memo has also been copied to the clipboard.)",  
- 								"Memo", JOptionPane.PLAIN_MESSAGE);
+ 								langUtil.getString("transactions.table.memo.clipboard.text", MemoField),
+								langUtil.getString("transactions.table.memo.clipboard.title"),
+								JOptionPane.PLAIN_MESSAGE);
  						} else
  						{
 					        JOptionPane.showMessageDialog(
 						            parent,
-						            "The selected transaction does not contain a memo field.",
-						            "Memo field is not available...",
+						            langUtil.getString("transactions.table.memo.field.missing.text"),
+						            langUtil.getString("transactions.table.memo.field.missing.title"),
 						            JOptionPane.ERROR_MESSAGE);
  						}
 					} catch (Exception ex)
@@ -232,7 +230,8 @@ public class TransactionTable
 		public DetailsDialog(JFrame parent, Map<String, String> details)
 			throws UnsupportedEncodingException
 		{
-			this.setTitle("Transaction details...");
+			LanguageUtil langUtil = LanguageUtil.instance();
+			this.setTitle(langUtil.getString("transaction.table.details.dialog.title"));
 			this.setSize(600,  310);
 		    this.setLocation(100, 100);
 			this.setLocationRelativeTo(parent);
@@ -244,15 +243,12 @@ public class TransactionTable
 			JPanel tempPanel = new JPanel(new BorderLayout(0, 0));
 			tempPanel.setBorder(BorderFactory.createEmptyBorder(4, 4, 4, 4));
 			JLabel infoLabel = new JLabel(
-					"<html><span style=\"font-size:0.97em;\">" +
-					"The table shows the information about the transaction with technical details as " +
-					"they appear at ZENCash network level." +
-				    "</span>");
+					langUtil.getString("transaction.table.details.dialog.info.label"));
 			infoLabel.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
 			tempPanel.add(infoLabel, BorderLayout.CENTER);
 			this.getContentPane().add(tempPanel, BorderLayout.NORTH);
 			
-			String[] columns = new String[] { "Name", "Value" };
+			String[] columns = langUtil.getString("transaction.table.details.dialog.column.names").split(":");
 			String[][] data = new String[details.size()][2];
 			int i = 0;
 			int maxPreferredWidht = 400;
@@ -293,7 +289,7 @@ public class TransactionTable
 			// Lower close button
 			JPanel closePanel = new JPanel();
 			closePanel.setLayout(new FlowLayout(FlowLayout.CENTER, 3, 3));
-			JButton closeButon = new JButton("Close");
+			JButton closeButon = new JButton(langUtil.getString("transaction.table.details.dialog.button.close"));
 			closePanel.add(closeButon);
 			this.getContentPane().add(closePanel, BorderLayout.SOUTH);
 

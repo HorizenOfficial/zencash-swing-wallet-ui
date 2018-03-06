@@ -422,8 +422,9 @@ public class AddressesPanel
 			addressBalances[i++] = new String[]
 					{
 							balanceToShow,
-				isConfirmed ? (langUtil.getString("panel.address.option.pane.yes") + confirmed) : ("No  " + notConfirmed),
-							addressToDisplay
+							isConfirmed ? (langUtil.getString("panel.address.option.pane.yes", confirmed))
+										: (langUtil.getString("panel.address.option.pane.no", notConfirmed)),
+							       		   addressToDisplay
 					};
 		}
 
@@ -438,8 +439,9 @@ public class AddressesPanel
 			addressBalances[i++] = new String[]
 					{
 							balanceToShow,
-							isConfirmed ? ("Yes " + confirmed) : ("No  " + notConfirmed),
-							address
+							isConfirmed ? (langUtil.getString("panel.address.option.pane.yes", confirmed))
+										: (langUtil.getString("panel.address.option.pane.no", notConfirmed)),
+										   address
 					};
 		}
 
