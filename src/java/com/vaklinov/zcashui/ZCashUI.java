@@ -48,7 +48,16 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.Random;
 
-import javax.swing.*;
+import javax.swing.ImageIcon;
+import javax.swing.JFrame;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+import javax.swing.JTabbedPane;
+import javax.swing.KeyStroke;
+import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
 import javax.swing.UIManager.LookAndFeelInfo;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -164,18 +173,7 @@ public class ZCashUI
 
         this.walletOps = new WalletOperations(
             	this, tabs, dashboard, addresses, sendPanel, 
-            	installationObserver, clientCaller, errorReporter, backupTracker);
-         
-        int height = 590;
-        OS_TYPE os = OSUtil.getOSType();
-        // Window needs to be larger on Mac/Windows - typically
-    	if ((os == OS_TYPE.WINDOWS) || (os == OS_TYPE.MAC_OS))
-    	{
-    		height += 75;
-    	}
-        
-        this.setSize(new Dimension(1000, height));
-        
+            	installationObserver, clientCaller, errorReporter, backupTracker);        
 
         // Build menu
         JMenuBar mb = new JMenuBar();
@@ -552,15 +550,24 @@ public class ZCashUI
     		}
         );
   
-        //TODO: packing is problematic
-        /*this.validate();
+        
+        this.validate();
 		this.repaint();
+		
 		
 		this.pack();
 		Dimension currentSize = this.getSize();
-		this.setSize(new Dimension(1000, currentSize.height));
+		
+		OS_TYPE os = OSUtil.getOSType();
+		int width = 1040;
+		if (os == OS_TYPE.MAC_OS)
+		{
+			width += 100; // Needs to be wider on Mac OS
+		}
+		
+		this.setSize(new Dimension(width, currentSize.height));
         this.validate();
-		this.repaint();*/
+		this.repaint();
     }
 
     public void exitProgram()
