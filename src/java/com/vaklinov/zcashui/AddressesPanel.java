@@ -354,8 +354,19 @@ public class AddressesPanel
 	private JTable createAddressBalanceTable(String rowData[][])
 		throws WalletCallException, IOException, InterruptedException
 	{
+		// Create new row data - to make sure we avoid update problems
+		String rowDataNew[][] = new String[rowData.length][];
+		for (int i = 0; i < rowData.length; i++)
+		{
+			rowDataNew[i] = new String[rowData[i].length];
+			for (int j = 0; j < rowData[i].length; j++)
+			{
+				rowDataNew[i][j] = rowData[i][j];
+			}
+		}
+		
 		String columnNames[] = { "Label", "Balance", "Confirmed?", "Address" };
-        JTable table = new AddressTable(rowData, columnNames, this.clientCaller, this.labelStorage);
+        JTable table = new AddressTable(rowDataNew, columnNames, this.clientCaller, this.labelStorage);
         table.setAutoResizeMode(JTable.AUTO_RESIZE_SUBSEQUENT_COLUMNS);
         table.getColumnModel().getColumn(0).setPreferredWidth(220);
         table.getColumnModel().getColumn(1).setPreferredWidth(160);
