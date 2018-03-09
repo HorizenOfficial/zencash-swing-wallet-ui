@@ -1053,7 +1053,7 @@ public class DashboardPanel
 				this.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.RAISED));
 				
 				String destinationAddress = transactionFeilds[5];
-				if (destinationAddress.length() > 35)
+				if (destinationAddress.length() > 37)
 				{
 					destinationAddress = destinationAddress.substring(0, 37) + "...";
 				}
