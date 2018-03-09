@@ -48,16 +48,7 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.Random;
 
-import javax.swing.ImageIcon;
-import javax.swing.JFrame;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
-import javax.swing.JTabbedPane;
-import javax.swing.KeyStroke;
-import javax.swing.SwingUtilities;
-import javax.swing.UIManager;
+import javax.swing.*;
 import javax.swing.UIManager.LookAndFeelInfo;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -166,7 +157,7 @@ public class ZCashUI
         tabs.addTab(langUtil.getString("main.frame.tab.address.book.title"),
     		        new ImageIcon(cl.getResource("images/address-book.png")),
     		        addressBookPanel = new AddressBookPanel(sendPanel, tabs));
-        tabs.addTab("Messaging ",
+        tabs.addTab(langUtil.getString("main.frame.tab.messaging.title"),
 		            new ImageIcon(cl.getResource("images/messaging.png")),
 		            messagingPanel = new MessagingPanel(this, sendPanel, tabs, clientCaller, errorReporter));
         contentPane.add(tabs);
@@ -501,30 +492,9 @@ public class ZCashUI
 
                 JOptionPane.showMessageDialog(
                     ZCashUI.this.getRootPane().getParent(),
-                    "The ZENCash GUI Wallet is currently considered experimental. Use of this software\n" +
-                    "comes at your own risk! Be sure to read the list of known issues and limitations\n" +
-                    "at this page: https://github.com/ZencashOfficial/zencash-swing-wallet-ui\n\n" +
-                    
-                    "The ZENCash Desktop GUI Wallet is not compatible with applications that modify\n" + 
-                    "the ZEN wallet.dat file. The wallet should not be used with such applications\n" +
-                    "on the same PC. For instance some distributed exchange applications are known to\n" +
-                    "create watch-only addresses in the wallet.dat file that cause the GUI wallet to\n" +
-                    "display a wrong balance and/or display addresses that do not belong to the wallet.\n\n" +
-                    
-                    "Encryption of the wallet.dat file is not yet supported for ZENCash. Using the wallet \n" + 
-                    "on a system infected with malware may result in wallet data/funds being stolen. The \n" +
-                    "wallet.dat needs to be backed up regularly (not just once - e.g. after every 30-40 \n" +
-                    "outgoing transactions) and it must also be backed up after creating a new Z address.\n\n" +
-                    
-                    "THE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR\n" +
-                    "IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,\n" +
-                    "FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE\n" +
-                    "AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER\n" +
-                    "LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,\n" +
-                    "OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN\n" +
-                    "THE SOFTWARE.\n\n" +
-                    "(This message will be shown only once, per release)",
-                    "Disclaimer", JOptionPane.INFORMATION_MESSAGE);
+                        langUtil.getString("main.frame.disclaimer.text"),
+                        langUtil.getString("main.frame.disclaimer.title"),
+                        JOptionPane.INFORMATION_MESSAGE);
             }
         });
         
@@ -599,6 +569,8 @@ public class ZCashUI
         	{
         		possiblyCreateZENConfigFile();
         	}
+
+        	LanguageUtil langUtil = LanguageUtil.instance();
         	
         	Log.info("Starting ZENCash Swing Wallet ...");
         	Log.info("OS: " + System.getProperty("os.name") + " = " + os);
@@ -686,10 +658,10 @@ public class ZCashUI
         	Log.error("Unexpected error: ", ide);
             JOptionPane.showMessageDialog(
                 null,
-                "This program was started in directory: " + OSUtil.getProgramDirectory() + "\n" +
-                ide.getMessage() + "\n" +
-                "See the console/logfile output for more detailed error information!",
-                "Installation error",
+                LanguageUtil.instance().getString("main.frame.option.pane.installation.error.text",
+                        OSUtil.getProgramDirectory(),
+                        ide.getMessage() ),
+                LanguageUtil.instance().getString("main.frame.option.pane.installation.error.title"),
                 JOptionPane.ERROR_MESSAGE);
             System.exit(1);
         } catch (WalletCallException wce)
@@ -701,21 +673,15 @@ public class ZCashUI
             {
                 JOptionPane.showMessageDialog(
                         null,
-                        "It appears that zend has been started but is not ready to accept wallet\n" +
-                        "connections. It is still loading the wallet and blockchain. Please try to \n" +
-                        "start the GUI wallet later...",
-                        "Wallet communication error",
+                        LanguageUtil.instance().getString("main.frame.option.pane.wallet.communication.error.text"),
+                        LanguageUtil.instance().getString("main.frame.option.pane.wallet.communication.error.title"),
                         JOptionPane.ERROR_MESSAGE);
             } else
             {
                 JOptionPane.showMessageDialog(
                     null,
-                    "There was a problem communicating with the ZENCash daemon/wallet. \n" +
-                    "Please ensure that the ZENCash server zend is started (e.g. via \n" + 
-                    "command  \"zend --daemon\"). Error message is: \n" +
-                     wce.getMessage() +
-                    "See the console/logfile output for more detailed error information!",
-                    "Wallet communication error",
+                        LanguageUtil.instance().getString("main.frame.option.pane.wallet.communication.error.2.text", wce.getMessage()),
+                        LanguageUtil.instance().getString("main.frame.option.pane.wallet.communication.error.2.title"),
                     JOptionPane.ERROR_MESSAGE);
             }
 
@@ -725,9 +691,8 @@ public class ZCashUI
         	Log.error("Unexpected error: ", e);
             JOptionPane.showMessageDialog(
                 null,
-                "A general unexpected critical error has occurred: \n" + e.getMessage() + "\n" +
-                "See the console/logfile output for more detailed error information!",
-                "Error",
+                LanguageUtil.instance().getString("main.frame.option.pane.wallet.critical.error.text", e.getMessage()),
+                LanguageUtil.instance().getString("main.frame.option.pane.wallet.critical.error.title"),
                 JOptionPane.ERROR_MESSAGE);
             System.exit(3);
         } catch (Error err)
@@ -736,10 +701,9 @@ public class ZCashUI
             err.printStackTrace();
             JOptionPane.showMessageDialog(
                 null,
-                "A general unexpected critical/unrecoverable error has occurred: \n" + err.getMessage() + "\n" +
-                "See the console/logfile output for more detailed error information!",
-                "Error",
-                JOptionPane.ERROR_MESSAGE);
+                    LanguageUtil.instance().getString("main.frame.option.pane.wallet.critical.error.2.text", err.getMessage()),
+                    LanguageUtil.instance().getString("main.frame.option.pane.wallet.critical.error.2.title"),
+                    JOptionPane.ERROR_MESSAGE);
             System.exit(4);
         }
     }
