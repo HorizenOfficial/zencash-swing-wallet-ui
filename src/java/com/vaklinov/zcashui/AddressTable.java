@@ -43,7 +43,6 @@ import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.TableModel;
 
-import com.vaklinov.zcashui.AddressesPanel.LabelStorage;
 
 
 /**

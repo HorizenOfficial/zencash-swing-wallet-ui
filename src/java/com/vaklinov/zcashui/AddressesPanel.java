@@ -92,14 +92,14 @@ public class AddressesPanel
 	// Storage of labels
 	private LabelStorage labelStorage;
 
-	public AddressesPanel(JFrame parentFrame, ZCashClientCaller clientCaller, StatusUpdateErrorReporter errorReporter)
+	public AddressesPanel(JFrame parentFrame, ZCashClientCaller clientCaller, StatusUpdateErrorReporter errorReporter, LabelStorage labelStorage)
 		throws IOException, InterruptedException, WalletCallException
 	{
 		this.parentFrame = parentFrame;
 		this.clientCaller = clientCaller;
 		this.errorReporter = errorReporter;
 		
-		this.labelStorage = new LabelStorage();
+		this.labelStorage = labelStorage;
 		
 		this.lastInteractiveRefresh = System.currentTimeMillis();
 
@@ -488,91 +488,4 @@ public class AddressesPanel
 
 		return addressBalances;
 	}	
-
-	
-	// Manages the load/store operations for address labels
-	public static class LabelStorage
-	{
-		private static final String LABELS_FILE_NAME = "wallet.dat.labels";
-		
-		// Address -> label
-		private Properties labels;
-		
-		public LabelStorage()
-			throws IOException
-		{
-			this.labels = new Properties();
-			this.loadLabels();
-		}
-		
-		
-		public String getLabel(String address)
-		{
-			String label = "";
-			
-			if (this.labels.containsKey(address))
-			{
-				label = this.labels.getProperty(address);
-			}
-			
-			return label;
-		}
-		
-		
-		public void setLabel(String address, String label)
-			throws IOException
-		{
-			if (!this.getLabel(address).equals(label))
-			{
-				this.labels.setProperty(address, label);
-				this.storeLabels();
-			}
-		}
-		
-		
-		private void loadLabels()
-			throws IOException
-		{
-			File labelsFile = new File(OSUtil.getSettingsDirectory() + File.separator + LABELS_FILE_NAME);
-			if (!labelsFile.exists())
-			{
-				Log.info("Wallet labels file does not exist: {0}", labelsFile.getCanonicalPath());
-				return;
-			}
-			
-		    InputStream in = null;
-			try
-			{
-				in = new BufferedInputStream(new FileInputStream(labelsFile));
-				this.labels.load(in);
-			} finally
-			{
-				if (in != null)
-				{
-					in.close();
-				}
-			}
-		}
-		
-		
-		private void storeLabels()
-			throws IOException
-		{
-			Util.renameFileForMultiVersionBackup(new File(OSUtil.getSettingsDirectory()), LABELS_FILE_NAME);
-			
-			File newLabelsFile = new File(OSUtil.getSettingsDirectory() + File.separator + LABELS_FILE_NAME);
-			OutputStream out = null;
-			try
-			{
-				out = new BufferedOutputStream(new FileOutputStream(newLabelsFile));
-				this.labels.store(out, "ZENCash GUI wallet address labels");
-			} finally
-			{
-				if (out != null)
-				{
-					out.close();
-				}
-			}
-		}
-	}
 }

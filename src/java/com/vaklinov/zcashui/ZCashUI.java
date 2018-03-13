@@ -141,11 +141,12 @@ public class ZCashUI
         Font newTabFont  = new Font(oldTabFont.getName(), Font.BOLD | Font.ITALIC, oldTabFont.getSize() * 57 / 50);
         tabs.setFont(newTabFont);
         BackupTracker backupTracker = new BackupTracker(this);
+        LabelStorage labelStorage = new LabelStorage();
         
         tabs.addTab("Overview ",
         		    new ImageIcon(cl.getResource("images/overview.png")),
         		    dashboard = new DashboardPanel(this, installationObserver, clientCaller, 
-        		    		                       errorReporter, backupTracker));
+        		    		                       errorReporter, backupTracker, labelStorage));
         tabs.addTab("Transactions ",
     		        new ImageIcon(cl.getResource("images/transactions.png")),
     		        transactionDetailsPanel = new TransactionsDetailPanel(
@@ -155,7 +156,7 @@ public class ZCashUI
         
         tabs.addTab("Own addresses ",
         		    new ImageIcon(cl.getResource("images/own-addresses.png")),
-        		    addresses = new AddressesPanel(this, clientCaller, errorReporter));
+        		    addresses = new AddressesPanel(this, clientCaller, errorReporter, labelStorage));
         tabs.addTab("Send cash ",
         		    new ImageIcon(cl.getResource("images/send.png")),
         		    sendPanel = new SendCashPanel(clientCaller, errorReporter, installationObserver, backupTracker));
