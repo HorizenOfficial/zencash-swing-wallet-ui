@@ -113,7 +113,7 @@ public class ZCashUI
     public ZCashUI(StartupProgressDialog progressDialog)
         throws IOException, InterruptedException, WalletCallException
     {
-        super("ZENCash Desktop GUI Wallet 0.80.3");
+        super("ZENCash Desktop GUI Wallet 0.81.0");
         
         if (progressDialog != null)
         {
@@ -151,7 +151,7 @@ public class ZCashUI
     		        new ImageIcon(cl.getResource("images/transactions.png")),
     		        transactionDetailsPanel = new TransactionsDetailPanel(
     		        	this, tabs, installationObserver, clientCaller, 
-    		    	    errorReporter, dashboard.getTransactionGatheringThread()));
+    		    	    errorReporter, dashboard.getTransactionGatheringThread(), labelStorage));
         this.dashboard.setDetailsPanelForSelection(this.transactionDetailsPanel);
         
         tabs.addTab("Own addresses ",
@@ -165,7 +165,7 @@ public class ZCashUI
     		        addressBookPanel = new AddressBookPanel(sendPanel, tabs));
         tabs.addTab("Messaging ",
 		            new ImageIcon(cl.getResource("images/messaging.png")),
-		            messagingPanel = new MessagingPanel(this, sendPanel, tabs, clientCaller, errorReporter));
+		            messagingPanel = new MessagingPanel(this, sendPanel, tabs, clientCaller, errorReporter, labelStorage));
         contentPane.add(tabs);
 
         this.walletOps = new WalletOperations(
@@ -435,7 +435,7 @@ public class ZCashUI
                 try
                 {
                     String userDir = OSUtil.getSettingsDirectory();
-                    File warningFlagFile = new File(userDir + File.separator + "initialInfoShown_0.80.flag");
+                    File warningFlagFile = new File(userDir + File.separator + "initialInfoShown_0.81.flag");
                     if (warningFlagFile.exists())
                     {
                         return;

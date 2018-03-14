@@ -163,7 +163,14 @@ public class TransactionTable
 						String txID = TransactionTable.this.getModel().getValueAt(lastRow, 6).toString();
 						txID = txID.replaceAll("\"", ""); // In case it has quotes
 						
+
 						String acc = TransactionTable.this.getModel().getValueAt(lastRow, 5).toString();
+						// TODO: better way to remove a label if it preceeds
+						if (acc.contains(" - "))
+						{
+							acc = acc.substring(acc.lastIndexOf(" - ") + 3);
+						}
+						
 						acc = acc.replaceAll("\"", ""); // In case it has quotes
 						
 						boolean isZAddress = Util.isZAddress(acc);
