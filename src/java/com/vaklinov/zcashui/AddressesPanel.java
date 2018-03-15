@@ -34,11 +34,19 @@ import java.awt.Cursor;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.text.DecimalFormat;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 
 import javax.swing.BorderFactory;
@@ -81,13 +89,17 @@ public class AddressesPanel
 	// and should be remembered as invalid here
 	private Map<String, Boolean> validationMap = new HashMap<String, Boolean>();
 	
+	// Storage of labels
+	private LabelStorage labelStorage;
 
-	public AddressesPanel(JFrame parentFrame, ZCashClientCaller clientCaller, StatusUpdateErrorReporter errorReporter)
+	public AddressesPanel(JFrame parentFrame, ZCashClientCaller clientCaller, StatusUpdateErrorReporter errorReporter, LabelStorage labelStorage)
 		throws IOException, InterruptedException, WalletCallException
 	{
 		this.parentFrame = parentFrame;
 		this.clientCaller = clientCaller;
 		this.errorReporter = errorReporter;
+		
+		this.labelStorage = labelStorage;
 		
 		this.lastInteractiveRefresh = System.currentTimeMillis();
 
@@ -223,7 +235,7 @@ public class AddressesPanel
 		
 		if (selectedRow != -1)
 		{
-			address = this.addressBalanceTable.getModel().getValueAt(selectedRow, 2).toString();
+			address = this.addressBalanceTable.getModel().getValueAt(selectedRow, 3).toString();
 		}
 		
 		return address;
@@ -266,6 +278,14 @@ public class AddressesPanel
 				"is currenly located. Not backing up the wallet may result in loss of funds in case of data\n" +
 				"loss on the current PC. To backup the wallet, use menu option: Wallet >> Backup\n";
 			}			
+			
+			
+            String label = (String) JOptionPane.showInputDialog(AddressesPanel.this,
+                    "Please enter a label for the newly created address:",
+                    "Label of the address...",
+                    JOptionPane.PLAIN_MESSAGE, null, null, "");
+			
+            this.labelStorage.setLabel(address, label);
 			
 			JOptionPane.showMessageDialog(
 				this.getRootPane().getParent(), 
@@ -334,12 +354,24 @@ public class AddressesPanel
 	private JTable createAddressBalanceTable(String rowData[][])
 		throws WalletCallException, IOException, InterruptedException
 	{
-		String columnNames[] = { "Balance", "Confirmed?", "Address" };
-        JTable table = new AddressTable(rowData, columnNames, this.clientCaller);
+		// Create new row data - to make sure we avoid update problems
+		String rowDataNew[][] = new String[rowData.length][];
+		for (int i = 0; i < rowData.length; i++)
+		{
+			rowDataNew[i] = new String[rowData[i].length];
+			for (int j = 0; j < rowData[i].length; j++)
+			{
+				rowDataNew[i][j] = rowData[i][j];
+			}
+		}
+		
+		String columnNames[] = { "Label", "Balance", "Confirmed?", "Address" };
+        JTable table = new AddressTable(rowDataNew, columnNames, this.clientCaller, this.labelStorage);
         table.setAutoResizeMode(JTable.AUTO_RESIZE_SUBSEQUENT_COLUMNS);
-        table.getColumnModel().getColumn(0).setPreferredWidth(160);
-        table.getColumnModel().getColumn(1).setPreferredWidth(140);
-        table.getColumnModel().getColumn(2).setPreferredWidth(1000);
+        table.getColumnModel().getColumn(0).setPreferredWidth(220);
+        table.getColumnModel().getColumn(1).setPreferredWidth(160);
+        table.getColumnModel().getColumn(2).setPreferredWidth(140);
+        table.getColumnModel().getColumn(3).setPreferredWidth(1000);
 
         return table;
 	}
@@ -430,6 +462,7 @@ public class AddressesPanel
 			
 			addressBalances[i++] = new String[] 
 			{  
+				this.labelStorage.getLabel(addressToDisplay),
 				balanceToShow,
 				isConfirmed ? ("Yes " + confirmed) : ("No  " + notConfirmed),
 				addressToDisplay
@@ -446,6 +479,7 @@ public class AddressesPanel
 			
 			addressBalances[i++] = new String[] 
 			{  
+				this.labelStorage.getLabel(address),
 				balanceToShow,
 				isConfirmed ? ("Yes " + confirmed) : ("No  " + notConfirmed),
 				address
@@ -454,5 +488,4 @@ public class AddressesPanel
 
 		return addressBalances;
 	}	
-
 }

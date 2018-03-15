@@ -73,13 +73,16 @@ public class TransactionsDetailPanel
 	private String[][] lastTransactionsData = null;
 	private DataGatheringThread<String[][]> transactionGatheringThread = null;
 	
+	// Storage of labels
+	private LabelStorage labelStorage;
 
 	public TransactionsDetailPanel(JFrame parentFrame,
 		                  JTabbedPane parentTabs,
 			              ZCashInstallationObserver installationObserver,
 			              ZCashClientCaller clientCaller,
 			              StatusUpdateErrorReporter errorReporter,
-			              DataGatheringThread<String[][]> transactionGatheringThread)
+			              DataGatheringThread<String[][]> transactionGatheringThread,
+			              LabelStorage labelStorage)
 		throws IOException, InterruptedException, WalletCallException
 	{
 		this.parentFrame          = parentFrame;
@@ -89,6 +92,7 @@ public class TransactionsDetailPanel
 		this.errorReporter = errorReporter;
 		this.installationObserver = installationObserver;
 		this.transactionGatheringThread = transactionGatheringThread;
+		this.labelStorage = labelStorage;
 		
 		this.timers = new ArrayList<Timer>();
 		this.threads = new ArrayList<DataGatheringThread<?>>();
@@ -154,12 +158,30 @@ public class TransactionsDetailPanel
 	private void updateWalletTransactionsTable()
 		throws WalletCallException, IOException, InterruptedException
 	{
-		String[][] newTransactionsData = this.transactionGatheringThread.getLastData();
+		String[][] newTransactionsDataOrig = this.transactionGatheringThread.getLastData();
 		
 		// May be null - not even gathered once
-		if (newTransactionsData == null)
+		if (newTransactionsDataOrig == null)
 		{
 			return;
+		}
+		
+		// Copy the data to a new array
+		String[][] newTransactionsData = new String[newTransactionsDataOrig.length][];
+		// Add wallet labels to the transaction data
+		for (int i = 0; i < newTransactionsDataOrig.length; i++)
+		{
+			newTransactionsData[i] = newTransactionsDataOrig[i].clone();
+			String address = newTransactionsData[i][5];
+			if ((address != null) && (address.length() > 0))
+			{
+				String label = this.labelStorage.getLabel(address);
+				if ((label != null) && (label.length() > 0))
+				{
+					address = label + " - " + address;
+				}
+			}
+			newTransactionsData[i][5] = address;
 		}
 			
 		if (Util.arraysAreDifferent(lastTransactionsData, newTransactionsData))
@@ -196,7 +218,7 @@ public class TransactionsDetailPanel
 	}
 
 
-	// TODO: duplication with dashboard - to be eliminated before release!
+	// TODO: duplication with dashboard ...
 	private String[][] getTransactionsDataFromWallet()
 		throws WalletCallException, IOException, InterruptedException
 	{

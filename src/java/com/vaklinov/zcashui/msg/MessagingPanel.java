@@ -79,6 +79,7 @@ import com.eclipsesource.json.JsonObject;
 import com.eclipsesource.json.JsonValue;
 import com.eclipsesource.json.WriterConfig;
 import com.vaklinov.zcashui.DataGatheringThread;
+import com.vaklinov.zcashui.LabelStorage;
 import com.vaklinov.zcashui.Log;
 import com.vaklinov.zcashui.OSUtil;
 import com.vaklinov.zcashui.SendCashPanel;
@@ -132,9 +133,12 @@ public class MessagingPanel
 	
 	private IPFSWrapper ipfs;
 	
+	// Storage of labels
+	private LabelStorage labelStorage;
 	
 	public MessagingPanel(JFrame parentFrame, SendCashPanel sendCashPanel, JTabbedPane parentTabs, 
-			              ZCashClientCaller clientCaller, StatusUpdateErrorReporter errorReporter)
+			              ZCashClientCaller clientCaller, StatusUpdateErrorReporter errorReporter,
+			              LabelStorage labelStorage)
 		throws IOException, InterruptedException, WalletCallException
 	{
 		super();
@@ -142,6 +146,7 @@ public class MessagingPanel
 		this.parentFrame      = parentFrame;
 		this.sendCashPanel    = sendCashPanel;
 		this.parentTabs       = parentTabs;
+		this.labelStorage     = labelStorage;
 		
 		this.clientCaller     = clientCaller;
 		this.errorReporter    = errorReporter;
@@ -682,8 +687,10 @@ public class MessagingPanel
 				    
 				     String ZAddress = this.clientCaller.createNewAddress(true);
 				     
-					// TODO: update address book (later on)
-						
+					// Update the labels for the two addresses
+				    this.labelStorage.setLabel(TAddress, "Own Messaging ID T address");
+				    this.labelStorage.setLabel(ZAddress, "Own Messaging ID Z address");
+				     
 					ownIdentity.setSenderidaddress(TAddress);
 					ownIdentity.setSendreceiveaddress(ZAddress);
 				} finally

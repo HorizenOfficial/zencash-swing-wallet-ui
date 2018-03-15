@@ -59,7 +59,6 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.ListCellRenderer;
 import javax.swing.ListSelectionModel;
-import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 import javax.swing.border.EtchedBorder;
 
@@ -118,6 +117,7 @@ public class DashboardPanel
 	private ZCashClientCaller clientCaller;
 	private StatusUpdateErrorReporter errorReporter;
 	private BackupTracker backupTracker;
+	private LabelStorage labelStorage;
 	
 	private JPanel upperLogoAndWarningPanel = null;
 	
@@ -147,7 +147,8 @@ public class DashboardPanel
 			              ZCashInstallationObserver installationObserver,
 			              ZCashClientCaller clientCaller,
 			              StatusUpdateErrorReporter errorReporter,
-			              BackupTracker backupTracker)
+			              BackupTracker backupTracker,
+			              LabelStorage labelStorage)
 		throws IOException, InterruptedException, WalletCallException
 	{
 		this.parentFrame          = parentFrame;
@@ -155,6 +156,7 @@ public class DashboardPanel
 		this.clientCaller  = clientCaller;
 		this.errorReporter = errorReporter;
 		this.backupTracker = backupTracker;
+		this.labelStorage = labelStorage;
 		
 		this.timers = new ArrayList<Timer>();
 		this.threads = new ArrayList<DataGatheringThread<?>>();
@@ -1077,6 +1079,13 @@ public class DashboardPanel
 				this.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.RAISED));
 				
 				String destinationAddress = transactionFeilds[5];
+
+				String label = DashboardPanel.this.labelStorage.getLabel(destinationAddress);
+				if ((label != null) && (label.length() > 0))
+				{
+					destinationAddress = label + " - " + destinationAddress;
+				}
+				
 				if (destinationAddress.length() > 37)
 				{
 					destinationAddress = destinationAddress.substring(0, 37) + "...";

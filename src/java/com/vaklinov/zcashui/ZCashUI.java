@@ -113,7 +113,7 @@ public class ZCashUI
     public ZCashUI(StartupProgressDialog progressDialog)
         throws IOException, InterruptedException, WalletCallException
     {
-        super("ZENCash Desktop GUI Wallet 0.80.5");
+        super("ZENCash Desktop GUI Wallet 0.81.0");
         
         if (progressDialog != null)
         {
@@ -141,21 +141,22 @@ public class ZCashUI
         Font newTabFont  = new Font(oldTabFont.getName(), Font.BOLD | Font.ITALIC, oldTabFont.getSize() * 57 / 50);
         tabs.setFont(newTabFont);
         BackupTracker backupTracker = new BackupTracker(this);
+        LabelStorage labelStorage = new LabelStorage();
         
         tabs.addTab("Overview ",
         		    new ImageIcon(cl.getResource("images/overview.png")),
         		    dashboard = new DashboardPanel(this, installationObserver, clientCaller, 
-        		    		                       errorReporter, backupTracker));
+        		    		                       errorReporter, backupTracker, labelStorage));
         tabs.addTab("Transactions ",
     		        new ImageIcon(cl.getResource("images/transactions.png")),
     		        transactionDetailsPanel = new TransactionsDetailPanel(
     		        	this, tabs, installationObserver, clientCaller, 
-    		    	    errorReporter, dashboard.getTransactionGatheringThread()));
+    		    	    errorReporter, dashboard.getTransactionGatheringThread(), labelStorage));
         this.dashboard.setDetailsPanelForSelection(this.transactionDetailsPanel);
         
         tabs.addTab("Own addresses ",
         		    new ImageIcon(cl.getResource("images/own-addresses.png")),
-        		    addresses = new AddressesPanel(this, clientCaller, errorReporter));
+        		    addresses = new AddressesPanel(this, clientCaller, errorReporter, labelStorage));
         tabs.addTab("Send cash ",
         		    new ImageIcon(cl.getResource("images/send.png")),
         		    sendPanel = new SendCashPanel(clientCaller, errorReporter, installationObserver, backupTracker));
@@ -164,7 +165,7 @@ public class ZCashUI
     		        addressBookPanel = new AddressBookPanel(sendPanel, tabs));
         tabs.addTab("Messaging ",
 		            new ImageIcon(cl.getResource("images/messaging.png")),
-		            messagingPanel = new MessagingPanel(this, sendPanel, tabs, clientCaller, errorReporter));
+		            messagingPanel = new MessagingPanel(this, sendPanel, tabs, clientCaller, errorReporter, labelStorage));
         contentPane.add(tabs);
 
         this.walletOps = new WalletOperations(
@@ -434,7 +435,7 @@ public class ZCashUI
                 try
                 {
                     String userDir = OSUtil.getSettingsDirectory();
-                    File warningFlagFile = new File(userDir + File.separator + "initialInfoShown_0.80.flag");
+                    File warningFlagFile = new File(userDir + File.separator + "initialInfoShown_0.81.flag");
                     if (warningFlagFile.exists())
                     {
                         return;

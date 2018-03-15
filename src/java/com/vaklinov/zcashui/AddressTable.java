@@ -39,6 +39,10 @@ import javax.swing.JFrame;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.KeyStroke;
+import javax.swing.event.TableModelEvent;
+import javax.swing.event.TableModelListener;
+import javax.swing.table.TableModel;
+
 
 
 /**
@@ -49,10 +53,15 @@ import javax.swing.KeyStroke;
 public class AddressTable 
 	extends DataTable 
 {	
+	LabelStorage labelStorage;
+	
 	public AddressTable(final Object[][] rowData, final Object[] columnNames, 
-			            final ZCashClientCaller caller)
+			            final ZCashClientCaller caller, LabelStorage labelStorage)
 	{
 		super(rowData, columnNames);
+		
+		this.labelStorage = labelStorage;
+		
 		int accelaratorKeyMask = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
         
 		JMenuItem obtainPrivateKey = new JMenuItem("Obtain private key...");
@@ -68,7 +77,7 @@ public class AddressTable
 				{
 					try
 					{
-						String address = AddressTable.this.getModel().getValueAt(lastRow, 2).toString();
+						String address = AddressTable.this.getModel().getValueAt(lastRow, 3).toString();
 						boolean isZAddress = Util.isZAddress(address);
 						
 						// Check for encrypted wallet
@@ -124,6 +133,92 @@ public class AddressTable
 				}
 			}
 		});
+        
+        
+		JMenuItem setLabel = new JMenuItem("Set label...");
+		setLabel.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_L, accelaratorKeyMask));
+        popupMenu.add(setLabel);
+        
+        setLabel.addActionListener(new ActionListener() 
+        {	
+			@Override
+			public void actionPerformed(ActionEvent e) 
+			{
+				if ((lastRow >= 0) && (lastColumn >= 0))
+				{
+					try
+					{
+			            TableModel model = AddressTable.this.getModel();
+			            
+			            String oldLabel = (String)model.getValueAt(lastRow, 0);
+						String label = (String) JOptionPane.showInputDialog(AddressTable.this,
+			                    "Please enter a label for the address:",
+			                    "Label of the address...",
+			                    JOptionPane.PLAIN_MESSAGE, null, null, oldLabel);
+
+			            model.setValueAt(label, lastRow, 0);
+			            
+			            AddressTable.this.invalidate();
+			            AddressTable.this.repaint();
+						
+					} catch (Exception ex)
+					{
+						Log.error("Unexpected error: ", ex);
+			            JOptionPane.showMessageDialog(
+			                AddressTable.this.getRootPane().getParent(),
+					        "Error in setting label:" + "\n" + ex.getMessage() + "\n\n",
+					        "Error in obtaining private key!",
+					        JOptionPane.ERROR_MESSAGE);
+					}
+				} else
+				{
+					// Log perhaps
+				}
+			}
+		});
+
+
+        
+        // Model listener for labels
+        this.getModel().addTableModelListener(new TableModelListener() 
+        {	
+			@Override
+			public void tableChanged(TableModelEvent e) 
+			{
+				// Make sure we respond only to editing labels
+				if ((e.getType() == TableModelEvent.UPDATE) &&
+					(e.getFirstRow() == e.getLastRow()) &&
+					(e.getColumn() == 0))
+				{
+					TableModel model = AddressTable.this.getModel();
+					String address = model.getValueAt(e.getFirstRow(), 3).toString();
+					String newLabel = model.getValueAt(e.getFirstRow(), 0).toString();
+					
+					try
+					{
+						AddressTable.this.labelStorage.setLabel(address, newLabel);
+					}
+					catch (Exception ex)
+					{
+						Log.error("Unexpected error: ", ex);
+				           JOptionPane.showMessageDialog(
+				               AddressTable.this.getRootPane().getParent(),
+					           "Error in editing label:" + "\n" +
+					           ex.getMessage() + "\n\n",
+					           "Error in editing label!",
+					           JOptionPane.ERROR_MESSAGE);
+					}		
+				}
+			}
+		});
+        
 	} // End constructor
 
+	
+	// Make sure labels may be edited
+	@Override
+    public boolean isCellEditable(int row, int column) 
+    {                
+        return column == 0;
+    }
 }
