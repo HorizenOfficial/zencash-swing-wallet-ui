@@ -43,7 +43,7 @@ public class LanguageUtil {
     }
 
     private void loadBundle(){
-        Locale currentLocale = getUsersPrferedLocale();
+        Locale currentLocale = DEFAULT_LOCALE;
         rb = ResourceBundle.getBundle(RESOURCE_BUNDLE_FILE_NAME, currentLocale);
         Log.info("Loading locale: " + currentLocale.toString());
     }

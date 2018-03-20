@@ -45,7 +45,6 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
 import java.util.Date;
-import java.util.Locale;
 import java.util.Random;
 
 import javax.swing.*;
@@ -171,103 +170,57 @@ public class ZCashUI
         JMenu file = new JMenu(langUtil.getString("menu.label.main"));
         file.setMnemonic(KeyEvent.VK_M);
         int accelaratorKeyMask = Toolkit.getDefaultToolkit ().getMenuShortcutKeyMask();
-        file.add(menuItemAbout = new JMenuItem("About...", KeyEvent.VK_T));
+        file.add(menuItemAbout = new JMenuItem(langUtil.getString("menu.label.about"), KeyEvent.VK_T));
         menuItemAbout.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_T, accelaratorKeyMask));
         file.addSeparator();
-        file.add(menuItemExit = new JMenuItem("Quit", KeyEvent.VK_Q));
+        file.add(menuItemExit = new JMenuItem(langUtil.getString("menu.label.quit"), KeyEvent.VK_Q));
         menuItemExit.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Q, accelaratorKeyMask));
         mb.add(file);
 
         JMenu wallet = new JMenu(langUtil.getString("menu.label.wallet"));
         wallet.setMnemonic(KeyEvent.VK_W);
-        wallet.add(menuItemBackup = new JMenuItem("Backup...", KeyEvent.VK_B));
+        wallet.add(menuItemBackup = new JMenuItem(langUtil.getString("menu.label.backup"), KeyEvent.VK_B));
         menuItemBackup.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_B, accelaratorKeyMask));
-        wallet.add(menuItemEncrypt = new JMenuItem("Encrypt...", KeyEvent.VK_E));
+        wallet.add(menuItemEncrypt = new JMenuItem(langUtil.getString("menu.label.encrypt"), KeyEvent.VK_E));
         menuItemEncrypt.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_E, accelaratorKeyMask));
-        wallet.add(menuItemExportKeys = new JMenuItem("Export private keys...", KeyEvent.VK_K));
+        wallet.add(menuItemExportKeys = new JMenuItem(langUtil.getString("menu.label.export.private.keys"), KeyEvent.VK_K));
         menuItemExportKeys.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_K, accelaratorKeyMask));
-        wallet.add(menuItemImportKeys = new JMenuItem("Import private keys...", KeyEvent.VK_I));
+        wallet.add(menuItemImportKeys = new JMenuItem(langUtil.getString("menu.label.import.private.keys"), KeyEvent.VK_I));
         menuItemImportKeys.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_I, accelaratorKeyMask));
-        wallet.add(menuItemShowPrivateKey = new JMenuItem("Show private key...", KeyEvent.VK_P));
+        wallet.add(menuItemShowPrivateKey = new JMenuItem(langUtil.getString("menu.label.show.private.key"), KeyEvent.VK_P));
         menuItemShowPrivateKey.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_P, accelaratorKeyMask));
-        wallet.add(menuItemImportOnePrivateKey = new JMenuItem("Import one private key...", KeyEvent.VK_N));
+        wallet.add(menuItemImportOnePrivateKey = new JMenuItem(langUtil.getString("menu.label.import.one.private.key"), KeyEvent.VK_N));
         menuItemImportOnePrivateKey.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, accelaratorKeyMask));
-        wallet.add(menuItemExportToArizen = new JMenuItem("Export to Arizen wallet...", KeyEvent.VK_A));
+        wallet.add(menuItemExportToArizen = new JMenuItem(langUtil.getString("menu.label.export.to.arizen"), KeyEvent.VK_A));
         menuItemExportToArizen.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_A, accelaratorKeyMask));
         mb.add(wallet);
 
         JMenu messaging = new JMenu(langUtil.getString("menu.label.messaging"));
         messaging.setMnemonic(KeyEvent.VK_S);
-        messaging.add(menuItemOwnIdentity = new JMenuItem("Own identity...", KeyEvent.VK_D));
+        messaging.add(menuItemOwnIdentity = new JMenuItem(langUtil.getString("menu.label.own.identity"), KeyEvent.VK_D));
         menuItemOwnIdentity.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_D, accelaratorKeyMask));        
-        messaging.add(menuItemExportOwnIdentity = new JMenuItem("Export own identity...", KeyEvent.VK_X));
+        messaging.add(menuItemExportOwnIdentity = new JMenuItem(langUtil.getString("menu.label.export.own.identity"), KeyEvent.VK_X));
         menuItemExportOwnIdentity.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_X, accelaratorKeyMask));        
-        messaging.add(menuItemAddMessagingGroup = new JMenuItem("Add messaging group...", KeyEvent.VK_G));
+        messaging.add(menuItemAddMessagingGroup = new JMenuItem(langUtil.getString("menu.label.add.messaging.group"), KeyEvent.VK_G));
         menuItemAddMessagingGroup.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_G, accelaratorKeyMask));
-        messaging.add(menuItemImportContactIdentity = new JMenuItem("Import contact identity...", KeyEvent.VK_Y));
+        messaging.add(menuItemImportContactIdentity = new JMenuItem(langUtil.getString("menu.label.import.contact.identity"), KeyEvent.VK_Y));
         menuItemImportContactIdentity.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Y, accelaratorKeyMask));
-        messaging.add(menuItemRemoveContactIdentity = new JMenuItem("Remove contact...", KeyEvent.VK_R));
+        messaging.add(menuItemRemoveContactIdentity = new JMenuItem(langUtil.getString("menu.label.remove.contact"), KeyEvent.VK_R));
         menuItemRemoveContactIdentity.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R, accelaratorKeyMask));
-        messaging.add(menuItemMessagingOptions = new JMenuItem("Options...", KeyEvent.VK_O));
+        messaging.add(menuItemMessagingOptions = new JMenuItem(langUtil.getString("menu.label.options"), KeyEvent.VK_O));
         menuItemMessagingOptions.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, accelaratorKeyMask));
         
-        JMenu shareFileVia = new JMenu("Share file via:");
+        JMenu shareFileVia = new JMenu(langUtil.getString("menu.label.share.file"));
         shareFileVia.setMnemonic(KeyEvent.VK_V);
         // TODO: uncomment this for IPFS integration
         //messaging.add(shareFileVia);
-        shareFileVia.add(menuItemShareFileViaIPFS = new JMenuItem("IPFS", KeyEvent.VK_F));
+        shareFileVia.add(menuItemShareFileViaIPFS = new JMenuItem(langUtil.getString("menu.label.ipfs"), KeyEvent.VK_F));
         menuItemShareFileViaIPFS.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F, accelaratorKeyMask));
         
         mb.add(messaging);
 
         // TODO: Temporarily disable encryption until further notice - Oct 24 2016
         menuItemEncrypt.setEnabled(false);
-
-        ActionListener languageSelectionAction = new ActionListener(  ) {
-            public void actionPerformed(ActionEvent e) {
-                try {
-                    Log.info("Action ["+e.getActionCommand(  )+"] performed");
-                    LanguageMenuItem item = (LanguageMenuItem) e.getSource();
-                    langUtil.updatePreferedLanguage(item.getLocale());
-                    JOptionPane.showMessageDialog(
-                            ZCashUI.this.getRootPane().getParent(),
-                            langUtil.getString("dialog.message.language.prefs.update"),
-                            langUtil.getString("dialog.message.language.prefs.update.title"),
-                            JOptionPane.INFORMATION_MESSAGE);
-                } catch (Exception ex) { ex.printStackTrace(  ); }
-            }
-        };
-        JMenu languageMenu = new JMenu(langUtil.getString("menu.label.language"));
-        LanguageMenuItem italian = new
-                LanguageMenuItem(langUtil.getString("menu.label.language.italian"),
-                new ImageIcon(cl.getResource("images/italian.png")), Locale.ITALY);
-        italian.setHorizontalTextPosition(JMenuItem.RIGHT);
-
-        italian.addActionListener(languageSelectionAction);
-
-        LanguageMenuItem deutsch = new
-                LanguageMenuItem(langUtil.getString("menu.label.language.german"),
-                new ImageIcon(cl.getResource("images/german.png")), Locale.GERMANY);
-        deutsch.setHorizontalTextPosition(JMenuItem.RIGHT);
-        deutsch.addActionListener(languageSelectionAction);
-
-        LanguageMenuItem english = new
-                LanguageMenuItem(langUtil.getString("menu.label.language.english"),
-                new ImageIcon(cl.getResource("images/uk.png")), Locale.US);
-        english.setHorizontalTextPosition(JMenuItem.RIGHT);
-
-        english.addActionListener(languageSelectionAction);
-
-        ButtonGroup group = new ButtonGroup(  );
-        group.add(italian);
-        group.add(deutsch);
-        group.add(english);
-
-        languageMenu.add(italian);
-        languageMenu.add(deutsch);
-        languageMenu.add(english);
-
-        mb.add(languageMenu);
 
         this.setJMenuBar(mb);
 
