@@ -448,12 +448,13 @@ public class AddressesPanel
 					isConfirmed ? confirmedBalance : unconfirmedBalance));
 
 			addressBalances[i++] = new String[]
-					{
+			{
+				            this.labelStorage.getLabel(addressToDisplay),
 							balanceToShow,
 							isConfirmed ? (langUtil.getString("panel.address.option.pane.yes", confirmed))
 										: (langUtil.getString("panel.address.option.pane.no", notConfirmed)),
-							       		   addressToDisplay
-					};
+						    addressToDisplay
+			};
 		}
 
 		for (String address : zAddresses)
@@ -465,12 +466,13 @@ public class AddressesPanel
 					isConfirmed ? confirmedBalance : unconfirmedBalance));
 
 			addressBalances[i++] = new String[]
-					{
+			{
+				            this.labelStorage.getLabel(address),
 							balanceToShow,
 							isConfirmed ? (langUtil.getString("panel.address.option.pane.yes", confirmed))
 										: (langUtil.getString("panel.address.option.pane.no", notConfirmed)),
-										   address
-					};
+							address
+			};
 		}
 
 		return addressBalances;
