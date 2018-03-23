@@ -70,6 +70,7 @@ public class LanguageUtil {
             try (PrintWriter printWriter = new PrintWriter(new FileWriter(languagePrefsFile))) {
                     printWriter.println(locale.getCountry());
             }
+            
         } catch (IOException e) {
             Log.error("Saving Prefered Locale Failed!!!!", e);
         }
@@ -85,6 +86,7 @@ public class LanguageUtil {
         }
             BufferedReader bufferedReader = new BufferedReader(new FileReader(languagePrefsFile));
             String country = bufferedReader.readLine().trim();
+            bufferedReader.close();
             return supportedLocale.get(country);
         } catch (FileNotFoundException e) {
             Log.error("Loading Locale Failed!!!!", e);

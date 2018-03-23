@@ -63,7 +63,7 @@ public class AddressTable
 		this.labelStorage = labelStorage;
 		
 		int accelaratorKeyMask = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
-		LanguageUtil langUtil = LanguageUtil.instance();
+		final LanguageUtil langUtil = LanguageUtil.instance();
 		JMenuItem obtainPrivateKey = new JMenuItem(langUtil.getString("table.address.option.obtain.private.key.label"));
 		obtainPrivateKey.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, accelaratorKeyMask));
         popupMenu.add(obtainPrivateKey);

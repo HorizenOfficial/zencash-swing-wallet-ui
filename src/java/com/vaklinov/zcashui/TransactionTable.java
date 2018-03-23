@@ -74,7 +74,7 @@ public class TransactionTable
 	{
 		super(rowData, columnNames);
 		int accelaratorKeyMask = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
-		LanguageUtil langUtil = LanguageUtil.instance();
+		final LanguageUtil langUtil = LanguageUtil.instance();
 		JMenuItem showDetails = new JMenuItem("Show details...");
 		showDetails.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, accelaratorKeyMask));
         popupMenu.add(showDetails);
