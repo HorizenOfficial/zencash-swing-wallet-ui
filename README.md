@@ -7,12 +7,6 @@ presents the information in a user-friendly manner.
 
 ![Screenshot](https://github.com/ZencashOfficial/zencash-swing-wallet-ui/raw/master/docs/ZENCashWallet.png "Main Window")
 
-**SECURITY WARNING: Encryption of the wallet.dat file is not yet supported for ZENCash. Using the wallet** 
-**on a system infected with malware may result in wallet data/funds being stolen. The**
-**wallet.dat needs to be backed up regularly (not just once - e.g. after every 30-40**
-**outgoing transactions) and it must also be backed up after creating a new Z address.**
-
-
 #### New/Experimental: [ZENCash Desktop GUI Wallet packages for Debian/Ubuntu Linux](https://github.com/ZencashOfficial/zencash-swing-wallet-ui/blob/master/docs/ReleaseUbuntuRepository.md) are available
 
 #### New/Experimental: [ZENCash Desktop GUI Wallet for Mac OS](https://github.com/ZencashOfficial/zencash-swing-wallet-ui/blob/master/docs/Release_0.81.0.md) is available

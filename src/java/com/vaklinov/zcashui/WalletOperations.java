@@ -66,6 +66,8 @@ public class WalletOperations
 	private StatusUpdateErrorReporter errorReporter;
 	private BackupTracker             backupTracker;
 
+	private LanguageUtil langUtil;
+
 
 	public WalletOperations(ZCashUI parent,
 			                JTabbedPane tabs,
@@ -90,6 +92,7 @@ public class WalletOperations
 		this.errorReporter = errorReporter;
 		
 		this.backupTracker = backupTracker;
+		this.langUtil = LanguageUtil.instance();
 	}
 
 	
@@ -101,10 +104,8 @@ public class WalletOperations
 			{
 		        JOptionPane.showMessageDialog(
 		            this.parent,
-		            "The wallet.dat file being used is already encrypted. " +
-		            "This \noperation may be performed only on a wallet that " + 
-		            "is not\nyet encrypted!",
-		            "Wallet is already encrypted...",
+		            langUtil.getString("wallet.operations.option.pane.already.encrypted.error.text"),
+		            langUtil.getString("wallet.operations.option.pane.already.encrypted.error.title"),
 		            JOptionPane.ERROR_MESSAGE);
 		        return;
 			}
@@ -136,21 +137,17 @@ public class WalletOperations
 				
 				JOptionPane.showMessageDialog(
 					this.parent, 
-					"An unexpected error occurred while encrypting the wallet!\n" +
-					"It is recommended to stop and restart both zend and the GUI wallet! \n" +
-					"\n" + wce.getMessage().replace(",", ",\n"),
-					"Error in encrypting wallet...", JOptionPane.ERROR_MESSAGE);
+					langUtil.getString("wallet.operations.option.pane.encryption.error.text", wce.getMessage().replace(",", ",\n")),
+					langUtil.getString("wallet.operations.option.pane.encryption.error.title"),
+					JOptionPane.ERROR_MESSAGE);
 				return;
 			}
 			
 			JOptionPane.showMessageDialog(
 				this.parent, 
-				"The wallet has been encrypted sucessfully and zend has stopped.\n" +
-				"The GUI wallet will be stopped as well. Please restart both. In\n" +
-				"addtion the internal wallet keypool has been flushed. You need\n" +
-				"to make a new backup..." +
-				"\n",
-				"Wallet is now encrypted...", JOptionPane.INFORMATION_MESSAGE);
+				langUtil.getString("wallet.operations.option.pane.encryption.success.text"),
+				langUtil.getString("wallet.operations.option.pane.encryption.success.title"),
+				JOptionPane.INFORMATION_MESSAGE);
 			
 			this.parent.exitProgram();
 			
@@ -168,7 +165,7 @@ public class WalletOperations
 			this.issueBackupDirectoryWarning();
 			
 			JFileChooser fileChooser = new JFileChooser();
-			fileChooser.setDialogTitle("Backup wallet to file...");
+			fileChooser.setDialogTitle(langUtil.getString("wallet.operations.dialog.backup.wallet.title"));
 			fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
 			fileChooser.setCurrentDirectory(OSUtil.getUserHomeDirectory());
 			 
@@ -199,18 +196,17 @@ public class WalletOperations
 				
 				JOptionPane.showMessageDialog(
 					this.parent, 
-					"An unexpected error occurred while backing up the wallet!" +
-					"\n" + wce.getMessage().replace(",", ",\n"),
-					"Error in backing up wallet...", JOptionPane.ERROR_MESSAGE);
+					langUtil.getString("wallet.operations.option.pane.backup.wallet.error.text", wce.getMessage().replace(",", ",\n")),
+					langUtil.getString("wallet.operations.option.pane.backup.wallet.error.title"),
+					JOptionPane.ERROR_MESSAGE);
 				return;
 			}
 			
 			JOptionPane.showMessageDialog(
 				this.parent, 
-				"The wallet has been backed up successfully to file: " + f.getName() + "\n" +
-				"in the backup directory provided to zend (-exportdir=<dir>).\nFull path is: " + 
-				path,
-				"Wallet is backed up...", JOptionPane.INFORMATION_MESSAGE);
+				langUtil.getString("wallet.operations.option.pane.backup.wallet.success.text", f.getName(), path),
+
+				langUtil.getString("wallet.operations.option.pane.backup.wallet.success.title"), JOptionPane.INFORMATION_MESSAGE);
 			
 		} catch (Exception e)
 		{
@@ -228,7 +224,7 @@ public class WalletOperations
 			this.issueBackupDirectoryWarning();
 			
 			JFileChooser fileChooser = new JFileChooser();
-			fileChooser.setDialogTitle("Export wallet private keys to file...");
+			fileChooser.setDialogTitle(langUtil.getString("wallet.operations.dialog.export.private.keys.title"));
 			fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
 			fileChooser.setCurrentDirectory(OSUtil.getUserHomeDirectory());
 			 

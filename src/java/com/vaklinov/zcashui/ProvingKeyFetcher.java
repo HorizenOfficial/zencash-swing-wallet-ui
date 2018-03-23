@@ -34,12 +34,14 @@ public class ProvingKeyFetcher {
     private static final String SHA256 = "8bc20a7f013b2b58970cddd2e7ea028975c88ae7ceb9259a5344a16bc2c0eef7";
     private static final String pathURL = "https://zensystem.io/downloads/sprout-proving.key";
     // TODO: add backups
-    
+    private LanguageUtil langUtil;
+
     public void fetchIfMissing(StartupProgressDialog parent) throws IOException {
+        langUtil = LanguageUtil.instance();
         try {
             verifyOrFetch(parent);
         } catch (InterruptedIOException iox) {
-            JOptionPane.showMessageDialog(parent, "The ZENCash wallet cannot proceed without a proving key.");
+            JOptionPane.showMessageDialog(parent, langUtil.getString("proving.key.fetcher.option.pane.message"));
             System.exit(-3);
         }
     }
@@ -102,10 +104,9 @@ public class ProvingKeyFetcher {
         
         JOptionPane.showMessageDialog(
         	parent, 
-        	"The wallet needs to download the Z cryptographic proving key (approx. 900 MB).\n" + 
-        	"This will be done only once. Please be patient... Press OK to continue");
+        	langUtil.getString("proving.key.fetcher.option.pane.verify.message"));
         
-        parent.setProgressText("Downloading proving key...");
+        parent.setProgressText(langUtil.getString("proving.key.fetcher.option.pane.verify.progress.text"));
         provingKeyFile.delete();
         OutputStream os = new BufferedOutputStream(new FileOutputStream(provingKeyFile));
         URL keyURL = new URL(pathURL);
@@ -115,7 +116,7 @@ public class ProvingKeyFetcher {
         try 
         {
         	is = urlc.getInputStream();
-            ProgressMonitorInputStream pmis = new ProgressMonitorInputStream(parent, "Downloading proving key", is);
+            ProgressMonitorInputStream pmis = new ProgressMonitorInputStream(parent, langUtil.getString("proving.key.fetcher.option.pane.verify.progress.monitor.text"), is);
             pmis.getProgressMonitor().setMaximum(PROVING_KEY_SIZE);
             pmis.getProgressMonitor().setMillisToPopup(10);
             
@@ -125,10 +126,10 @@ public class ProvingKeyFetcher {
         {
             try { if (is != null) is.close(); } catch (IOException ignore){}
         }
-        parent.setProgressText("Verifying downloaded proving key...");
+        parent.setProgressText(langUtil.getString("proving.key.fetcher.option.pane.verify.key.text"));
         if (!checkSHA256(provingKeyFile, parent)) 
         {
-            JOptionPane.showMessageDialog(parent, "Failed to download proving key properly. Cannot continue!");
+            JOptionPane.showMessageDialog(parent, langUtil.getString("proving.key.fetcher.option.pane.verify.key.failed.text"));
             System.exit(-4);
         }
     }
@@ -151,7 +152,9 @@ public class ProvingKeyFetcher {
             throw new IOException(impossible);
         }
         try (InputStream is = new BufferedInputStream(new FileInputStream(provingKey))) {
-            ProgressMonitorInputStream pmis = new ProgressMonitorInputStream(parent,"Verifying proving key",is);
+            ProgressMonitorInputStream pmis = new ProgressMonitorInputStream(parent,
+                    LanguageUtil.instance().getString("proving.key.fetcher.option.pane.verify.progress.monitor.text"),
+                    is);
             pmis.getProgressMonitor().setMaximum(PROVING_KEY_SIZE);
             pmis.getProgressMonitor().setMillisToPopup(10);
             DigestInputStream dis = new DigestInputStream(pmis, sha256);

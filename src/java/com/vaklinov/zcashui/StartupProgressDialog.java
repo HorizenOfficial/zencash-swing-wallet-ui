@@ -60,9 +60,7 @@ public class StartupProgressDialog extends JFrame {
         southPanel.setLayout(southPanelLayout);
         southPanel.setBorder(BorderFactory.createEmptyBorder(0, 16, 16, 16));
         contentPane.add(imageLabel, BorderLayout.NORTH);
-		JLabel zcashWalletLabel = new JLabel(
-			"<html><span style=\"font-style:italic;font-weight:bold;font-size:2.2em\">" + 
-		    "ZENCash Wallet</span></html>");
+		JLabel zcashWalletLabel = new JLabel(LanguageUtil.instance().getString("startup.progress.dialog.label"));
 		zcashWalletLabel.setBorder(BorderFactory.createEmptyBorder(16, 16, 16, 16));
 		// todo - place in a panel with flow center
 		JPanel tempPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 1, 1));
@@ -71,7 +69,7 @@ public class StartupProgressDialog extends JFrame {
         contentPane.add(southPanel, BorderLayout.SOUTH);
         progressBar.setIndeterminate(true);
         southPanel.add(progressBar, BorderLayout.NORTH);
-        progressLabel.setText("Starting...");
+        progressLabel.setText(LanguageUtil.instance().getString("startup.progress.dialog.progressbar.label"));
         southPanel.add(progressLabel, BorderLayout.SOUTH);
         pack();
         setLocationRelativeTo(null);

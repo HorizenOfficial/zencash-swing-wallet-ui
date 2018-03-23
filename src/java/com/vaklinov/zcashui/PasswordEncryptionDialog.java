@@ -47,17 +47,16 @@ public class PasswordEncryptionDialog
 	extends PasswordDialog
 {
 	protected JTextField passwordConfirmationField = null;
+
+	private LanguageUtil langUtil;
 	
 	public PasswordEncryptionDialog(JFrame parent)
 	{
 		super(parent);
-
-		this.upperLabel.setText(
-			"<html>The wallet.dat file will be encrypted with a password. If the operation is successful, " +
-            "zend will automatically stop and will need to be restarted. The GUI wallet will also be stopped " +
-            "and will need to be restarted. Please enter the password:</html>");
+		langUtil = LanguageUtil.instance();
+		this.upperLabel.setText(langUtil.getString("dialog.password.encryption.upper.label.text"));
 		
-		JLabel confLabel = new JLabel("Confirmation: ");
+		JLabel confLabel = new JLabel(langUtil.getString("dialog.password.encryption.confirmation.label.text"));
 		this.freeSlotPanel.add(confLabel);
 		this.freeSlotPanel.add(passwordConfirmationField = new JPasswordField(30));
 		this.passwordLabel.setPreferredSize(confLabel.getPreferredSize());
@@ -91,7 +90,8 @@ public class PasswordEncryptionDialog
 		{
 			JOptionPane.showMessageDialog(
 				this.getParent(), 
-				"The password and the confirmation do not match!", "Password mismatch...", 
+				langUtil.getString("dialog.password.encryption.option.pane.mismatch.text"),
+				langUtil.getString("dialog.password.encryption.option.pane.mismatch.title")	,
 				JOptionPane.ERROR_MESSAGE);
 			return;
 		}

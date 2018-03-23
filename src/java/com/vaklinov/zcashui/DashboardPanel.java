@@ -141,7 +141,8 @@ public class DashboardPanel
 	private DataGatheringThread<WalletBalance> walletBalanceGatheringThread = null;
 	
 	private DataGatheringThread<String[][]> transactionGatheringThread = null;
-	
+	private LanguageUtil langUtil;
+
 
 	public DashboardPanel(JFrame parentFrame,
 			              ZCashInstallationObserver installationObserver,
@@ -161,6 +162,7 @@ public class DashboardPanel
 		this.timers = new ArrayList<Timer>();
 		this.threads = new ArrayList<DataGatheringThread<?>>();
 
+		this.langUtil = LanguageUtil.instance();
 		// Build content
 		JPanel dashboard = this;
 		dashboard.setBorder(BorderFactory.createEmptyBorder(3, 3, 3, 3));
@@ -168,28 +170,28 @@ public class DashboardPanel
 
 		// Upper panel with wallet balance
 		upperLogoAndWarningPanel = new JPanel();
-		upperLogoAndWarningPanel.setLayout(new BorderLayout(3, 3)); 
-		
+		upperLogoAndWarningPanel.setLayout(new BorderLayout(3, 3));
+
 		JPanel tempPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 14, 16));
 		JLabel logoLabel = new JLabel(new ImageIcon(
-			this.getClass().getClassLoader().getResource("images/ZEN-yellow.orange-logo-small.png")));
+				this.getClass().getClassLoader().getResource("images/ZEN-yellow.orange-logo-small.png")));
 		tempPanel.add(logoLabel);
-		JLabel zcLabel = new JLabel("<html><span style=\"font-size:3.3em;font-weight:bold;font-style:italic;\">ZENCash Wallet&nbsp;</span></html>");
-		tempPanel.add(zcLabel); 
-		tempPanel.setToolTipText("Powered by ZENCash");
-		upperLogoAndWarningPanel.add(tempPanel, BorderLayout.WEST);		
+		JLabel zcLabel = new JLabel(langUtil.getString("panel.dashboard.main.label"));
+		tempPanel.add(zcLabel);
+		tempPanel.setToolTipText(langUtil.getString("panel.dashboard.tooltip"));
+		upperLogoAndWarningPanel.add(tempPanel, BorderLayout.WEST);
 		dashboard.add(upperLogoAndWarningPanel, BorderLayout.NORTH);
 
-        JPanel roundedLeftPanel = new JPanel();
-        roundedLeftPanel.setLayout(new FlowLayout(FlowLayout.LEFT, 12, 0));
-        JPanel leftInsidePanel = new JPanel();
-        leftInsidePanel.setLayout(new BorderLayout(8, 8));
-        leftInsidePanel.add(walletBalanceLabel = new JLabel(), BorderLayout.NORTH);
-        roundedLeftPanel.add(leftInsidePanel);
-        tempPanel = new JPanel(new BorderLayout(0, 0));
-        tempPanel.add(roundedLeftPanel, BorderLayout.NORTH);
-        tempPanel.add(this.exchangeRatePanel = new ExchangeRatePanel(errorReporter), BorderLayout.CENTER);
-        dashboard.add(tempPanel, BorderLayout.WEST);
+		JPanel roundedLeftPanel = new JPanel();
+		roundedLeftPanel.setLayout(new FlowLayout(FlowLayout.LEFT, 12, 0));
+		JPanel leftInsidePanel = new JPanel();
+		leftInsidePanel.setLayout(new BorderLayout(8, 8));
+		leftInsidePanel.add(walletBalanceLabel = new JLabel(), BorderLayout.NORTH);
+		roundedLeftPanel.add(leftInsidePanel);
+		tempPanel = new JPanel(new BorderLayout(0, 0));
+		tempPanel.add(roundedLeftPanel, BorderLayout.NORTH);
+		tempPanel.add(this.exchangeRatePanel = new ExchangeRatePanel(errorReporter), BorderLayout.CENTER);
+		dashboard.add(tempPanel, BorderLayout.WEST);
         
 		// List of transactions 
         tempPanel = new JPanel(new BorderLayout(0, 0));
@@ -390,10 +392,10 @@ public class DashboardPanel
 			return;
 		}
 		
-		String daemonStatus = "<span style=\"color:green;font-weight:bold\">RUNNING</span>";
+		String daemonStatus = langUtil.getString("panel.dashboard.deamon.status.running");
 		if (daemonInfo.status != DAEMON_STATUS.RUNNING)
 		{
-			daemonStatus = "<span style=\"color:red;font-weight:bold\">NOT RUNNING</span>";
+			daemonStatus = langUtil.getString("panel.dashboard.deamon.status.not.running");
 		}
 		
 		String runtimeInfo = "";
@@ -402,20 +404,19 @@ public class DashboardPanel
 		String virtual = "";
 		if (daemonInfo.virtualSizeMB > 0)
 		{
-			virtual = ", Virtual: " + daemonInfo.virtualSizeMB + " MB";
+			virtual = langUtil.getString("panel.dashboard.deamon.info.virtual", daemonInfo.virtualSizeMB);
 		}
 		
 		String cpuPercentage = "";
 		if (daemonInfo.cpuPercentage > 0)
 		{
-			cpuPercentage = ", CPU: " + daemonInfo.cpuPercentage + "%";
+			cpuPercentage = langUtil.getString("panel.dashboard.deamon.info.cpu", daemonInfo.cpuPercentage);
 		}
 		
 		if (daemonInfo.status == DAEMON_STATUS.RUNNING)
 		{
-			runtimeInfo = "<span style=\"font-size:0.8em\">" +
-					      "Resident: " + daemonInfo.residentSizeMB + " MB" + virtual +
-					       cpuPercentage + "</span>";
+			runtimeInfo = langUtil.getString("panel.dashboard.deamon.runtime.info",
+					daemonInfo.residentSizeMB, virtual, cpuPercentage);
 		}
 
 		// TODO: what if ZCash directory is non-default...
@@ -434,22 +435,20 @@ public class DashboardPanel
 		// TODO: Use a one-off data gathering thread - better design
 		if (this.walletIsEncrypted != null)
 		{
-			walletEncryption = 
-					"<span style=\"font-size:0.8em\">" + 
-			        " (" + (this.walletIsEncrypted ? "" : "not ") + "encrypted)" +
-			        "</span>";
+			String encryptionText =
+					(this.walletIsEncrypted ? "" :
+							langUtil.getString("panel.dashboard.deamon.status.not")) +
+							langUtil.getString("panel.dashboard.deamon.status.encrypted");
+
+			walletEncryption =langUtil.getString("panel.dashboard.deamon.status.walletencrypted.text", encryptionText);
+
 		}
 		
-		String text =
-			"<html><span style=\"font-weight:bold;color:#303030\">zend</span> status: " + 
-		    daemonStatus + ",  " + runtimeInfo + " <br/>" +
-			"Wallet: <span style=\"font-weight:bold;color:#303030\">" + walletDAT.getCanonicalPath() + "</span>" + 
-			walletEncryption + " <br/> " +
-			"<span style=\"font-size:3px\"><br/></span>" +
-			"<span style=\"font-size:0.8em\">" +
-			"Installation: " + OSUtil.getProgramDirectory() + ", " +
-	        "Blockchain: " + OSUtil.getBlockchainDirectory() + " <br/> " +
-		    "System: " + this.OSInfo + " </span> </html>";
+		String text =langUtil.getString("panel.dashboard.deamon.status.text",
+				daemonStatus, runtimeInfo, walletDAT.getCanonicalPath(),
+				walletEncryption, OSUtil.getProgramDirectory(),	OSUtil.getBlockchainDirectory(),
+				this.OSInfo);
+
 		this.daemonStatusLabel.setText(text);
 	}
 
@@ -501,14 +500,9 @@ public class DashboardPanel
 			info.lastBlockDate = startDate;
 		}
 				
-		String text =
-			"<html> " +
-		    "Blockchain synchronized: <span style=\"font-weight:bold\">" + 
-			percentage + "% </span> " + " <br/>" +
-			"Up to: <span style=\"font-size:0.8em;font-weight:bold\">" + 
-		    info.lastBlockDate.toLocaleString() + "</span>  <br/> " + 
-			"<span style=\"font-size:3px\"><br/><br/></span>" +
-			"Network peers: <span style=\"font-weight:bold\">" + info.numConnections + " connections&nbsp;&nbsp;</span>";
+		String text =langUtil.getString("panel.dashboard.network.blockchain.label",
+				percentage, info.lastBlockDate.toLocaleString(), info.numConnections );
+
 		this.networkAndBlockchainLabel.setText(text);
 		
 		// Connections check (typically not an open node with more than 8)
@@ -554,13 +548,9 @@ public class DashboardPanel
 		// Possibly show a blockchain synchronization warning
 		if (this.blockchainPercentage < 100)
 		{
-			String warningText = 					
-					"<html><span style=\"font-size:1em;font-weight:bold;color:red;\">" +
-				    "WARNING: The blockchain is not 100% synchronized. The visible<br/>" +
-				    "transactions and wallet balaance reflect an old state of the<br/>" +
-				    "wallet as of " + info.lastBlockDate.toLocaleString() + " !" +
-				    "</span></html>";
-			
+			String warningText = langUtil.getString("panel.dashboard.synchronisation.warning",
+					info.lastBlockDate.toLocaleString());
+
 			if (this.blockcahinWarningPanel == null)
 			{
 				// Create a new warning panel
@@ -631,25 +621,13 @@ public class DashboardPanel
 				formattedUSDVal += "&nbsp;";
 			}
 			
-			usdBalanceStr = "<br/>" + "<span style=\"font-family:monospace;font-size:1.8em;" + color3 + "\">" +
-			                "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + 
-		                    "<span style=\"font-weight:bold;font-size:2.1em;\">" + formattedUSDVal + " USD</span></span>";
+			usdBalanceStr = langUtil.getString("panel.dashboard.marketcap.usd.balance.string", color3, formattedUSDVal);
 		}
 		
-		String text =
-			"<html>" + 
-		    "<span style=\"font-size:1.5em;font-weight:bold;font-style:italic;" + color1 + "\">Balance:</span><br/> " +
-		    "<span style=\"font-family:monospace;font-size:0.4em;font-weight:bold;" + color1 + "\"><br/></span> " +
-		    "<span style=\"font-family:monospace;font-size:1.8em;" + color1 + "\">Transparent: <span style=\"font-size:1.8em;\">" + 
-				transparentUCBalance + " ZEN </span></span><br/> " +
-			"<span style=\"font-family:monospace;font-size:1.8em;" + color2 + "\">Private (Z): <span style=\"font-weight:bold;font-size:1.8em;\">" + 
-		    	privateUCBalance + " ZEN </span></span><br/> " +
-			"<hr/>" +
-		    "<span style=\"font-family:monospace;font-size:1.8em;" + color3 + "\">Total (Z+T): <span style=\"font-weight:bold;font-size:2.1em;\">" + 
-		    	totalUCBalance + " ZEN </span></span>" +
-		    usdBalanceStr +
-			"<br/>  </html>";
-		
+		String text = langUtil.getString("panel.dashboard.marketcap.usd.balance.text",
+				color1, transparentUCBalance, color2, privateUCBalance,
+				color3, totalUCBalance, usdBalanceStr);
+
 		this.walletBalanceLabel.setText(text);
 				
 		String toolTip = null;
@@ -657,14 +635,7 @@ public class DashboardPanel
 		    (!privateBalance.equals(privateUCBalance))         ||
 		    (!totalBalance.equals(totalUCBalance)))
 		{
-			toolTip = "<html>" +
-					  "Unconfirmed (unspendable) balance is being shown due to an<br/>" + 
-		              "ongoing transaction! Actual confirmed (spendable) balance is:<br/>" +
-		              "<span style=\"font-size:5px\"><br/></span>" +
-					  "Transparent: " + transparentBalance + " ZEN<br/>" +
-		              "Private ( Z ): <span style=\"font-weight:bold\">" + privateBalance + " ZEN</span><br/>" +
-					  "Total ( Z+T ): <span style=\"font-weight:bold\">" + totalBalance + " ZEN</span>" +
-					  "</html>";
+			toolTip = langUtil.getString("panel.dashboard.balance.tooltip", transparentBalance, privateBalance, totalBalance);
 		}
 		
 		this.walletBalanceLabel.setToolTipText(toolTip);
@@ -783,7 +754,9 @@ public class DashboardPanel
 			{
 				boolean isConfirmed = !trans[2].trim().equals("0"); 
 				
-				trans[2] = isConfirmed ? ("Yes " + confirmed) : ("No  " + notConfirmed);
+				trans[2] = isConfirmed ?
+						(langUtil.getString("panel.dashboard.table.transactions.confirmed.yes") + confirmed) :
+						(langUtil.getString("panel.dashboard.table.transactions.confirmed.no") + notConfirmed);
 			} catch (NumberFormatException nfe)
 			{
 				Log.error("Error occurred while formatting confirmations: " + trans[2] + 
@@ -858,7 +831,10 @@ public class DashboardPanel
 			}
 						
 			this.table = new DataTable(getExchangeDataInTableForm(), 
-	                                   new String[] { "Exchange information", "Value" });
+	                                   new String[] {
+														langUtil.getString("panel.dashboard.marketcap.column.exchange.info"),
+											   			langUtil.getString("panel.dashboard.marketcap.column.exchange.value")
+													});
 			Dimension d = this.table.getPreferredSize();
 			d.setSize((d.getWidth() * 26) / 10, d.getHeight()); // TODO: better sizing
 			this.table.setPreferredScrollableViewportSize(d);
@@ -894,13 +870,13 @@ public class DashboardPanel
 			// Query the object for individual fields
 			String tableData[][] = new String[][]
 			{
-				{ "Current price in USD:",     usdPrice},
-				{ "Current price in BTC:",     data.getString("price_btc",          "N/A") },
-				{ "ZEN capitalization (USD):", usdMarketCap },
-				{ "Daily change (USD price):", data.getString("percent_change_24h", "N/A") + "%"},
-				{ "Weekly change (USD price):", data.getString("percent_change_7d", "N/A") + "%"},
+				{ langUtil.getString("panel.dashboard.marketcap.price.usd"),     usdPrice},
+				{ langUtil.getString("panel.dashboard.marketcap.price.btc"),     data.getString("price_btc",          "N/A") },
+				{ langUtil.getString("panel.dashboard.marketcap.capitalisation"), usdMarketCap },
+				{ langUtil.getString("panel.dashboard.marketcap.daily.change"), data.getString("percent_change_24h", "N/A") + "%"},
+				{ langUtil.getString("panel.dashboard.marketcap.weekly.change"), data.getString("percent_change_7d", "N/A") + "%"},
 			};
-			
+
 			return tableData;
 		}
 		
@@ -945,7 +921,7 @@ public class DashboardPanel
 		{
 			final JPanel content = new JPanel();
 			content.setLayout(new BorderLayout(3,  3));
-			content.add(new JLabel("<html><span style=\"font-size:1.5em;font-weight:bold;font-style:italic;\">Latest transactions:</span></html>"),
+			content.add(new JLabel(langUtil.getString("panel.dashboard.transactions.label")),
 					    BorderLayout.NORTH);
 			transactionList = new LatestTransactionsList();
 			JPanel tempPanel = new JPanel(new BorderLayout(0,  0));
@@ -1122,14 +1098,15 @@ public class DashboardPanel
 				
 				// Set the transaction information
 				JLabel transacitonInfo = new JLabel(
-						"<html><span>" +
-						"Type: " + transactionFeilds[0] + ",&nbsp;" +
-						"Direction: " + transactionFeilds[1] + ",&nbsp;" +
-						"Confirmed: " +	transactionFeilds[2] + "<br/>" +
-						"Amount: <span style=\"font-weight:bold\">" + transactionFeilds[3] + " ZEN</span>,&nbsp;" +
-						"Date: " + transactionFeilds[4] + "<br/>" +
-						"Destination: <span style=\"font-weight:bold\">" + destinationAddress + "</span><br/>" +
-						"</span></html>");
+						langUtil.getString("panel.dashboard.transactions.info",
+								transactionFeilds[0],
+								transactionFeilds[1],
+								transactionFeilds[2],
+								transactionFeilds[3],
+								transactionFeilds[4],
+								destinationAddress
+						)
+				);
 				this.add(transacitonInfo);
 			}
 		}

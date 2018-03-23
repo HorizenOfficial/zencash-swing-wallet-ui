@@ -81,10 +81,8 @@ public class StatusUpdateErrorReporter
 		
 		JOptionPane.showMessageDialog(
 			parent, 
-			"An unexpected error occurred during the operation of the GUI wallet.\n" +
-			"Details may be found in the log in directory: " + settingsDirectory + "\n" +
-			"\n" +
-			e.getMessage(),
-			"Error in wallet operation.", JOptionPane.ERROR_MESSAGE);
+			LanguageUtil.instance().getString("status.update.error.reporter.panel.message",settingsDirectory, e.getMessage()),
+			LanguageUtil.instance().getString("status.update.error.reporter.panel.title"),
+			JOptionPane.ERROR_MESSAGE);
 	}
 }

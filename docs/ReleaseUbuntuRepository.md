@@ -3,12 +3,9 @@
 This is a [ZENCash](https://zensystem.io/) Desktop GUI Wallet made available through a package repository
 for Debian/Ubuntu (and similar) Linux systems.
 
-![Screenshot](ZENCashWalletUbuntu.png "Main Window")
+### IMPORTANT: Please read the [security notice](KnownSecurityIssues.md) about watch-only addresses before using the wallet!
 
-**SECURITY WARNING: Encryption of the wallet.dat file is not yet supported for ZENCash. Using the wallet** 
-**on a system infected with malware may result in wallet data/funds being stolen. The**
-**wallet.dat needs to be backed up regularly (not just once - e.g. after every 30-40**
-**outgoing transactions) and it must also be backed up after creating a new Z address.**
+![Screenshot](ZENCashWalletUbuntu.png "Main Window")
 
 ### Installing the ZENCash Desktop GUI Wallet on Linux
 

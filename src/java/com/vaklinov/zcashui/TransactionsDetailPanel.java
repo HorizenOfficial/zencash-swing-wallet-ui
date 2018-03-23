@@ -72,6 +72,7 @@ public class TransactionsDetailPanel
 	private JScrollPane transactionsTablePane  = null;
 	private String[][] lastTransactionsData = null;
 	private DataGatheringThread<String[][]> transactionGatheringThread = null;
+	private LanguageUtil langUtil;
 	
 	// Storage of labels
 	private LabelStorage labelStorage;
@@ -97,6 +98,7 @@ public class TransactionsDetailPanel
 		this.timers = new ArrayList<Timer>();
 		this.threads = new ArrayList<DataGatheringThread<?>>();
 
+		langUtil = LanguageUtil.instance();
 		// Build content
 		JPanel dashboard = this;
 		dashboard.setBorder(BorderFactory.createEmptyBorder(3, 3, 3, 3));
@@ -203,7 +205,7 @@ public class TransactionsDetailPanel
 	private JTable createTransactionsTable(String rowData[][])
 		throws WalletCallException, IOException, InterruptedException
 	{
-		String columnNames[] = { "Type", "Direction", "Confirmed?", "Amount", "Date", "Destination Address"};
+		String columnNames[] = langUtil.getString("transactions.detail.panel.column.names").split(":");
         JTable table = new TransactionTable(
         	rowData, columnNames, this.parentFrame, this.clientCaller, this.installationObserver); 
         table.setAutoResizeMode(JTable.AUTO_RESIZE_SUBSEQUENT_COLUMNS);
@@ -326,7 +328,8 @@ public class TransactionsDetailPanel
 			{
 				boolean isConfirmed = !trans[2].trim().equals("0"); 
 				
-				trans[2] = isConfirmed ? ("Yes " + confirmed) : ("No  " + notConfirmed);
+				trans[2] = isConfirmed ? (langUtil.getString("transactions.detail.panel.yes", confirmed))
+									   : (langUtil.getString("transactions.detail.panel.no", notConfirmed));
 			} catch (NumberFormatException nfe)
 			{
 				Log.error("Error occurred while formatting confirmations: " + trans[2] + 

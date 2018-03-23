@@ -68,6 +68,8 @@ public class SingleKeyImportDialog
 	protected JProgressBar progress = null;
 	
 	protected ZCashClientCaller caller;
+
+	private LanguageUtil langUtil;
 	
 	JButton okButon;
 	JButton cancelButon;
@@ -76,8 +78,8 @@ public class SingleKeyImportDialog
 	{
 		super(parent);
 		this.caller = caller;
-		
-		this.setTitle("Enter private key...");
+		langUtil = LanguageUtil.instance();
+		this.setTitle(langUtil.getString("single.key.import.dialog.title"));
 	    this.setLocation(parent.getLocation().x + 50, parent.getLocation().y + 50);
 		this.setModal(true);
 		this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
@@ -88,8 +90,8 @@ public class SingleKeyImportDialog
 
 		JPanel tempPanel = new JPanel(new BorderLayout(0, 0));
 		tempPanel.add(this.upperLabel = new JLabel(
-			"<html>Please enter a single private key to import." +
-		    "</html>"), BorderLayout.CENTER);
+				langUtil.getString("single.key.import.dialog.tmp.panel")),
+				BorderLayout.CENTER);
 		controlsPanel.add(tempPanel);
 		
 		JLabel dividerLabel = new JLabel("   ");
@@ -97,7 +99,7 @@ public class SingleKeyImportDialog
 		controlsPanel.add(dividerLabel);
 		
 		tempPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
-		tempPanel.add(keyLabel = new JLabel("Key: "));
+		tempPanel.add(keyLabel = new JLabel(langUtil.getString("single.key.import.dialog.tmp.panel.key.label")));
 		tempPanel.add(keyField = new JTextField(60));
 		controlsPanel.add(tempPanel);
 		
@@ -107,11 +109,8 @@ public class SingleKeyImportDialog
 
 		tempPanel = new JPanel(new BorderLayout(0, 0));
 		tempPanel.add(this.lowerLabel = new JLabel(
-			"<html><span style=\"font-weight:bold\">" + 
-		    "Warning:</span> Private key import is a slow operation that " +
-		    "requires blockchain rescanning (may take many minutes). <br/>The GUI " +
-			"will not be usable for other functions during this time</html>"), 
-			BorderLayout.CENTER);
+				langUtil.getString("single.key.import.dialog.tmp.panel.key.lower.label")),
+				BorderLayout.CENTER);
 		controlsPanel.add(tempPanel);
 		
 		dividerLabel = new JLabel("   ");
@@ -128,10 +127,10 @@ public class SingleKeyImportDialog
 		// Form buttons
 		JPanel buttonPanel = new JPanel();
 		buttonPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 3, 3));
-		okButon = new JButton("Import");
+		okButon = new JButton(langUtil.getString("single.key.import.dialog.tmp.panel.ok.button.text"));
 		buttonPanel.add(okButon);
 		buttonPanel.add(new JLabel("   "));
-		cancelButon = new JButton("Cancel");
+		cancelButon = new JButton(langUtil.getString("single.key.import.dialog.tmp.panel.cancel.button.text"));
 		buttonPanel.add(cancelButon);
 		this.getContentPane().add(buttonPanel, BorderLayout.SOUTH);
 
@@ -173,7 +172,8 @@ public class SingleKeyImportDialog
 		{
 			JOptionPane.showMessageDialog(
 				SingleKeyImportDialog.this.getParent(), 
-				"The key is empty. Please enter it into the text field.", "Empty...", 
+				langUtil.getString("single.key.import.dialog.tmp.panel.process.ok.message"),
+				langUtil.getString("single.key.import.dialog.tmp.panel.process.ok.title"),
 				JOptionPane.ERROR_MESSAGE);
 			return;
 		}
@@ -203,15 +203,13 @@ public class SingleKeyImportDialog
 					
 					if (!Util.stringIsEmpty(address))
 					{
-						addition = " It corresponds to address:\n" + address;
+						addition = langUtil.getString("single.key.import.dialog.tmp.panel.process.ok.addition", address);
 					}
 			    
 					JOptionPane.showMessageDialog(
 						SingleKeyImportDialog.this,  
-						"The private key:\n" +
-						key + "\n" + 
-						"has been imported successfully." + addition,
-						"Private key imported successfully...",
+						langUtil.getString("single.key.import.dialog.tmp.panel.success.message", key, addition),
+						langUtil.getString("single.key.import.dialog.tmp.panel.success.title"),
 						JOptionPane.INFORMATION_MESSAGE);		
 				} catch (Exception e)
 				{
@@ -219,11 +217,9 @@ public class SingleKeyImportDialog
 					
 					JOptionPane.showMessageDialog(
 						SingleKeyImportDialog.this.getRootPane().getParent(), 
-						"An error occurred when importing private key. Error message is:\n" +
-						e.getClass().getName() + ":\n" + e.getMessage() + "\n\n" +
-						"Please ensure that zend is running and the key is in the correct \n" + 
-						"form. You may try again later...\n", 
-						"Error in importing private key", JOptionPane.ERROR_MESSAGE);
+						langUtil.getString("single.key.import.dialog.tmp.panel.error.message", e.getClass().getName(), e.getMessage()),
+						langUtil.getString("single.key.import.dialog.tmp.panel.error.title"),
+						JOptionPane.ERROR_MESSAGE);
 				} finally
 				{
 					SingleKeyImportDialog.this.setVisible(false);

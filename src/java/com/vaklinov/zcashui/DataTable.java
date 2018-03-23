@@ -67,6 +67,8 @@ public class DataTable
 	protected int lastColumn = -1;
 	
 	protected JPopupMenu popupMenu;
+
+	private LanguageUtil langUtil = LanguageUtil.instance();
 	
 	public DataTable(final Object[][] rowData, final Object[] columnNames)
 	{
@@ -80,7 +82,7 @@ public class DataTable
 		popupMenu = new JPopupMenu();
 		int accelaratorKeyMask = Toolkit.getDefaultToolkit ().getMenuShortcutKeyMask();
 		
-		JMenuItem copy = new JMenuItem("Copy value");
+		JMenuItem copy = new JMenuItem(langUtil.getString("data.table.menu.item.copy"));
         popupMenu.add(copy);
         copy.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, accelaratorKeyMask));
         copy.addActionListener(new ActionListener() 
@@ -102,7 +104,7 @@ public class DataTable
 		});
         
         
-		JMenuItem exportToCSV = new JMenuItem("Export data to CSV...");
+		JMenuItem exportToCSV = new JMenuItem(langUtil.getString("data.table.menu.item.export"));
         popupMenu.add(exportToCSV);
         exportToCSV.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_V, accelaratorKeyMask));
         exportToCSV.addActionListener(new ActionListener() 
@@ -119,10 +121,9 @@ public class DataTable
 					// TODO: better error handling
 					JOptionPane.showMessageDialog(
 							DataTable.this.getRootPane().getParent(), 
-							"An unexpected error occurred when exporting data to CSV file.\n" +
-							"\n" +
-							ex.getMessage(),
-							"Error in CSV export", JOptionPane.ERROR_MESSAGE);
+							langUtil.getString("data.table.option.pane.export.error.text",
+							ex.getMessage()),
+							langUtil.getString("data.table.option.pane.export.error.title"), JOptionPane.ERROR_MESSAGE);
 				}
 			}
 		});
@@ -192,7 +193,7 @@ public class DataTable
         final String ENCODING = "UTF-8";
 		
 		JFileChooser fileChooser = new JFileChooser();
-		fileChooser.setDialogTitle("Export data to CSV file...");
+		fileChooser.setDialogTitle(langUtil.getString("data.table.file.chooser.export.dialog.title"));
 		fileChooser.setFileFilter(new FileNameExtensionFilter("CSV Files (*.csv)", "csv"));
 		 
 		int result = fileChooser.showSaveDialog(this.getRootPane().getParent());
@@ -243,8 +244,8 @@ public class DataTable
 		
 		JOptionPane.showMessageDialog(
 			this.getRootPane().getParent(), 
-			"The data has been exported successfully as CSV to location:\n" +
-			f.getCanonicalPath(),
-			"Export successful...", JOptionPane.INFORMATION_MESSAGE);
+			langUtil.getString("data.table.option.pane.export.success.text",
+			f.getCanonicalPath()),
+			langUtil.getString("data.table.option.pane.export.success.title"), JOptionPane.INFORMATION_MESSAGE);
 	}
 }

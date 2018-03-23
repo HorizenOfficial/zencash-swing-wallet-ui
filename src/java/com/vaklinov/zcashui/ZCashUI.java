@@ -47,16 +47,7 @@ import java.io.UnsupportedEncodingException;
 import java.util.Date;
 import java.util.Random;
 
-import javax.swing.ImageIcon;
-import javax.swing.JFrame;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
-import javax.swing.JTabbedPane;
-import javax.swing.KeyStroke;
-import javax.swing.SwingUtilities;
-import javax.swing.UIManager;
+import javax.swing.*;
 import javax.swing.UIManager.LookAndFeelInfo;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -107,17 +98,21 @@ public class ZCashUI
     private SendCashPanel    sendPanel;
     private AddressBookPanel addressBookPanel;
     private MessagingPanel   messagingPanel;
-    
+    private LanguageUtil langUtil;
+
     JTabbedPane tabs;
 
     public ZCashUI(StartupProgressDialog progressDialog)
         throws IOException, InterruptedException, WalletCallException
     {
-        super("ZENCash Desktop GUI Wallet 0.81.0");
-        
+
+        langUtil = LanguageUtil.instance();
+
+        this.setTitle(langUtil.getString("main.frame.title"));
+
         if (progressDialog != null)
         {
-        	progressDialog.setProgressText("Starting GUI wallet...");
+        	progressDialog.setProgressText(langUtil.getString("main.frame.progressbar"));
         }
         
         ClassLoader cl = this.getClass().getClassLoader();
@@ -132,7 +127,7 @@ public class ZCashUI
         
         if (installationObserver.isOnTestNet())
         {
-        	this.setTitle(this.getTitle() + " [using TESTNET]");
+        	this.setTitle(this.getTitle() + langUtil.getString("main.frame.title.testnet"));
         }
 
         // Build content
@@ -141,9 +136,8 @@ public class ZCashUI
         Font newTabFont  = new Font(oldTabFont.getName(), Font.BOLD | Font.ITALIC, oldTabFont.getSize() * 57 / 50);
         tabs.setFont(newTabFont);
         BackupTracker backupTracker = new BackupTracker(this);
-        LabelStorage labelStorage = new LabelStorage();
-        
-        tabs.addTab("Overview ",
+		LabelStorage labelStorage = new LabelStorage();
+        tabs.addTab(langUtil.getString("main.frame.tab.overview.title"),
         		    new ImageIcon(cl.getResource("images/overview.png")),
         		    dashboard = new DashboardPanel(this, installationObserver, clientCaller, 
         		    		                       errorReporter, backupTracker, labelStorage));
@@ -153,17 +147,16 @@ public class ZCashUI
     		        	this, tabs, installationObserver, clientCaller, 
     		    	    errorReporter, dashboard.getTransactionGatheringThread(), labelStorage));
         this.dashboard.setDetailsPanelForSelection(this.transactionDetailsPanel);
-        
-        tabs.addTab("Own addresses ",
+        tabs.addTab(langUtil.getString("main.frame.tab.own.address.title"),
         		    new ImageIcon(cl.getResource("images/own-addresses.png")),
         		    addresses = new AddressesPanel(this, clientCaller, errorReporter, labelStorage));
-        tabs.addTab("Send cash ",
+        tabs.addTab(langUtil.getString("main.frame.tab.send.cash.title"),
         		    new ImageIcon(cl.getResource("images/send.png")),
         		    sendPanel = new SendCashPanel(clientCaller, errorReporter, installationObserver, backupTracker));
-        tabs.addTab("Address book ",
+        tabs.addTab(langUtil.getString("main.frame.tab.address.book.title"),
     		        new ImageIcon(cl.getResource("images/address-book.png")),
     		        addressBookPanel = new AddressBookPanel(sendPanel, tabs));
-        tabs.addTab("Messaging ",
+        tabs.addTab(langUtil.getString("main.frame.tab.messaging.title"),
 		            new ImageIcon(cl.getResource("images/messaging.png")),
 		            messagingPanel = new MessagingPanel(this, sendPanel, tabs, clientCaller, errorReporter, labelStorage));
         contentPane.add(tabs);
@@ -174,61 +167,61 @@ public class ZCashUI
 
         // Build menu
         JMenuBar mb = new JMenuBar();
-        JMenu file = new JMenu("Main");
+        JMenu file = new JMenu(langUtil.getString("menu.label.main"));
         file.setMnemonic(KeyEvent.VK_M);
         int accelaratorKeyMask = Toolkit.getDefaultToolkit ().getMenuShortcutKeyMask();
-        file.add(menuItemAbout = new JMenuItem("About...", KeyEvent.VK_T));
+        file.add(menuItemAbout = new JMenuItem(langUtil.getString("menu.label.about"), KeyEvent.VK_T));
         menuItemAbout.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_T, accelaratorKeyMask));
         file.addSeparator();
-        file.add(menuItemExit = new JMenuItem("Quit", KeyEvent.VK_Q));
+        file.add(menuItemExit = new JMenuItem(langUtil.getString("menu.label.quit"), KeyEvent.VK_Q));
         menuItemExit.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Q, accelaratorKeyMask));
         mb.add(file);
 
-        JMenu wallet = new JMenu("Wallet");
+        JMenu wallet = new JMenu(langUtil.getString("menu.label.wallet"));
         wallet.setMnemonic(KeyEvent.VK_W);
-        wallet.add(menuItemBackup = new JMenuItem("Backup...", KeyEvent.VK_B));
+        wallet.add(menuItemBackup = new JMenuItem(langUtil.getString("menu.label.backup"), KeyEvent.VK_B));
         menuItemBackup.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_B, accelaratorKeyMask));
-        wallet.add(menuItemEncrypt = new JMenuItem("Encrypt...", KeyEvent.VK_E));
+        wallet.add(menuItemEncrypt = new JMenuItem(langUtil.getString("menu.label.encrypt"), KeyEvent.VK_E));
         menuItemEncrypt.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_E, accelaratorKeyMask));
-        wallet.add(menuItemExportKeys = new JMenuItem("Export private keys...", KeyEvent.VK_K));
+        wallet.add(menuItemExportKeys = new JMenuItem(langUtil.getString("menu.label.export.private.keys"), KeyEvent.VK_K));
         menuItemExportKeys.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_K, accelaratorKeyMask));
-        wallet.add(menuItemImportKeys = new JMenuItem("Import private keys...", KeyEvent.VK_I));
+        wallet.add(menuItemImportKeys = new JMenuItem(langUtil.getString("menu.label.import.private.keys"), KeyEvent.VK_I));
         menuItemImportKeys.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_I, accelaratorKeyMask));
-        wallet.add(menuItemShowPrivateKey = new JMenuItem("Show private key...", KeyEvent.VK_P));
+        wallet.add(menuItemShowPrivateKey = new JMenuItem(langUtil.getString("menu.label.show.private.key"), KeyEvent.VK_P));
         menuItemShowPrivateKey.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_P, accelaratorKeyMask));
-        wallet.add(menuItemImportOnePrivateKey = new JMenuItem("Import one private key...", KeyEvent.VK_N));
+        wallet.add(menuItemImportOnePrivateKey = new JMenuItem(langUtil.getString("menu.label.import.one.private.key"), KeyEvent.VK_N));
         menuItemImportOnePrivateKey.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, accelaratorKeyMask));
-        wallet.add(menuItemExportToArizen = new JMenuItem("Export to Arizen wallet...", KeyEvent.VK_A));
+        wallet.add(menuItemExportToArizen = new JMenuItem(langUtil.getString("menu.label.export.to.arizen"), KeyEvent.VK_A));
         menuItemExportToArizen.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_A, accelaratorKeyMask));
         mb.add(wallet);
 
-        JMenu messaging = new JMenu("Messaging");
+        JMenu messaging = new JMenu(langUtil.getString("menu.label.messaging"));
         messaging.setMnemonic(KeyEvent.VK_S);
-        messaging.add(menuItemOwnIdentity = new JMenuItem("Own identity...", KeyEvent.VK_D));
+        messaging.add(menuItemOwnIdentity = new JMenuItem(langUtil.getString("menu.label.own.identity"), KeyEvent.VK_D));
         menuItemOwnIdentity.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_D, accelaratorKeyMask));        
-        messaging.add(menuItemExportOwnIdentity = new JMenuItem("Export own identity...", KeyEvent.VK_X));
+        messaging.add(menuItemExportOwnIdentity = new JMenuItem(langUtil.getString("menu.label.export.own.identity"), KeyEvent.VK_X));
         menuItemExportOwnIdentity.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_X, accelaratorKeyMask));        
-        messaging.add(menuItemAddMessagingGroup = new JMenuItem("Add messaging group...", KeyEvent.VK_G));
+        messaging.add(menuItemAddMessagingGroup = new JMenuItem(langUtil.getString("menu.label.add.messaging.group"), KeyEvent.VK_G));
         menuItemAddMessagingGroup.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_G, accelaratorKeyMask));
-        messaging.add(menuItemImportContactIdentity = new JMenuItem("Import contact identity...", KeyEvent.VK_Y));
+        messaging.add(menuItemImportContactIdentity = new JMenuItem(langUtil.getString("menu.label.import.contact.identity"), KeyEvent.VK_Y));
         menuItemImportContactIdentity.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Y, accelaratorKeyMask));
-        messaging.add(menuItemRemoveContactIdentity = new JMenuItem("Remove contact...", KeyEvent.VK_R));
+        messaging.add(menuItemRemoveContactIdentity = new JMenuItem(langUtil.getString("menu.label.remove.contact"), KeyEvent.VK_R));
         menuItemRemoveContactIdentity.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R, accelaratorKeyMask));
-        messaging.add(menuItemMessagingOptions = new JMenuItem("Options...", KeyEvent.VK_O));
+        messaging.add(menuItemMessagingOptions = new JMenuItem(langUtil.getString("menu.label.options"), KeyEvent.VK_O));
         menuItemMessagingOptions.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, accelaratorKeyMask));
         
-        JMenu shareFileVia = new JMenu("Share file via:");
+        JMenu shareFileVia = new JMenu(langUtil.getString("menu.label.share.file"));
         shareFileVia.setMnemonic(KeyEvent.VK_V);
         // TODO: uncomment this for IPFS integration
         //messaging.add(shareFileVia);
-        shareFileVia.add(menuItemShareFileViaIPFS = new JMenuItem("IPFS", KeyEvent.VK_F));
+        shareFileVia.add(menuItemShareFileViaIPFS = new JMenuItem(langUtil.getString("menu.label.ipfs"), KeyEvent.VK_F));
         menuItemShareFileViaIPFS.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F, accelaratorKeyMask));
         
         mb.add(messaging);
 
         // TODO: Temporarily disable encryption until further notice - Oct 24 2016
         menuItemEncrypt.setEnabled(false);
-                        
+
         this.setJMenuBar(mb);
 
         // Add listeners etc.
@@ -452,30 +445,9 @@ public class ZCashUI
 
                 JOptionPane.showMessageDialog(
                     ZCashUI.this.getRootPane().getParent(),
-                    "The ZENCash GUI Wallet is currently considered experimental. Use of this software\n" +
-                    "comes at your own risk! Be sure to read the list of known issues and limitations\n" +
-                    "at this page: https://github.com/ZencashOfficial/zencash-swing-wallet-ui\n\n" +
-                    
-                    "The ZENCash Desktop GUI Wallet is not compatible with applications that modify\n" + 
-                    "the ZEN wallet.dat file. The wallet should not be used with such applications\n" +
-                    "on the same PC. For instance some distributed exchange applications are known to\n" +
-                    "create watch-only addresses in the wallet.dat file that cause the GUI wallet to\n" +
-                    "display a wrong balance and/or display addresses that do not belong to the wallet.\n\n" +
-                    
-                    "Encryption of the wallet.dat file is not yet supported for ZENCash. Using the wallet \n" + 
-                    "on a system infected with malware may result in wallet data/funds being stolen. The \n" +
-                    "wallet.dat needs to be backed up regularly (not just once - e.g. after every 30-40 \n" +
-                    "outgoing transactions) and it must also be backed up after creating a new Z address.\n\n" +
-                    
-                    "THE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR\n" +
-                    "IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,\n" +
-                    "FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE\n" +
-                    "AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER\n" +
-                    "LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,\n" +
-                    "OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN\n" +
-                    "THE SOFTWARE.\n\n" +
-                    "(This message will be shown only once, per release)",
-                    "Disclaimer", JOptionPane.INFORMATION_MESSAGE);
+                        langUtil.getString("main.frame.disclaimer.text"),
+                        langUtil.getString("main.frame.disclaimer.title"),
+                        JOptionPane.INFORMATION_MESSAGE);
             }
         });
         
@@ -550,6 +522,8 @@ public class ZCashUI
         	{
         		possiblyCreateZENConfigFile();
         	}
+
+        	LanguageUtil langUtil = LanguageUtil.instance();
         	
         	Log.info("Starting ZENCash Swing Wallet ...");
         	Log.info("OS: " + System.getProperty("os.name") + " = " + os);
@@ -637,10 +611,10 @@ public class ZCashUI
         	Log.error("Unexpected error: ", ide);
             JOptionPane.showMessageDialog(
                 null,
-                "This program was started in directory: " + OSUtil.getProgramDirectory() + "\n" +
-                ide.getMessage() + "\n" +
-                "See the console/logfile output for more detailed error information!",
-                "Installation error",
+                LanguageUtil.instance().getString("main.frame.option.pane.installation.error.text",
+                        OSUtil.getProgramDirectory(),
+                        ide.getMessage() ),
+                LanguageUtil.instance().getString("main.frame.option.pane.installation.error.title"),
                 JOptionPane.ERROR_MESSAGE);
             System.exit(1);
         } catch (WalletCallException wce)
@@ -652,21 +626,15 @@ public class ZCashUI
             {
                 JOptionPane.showMessageDialog(
                         null,
-                        "It appears that zend has been started but is not ready to accept wallet\n" +
-                        "connections. It is still loading the wallet and blockchain. Please try to \n" +
-                        "start the GUI wallet later...",
-                        "Wallet communication error",
+                        LanguageUtil.instance().getString("main.frame.option.pane.wallet.communication.error.text"),
+                        LanguageUtil.instance().getString("main.frame.option.pane.wallet.communication.error.title"),
                         JOptionPane.ERROR_MESSAGE);
             } else
             {
                 JOptionPane.showMessageDialog(
                     null,
-                    "There was a problem communicating with the ZENCash daemon/wallet. \n" +
-                    "Please ensure that the ZENCash server zend is started (e.g. via \n" + 
-                    "command  \"zend --daemon\"). Error message is: \n" +
-                     wce.getMessage() +
-                    "See the console/logfile output for more detailed error information!",
-                    "Wallet communication error",
+                        LanguageUtil.instance().getString("main.frame.option.pane.wallet.communication.error.2.text", wce.getMessage()),
+                        LanguageUtil.instance().getString("main.frame.option.pane.wallet.communication.error.2.title"),
                     JOptionPane.ERROR_MESSAGE);
             }
 
@@ -676,9 +644,8 @@ public class ZCashUI
         	Log.error("Unexpected error: ", e);
             JOptionPane.showMessageDialog(
                 null,
-                "A general unexpected critical error has occurred: \n" + e.getMessage() + "\n" +
-                "See the console/logfile output for more detailed error information!",
-                "Error",
+                LanguageUtil.instance().getString("main.frame.option.pane.wallet.critical.error.text", e.getMessage()),
+                LanguageUtil.instance().getString("main.frame.option.pane.wallet.critical.error.title"),
                 JOptionPane.ERROR_MESSAGE);
             System.exit(3);
         } catch (Error err)
@@ -687,10 +654,9 @@ public class ZCashUI
             err.printStackTrace();
             JOptionPane.showMessageDialog(
                 null,
-                "A general unexpected critical/unrecoverable error has occurred: \n" + err.getMessage() + "\n" +
-                "See the console/logfile output for more detailed error information!",
-                "Error",
-                JOptionPane.ERROR_MESSAGE);
+                    LanguageUtil.instance().getString("main.frame.option.pane.wallet.critical.error.2.text", err.getMessage()),
+                    LanguageUtil.instance().getString("main.frame.option.pane.wallet.critical.error.2.title"),
+                    JOptionPane.ERROR_MESSAGE);
             System.exit(4);
         }
     }
