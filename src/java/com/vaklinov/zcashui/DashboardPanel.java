@@ -621,6 +621,8 @@ public class DashboardPanel
 				formattedUSDVal += "&nbsp;";
 			}
 			
+			// TODO: Remove
+			//System.out.println("formattedUSDVal = [" + formattedUSDVal + "]");
 			usdBalanceStr = langUtil.getString("panel.dashboard.marketcap.usd.balance.string", color3, formattedUSDVal);
 		}
 		
@@ -628,6 +630,11 @@ public class DashboardPanel
 				color1, transparentUCBalance, color2, privateUCBalance,
 				color3, totalUCBalance, usdBalanceStr);
 
+		// TODO: Remove
+		//System.out.println("totalUCBalance = [" + totalUCBalance + "]");
+		//System.out.println("usdBalanceStr = [" + usdBalanceStr + "]");
+		//System.out.println("FULL TEXT: " + text);
+		
 		this.walletBalanceLabel.setText(text);
 				
 		String toolTip = null;
@@ -673,13 +680,13 @@ public class DashboardPanel
 			public int compare(String[] o1, String[] o2)
 			{
 				Date d1 = new Date(0);
-				if (!o1[4].equals("N/A"))
+				if ((!o1[4].equals("N/A")) && (Util.isNumeric(o1[4])))
 				{
 					d1 = new Date(Long.valueOf(o1[4]).longValue() * 1000L);
 				}
 
 				Date d2 = new Date(0);
-				if (!o2[4].equals("N/A"))
+				if (!o2[4].equals("N/A") && Util.isNumeric(o2[4]))
 				{
 					d2 = new Date(Long.valueOf(o2[4]).longValue() * 1000L);
 				}
@@ -729,7 +736,7 @@ public class DashboardPanel
 			};
 
 			// Date
-			if (!trans[4].equals("N/A"))
+			if ((!trans[4].equals("N/A")) && Util.isNumeric(trans[4]))
 			{
 				trans[4] = new Date(Long.valueOf(trans[4]).longValue() * 1000L).toLocaleString();
 			}

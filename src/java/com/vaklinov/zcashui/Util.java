@@ -444,4 +444,29 @@ public class Util
 			return pk;
 	}
 
+	
+	/**
+	 * Check if a string is numeric (log int)
+	 * 
+	 * @param s string to check
+	 * 
+	 * @return true if the string is numeric (log int)
+	 */
+	public static boolean isNumeric(String s)
+	{
+		if ((s == null) || (s.length() <= 0))
+		{
+			return false;
+		}
+		
+		try
+		{
+			Long.parseLong(s);
+		} catch (Exception e)
+		{
+			return false;
+		}
+		
+		return true;
+	}
 }

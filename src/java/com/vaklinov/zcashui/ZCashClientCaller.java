@@ -39,6 +39,8 @@ import java.util.HashMap;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
@@ -97,7 +99,20 @@ public class ZCashClientCaller
 
 	// ZCash client program and daemon
 	private File zcashcli, zcashd;
+	
+	// Table caching the wallet transaction times - to speed up performance
+	// TXID -> UNIX time as string
+	private Map<String, String> transactionTimes = Collections.synchronizedMap(
+		new HashMap<String, String>());
+	private long lastTransactionTimesAccess = System.currentTimeMillis();
 
+	// Table caching the wallet transaction confirmations - to speed up performance
+	// TXID -> confirmations as string
+	private Map<String, String> transactionConfirmations = Collections.synchronizedMap(
+		new HashMap<String, String>());
+	private long lastTransactionConfirmationsAccess = System.currentTimeMillis();
+
+	
 
 	public ZCashClientCaller(String installDir)
 		throws IOException
@@ -292,9 +307,41 @@ public class ZCashClientCaller
 		    	// TODO: some day refactor to use object containers
 		    	currentTransaction[0] = "\u2605Z (Private)";
 		    	currentTransaction[1] = "receive";
-		    	currentTransaction[2] = this.getWalletTransactionConfirmations(txID);
+		    	
+		    	// Transaction confirmations cached - cleared every 10 min
+		    	if ((System.currentTimeMillis() - this.lastTransactionConfirmationsAccess) > (10 * 60 * 1000))
+		    	{
+		    		this.lastTransactionConfirmationsAccess = System.currentTimeMillis();
+		    		this.transactionConfirmations.clear();
+		    	}
+		    	String confirmations = this.transactionConfirmations.get(txID);
+		    	if ((confirmations == null) || confirmations.equals("0"))
+		    	{
+		    		currentTransaction[2] = this.getWalletTransactionConfirmations(txID);
+		    		this.transactionConfirmations.put(txID, currentTransaction[2]);
+		    	} else
+		    	{
+		    		currentTransaction[2] = confirmations;
+		    	}
+		    	
 		    	currentTransaction[3] = trans.get("amount").toString();
-		    	currentTransaction[4] = this.getWalletTransactionTime(txID); // TODO: minimize sub-calls
+		    	
+		    	// Transaction time is cached - cleared every 10 min
+		    	if ((System.currentTimeMillis() - this.lastTransactionTimesAccess) > (10 * 60 * 1000))
+		    	{
+		    		this.lastTransactionTimesAccess = System.currentTimeMillis();
+		    		this.transactionTimes.clear();
+		    	}
+		    	String time = this.transactionTimes.get(txID);
+		    	if ((time == null) || (time.equals("-1")))
+		    	{
+		    		currentTransaction[4] = this.getWalletTransactionTime(txID);
+		    		this.transactionTimes.put(txID, currentTransaction[4]);
+		    	} else
+		    	{
+		    		currentTransaction[4] = time;
+		    	}
+		    	
 		    	currentTransaction[5] = zAddress;
 		    	currentTransaction[6] = trans.get("txid").toString();
 

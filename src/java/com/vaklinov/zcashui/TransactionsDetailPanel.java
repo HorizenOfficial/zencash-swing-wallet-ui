@@ -247,13 +247,13 @@ public class TransactionsDetailPanel
 			public int compare(String[] o1, String[] o2)
 			{
 				Date d1 = new Date(0);
-				if (!o1[4].equals("N/A"))
+				if ((!o1[4].equals("N/A")) && Util.isNumeric(o1[4]))
 				{
 					d1 = new Date(Long.valueOf(o1[4]).longValue() * 1000L);
 				}
 
 				Date d2 = new Date(0);
-				if (!o2[4].equals("N/A"))
+				if (!o2[4].equals("N/A") && Util.isNumeric(o2[4]))
 				{
 					d2 = new Date(Long.valueOf(o2[4]).longValue() * 1000L);
 				}
@@ -303,7 +303,7 @@ public class TransactionsDetailPanel
 			};
 
 			// Date
-			if (!trans[4].equals("N/A"))
+			if ((!trans[4].equals("N/A")) && Util.isNumeric(trans[4]))
 			{
 				trans[4] = new Date(Long.valueOf(trans[4]).longValue() * 1000L).toLocaleString();
 			}
