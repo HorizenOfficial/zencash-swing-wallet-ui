@@ -277,6 +277,14 @@ public class AddressesPanel
 				backupMessage = langUtil.getString("panel.address.message.backup");
 			}
 
+			
+            String label = (String) JOptionPane.showInputDialog(AddressesPanel.this,
+            		langUtil.getString("panel.address.label.input.text"),
+            		langUtil.getString("panel.address.label.input.title"),
+                    JOptionPane.PLAIN_MESSAGE, null, null, "");
+			
+            this.labelStorage.setLabel(address, label);
+			
 			JOptionPane.showMessageDialog(
 					this.getRootPane().getParent(),
 					langUtil.getString("panel.address.option.pane.text", (isZAddress ? "Z (Private)" : "T (Transparent)"),
