@@ -70,6 +70,8 @@ public class AddressBookPanel extends JPanel {
     private final SendCashPanel sendCashPanel;
     private final JTabbedPane tabs;
     
+    private LabelStorage labelStorage;
+    
     private JPanel buildButtonsPanel() {
         JPanel panel = new JPanel();
         panel.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
@@ -116,7 +118,10 @@ public class AddressBookPanel extends JPanel {
         return scrollPane;
     }
 
-    public AddressBookPanel(SendCashPanel sendCashPanel, JTabbedPane tabs) throws IOException {
+    public AddressBookPanel(SendCashPanel sendCashPanel, JTabbedPane tabs, LabelStorage labelStorage) 
+    	throws IOException 
+    {
+    	this.labelStorage = labelStorage;
         this.sendCashPanel = sendCashPanel;
         this.tabs = tabs;
         langUtil = LanguageUtil.instance();
@@ -220,6 +225,15 @@ public class AddressBookPanel extends JPanel {
             if (address == null || "".equals(address))
                 return; // cancelled
             entries.add(new AddressBookEntry(name,address));
+            
+            // Add the address also to the label storage
+            try
+            {
+            	AddressBookPanel.this.labelStorage.setLabel(address, name);
+            } catch (IOException ioe)
+            {
+            	Log.error("Saving labels from within address book failed!", ioe);
+            }
             
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {

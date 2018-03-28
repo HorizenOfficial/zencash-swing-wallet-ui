@@ -110,6 +110,23 @@ public class DashboardPanel
 	private static ImageIcon connect_4_Icon = new ImageIcon(
 			DashboardPanel.class.getClassLoader().getResource("images/connect4_16.png"));
 	
+	// Confirmation symbols
+	private static String confirmedSymbol    = "\u2690";
+	private static String notConfirmedSymbol = "\u2691";
+	
+	static
+	{
+		// Windows does not support the flag symbol (Windows 7 by default)
+		// TODO: isolate OS-specific symbol codes in a separate class
+		OS_TYPE os = OSUtil.getOSType();
+		if (os == OS_TYPE.WINDOWS)
+		{
+			confirmedSymbol = " \u25B7";
+			notConfirmedSymbol = " \u25B6";
+		}
+	}
+
+	
 	private JFrame parentFrame;
 	private TransactionsDetailPanel detailsPabelForSelection = null;
 	
@@ -701,20 +718,6 @@ public class DashboardPanel
 			}
 		});
 		
-		
-		// Confirmation symbols
-		String confirmed    = "\u2690";
-		String notConfirmed = "\u2691";
-		
-		// Windows does not support the flag symbol (Windows 7 by default)
-		// TODO: isolate OS-specific symbol codes in a separate class
-		OS_TYPE os = OSUtil.getOSType();
-		if (os == OS_TYPE.WINDOWS)
-		{
-			confirmed = " \u25B7";
-			notConfirmed = " \u25B6";
-		}
-
 		DecimalFormat df = new DecimalFormat("########0.00######");
 		
 		// Change the direction and date etc. attributes for presentation purposes
@@ -762,8 +765,8 @@ public class DashboardPanel
 				boolean isConfirmed = !trans[2].trim().equals("0"); 
 				
 				trans[2] = isConfirmed ?
-						(langUtil.getString("panel.dashboard.table.transactions.confirmed.yes") + confirmed) :
-						(langUtil.getString("panel.dashboard.table.transactions.confirmed.no") + notConfirmed);
+						(langUtil.getString("panel.dashboard.table.transactions.confirmed.yes") + confirmedSymbol) :
+						(langUtil.getString("panel.dashboard.table.transactions.confirmed.no") + notConfirmedSymbol);
 			} catch (NumberFormatException nfe)
 			{
 				Log.error("Error occurred while formatting confirmations: " + trans[2] + 
@@ -1093,7 +1096,8 @@ public class DashboardPanel
 				
 				// Set the two icons for public/private and confirmations
 				ImageIcon confirmationIcon = 
-					transactionFeilds[2].contains("Yes") ? confirmedTXIcon : unConfirmedTXIcon;
+					transactionFeilds[2].contains((langUtil.getString("panel.dashboard.table.transactions.confirmed.yes"))) 
+					? confirmedTXIcon : unConfirmedTXIcon;
 				ImageIcon pubPrivIcon = 
 						transactionFeilds[0].contains("Private") ? lockClosedIcon : lockOpenIcon;
 				JPanel iconsPanel = new JPanel(new BorderLayout(0, 1));

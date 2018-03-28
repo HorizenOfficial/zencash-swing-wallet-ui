@@ -164,7 +164,7 @@ public class ZCashUI
         		    sendPanel = new SendCashPanel(clientCaller, errorReporter, installationObserver, backupTracker));
         tabs.addTab(langUtil.getString("main.frame.tab.address.book.title"),
     		        new ImageIcon(cl.getResource("images/address-book.png")),
-    		        addressBookPanel = new AddressBookPanel(sendPanel, tabs));
+    		        addressBookPanel = new AddressBookPanel(sendPanel, tabs, labelStorage));
         tabs.addTab(langUtil.getString("main.frame.tab.messaging.title"),
 		            new ImageIcon(cl.getResource("images/messaging.png")),
 		            messagingPanel = new MessagingPanel(this, sendPanel, tabs, clientCaller, errorReporter, labelStorage));
@@ -190,8 +190,9 @@ public class ZCashUI
         wallet.setMnemonic(KeyEvent.VK_W);
         wallet.add(menuItemBackup = new JMenuItem(langUtil.getString("menu.label.backup"), KeyEvent.VK_B));
         menuItemBackup.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_B, accelaratorKeyMask));
-        wallet.add(menuItemEncrypt = new JMenuItem(langUtil.getString("menu.label.encrypt"), KeyEvent.VK_E));
-        menuItemEncrypt.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_E, accelaratorKeyMask));
+        // Encryption menu item is hidden since encryption is not possible
+        //wallet.add(menuItemEncrypt = new JMenuItem(langUtil.getString("menu.label.encrypt"), KeyEvent.VK_E));
+        //menuItemEncrypt.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_E, accelaratorKeyMask));
         wallet.add(menuItemExportKeys = new JMenuItem(langUtil.getString("menu.label.export.private.keys"), KeyEvent.VK_K));
         menuItemExportKeys.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_K, accelaratorKeyMask));
         wallet.add(menuItemImportKeys = new JMenuItem(langUtil.getString("menu.label.import.private.keys"), KeyEvent.VK_I));
@@ -227,9 +228,6 @@ public class ZCashUI
         menuItemShareFileViaIPFS.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F, accelaratorKeyMask));
         
         mb.add(messaging);
-
-        // TODO: Temporarily disable encryption until further notice - Oct 24 2016
-        menuItemEncrypt.setEnabled(false);
 
         this.setJMenuBar(mb);
 
@@ -275,6 +273,7 @@ public class ZCashUI
             }
         );
         
+        /** Encrypt menu item is not initiliazed
         menuItemEncrypt.addActionListener(
             new ActionListener()
             {
@@ -285,6 +284,7 @@ public class ZCashUI
                 }
             }
         );
+        */
 
         menuItemExportKeys.addActionListener(   
             new ActionListener()

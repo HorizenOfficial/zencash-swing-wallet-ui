@@ -402,32 +402,11 @@ public class SendCashPanel
 		} else if (destinationAddress.length() > 512)
 		{
 			errorMessage = langUtil.getString("send.cash.panel.option.pane.error.destination.address.too.long");
-		}
-		
-		// Prevent accidental sending to non-ZEN addresses (which zend supports) probably because of
-		// ZClassic compatibility
-		if (!installationObserver.isOnTestNet())
+		} else if (destinationAddress.trim().length() != destinationAddress.length())
 		{
-			if (!(destinationAddress.startsWith("zc") || 
-				  destinationAddress.startsWith("zn") ||
-				  destinationAddress.startsWith("zs")))
-			{
-				Object[] options = { "OK" };
-
-				JOptionPane.showOptionDialog(
-					SendCashPanel.this.getRootPane().getParent(), 
-					langUtil.getString("send.cash.panel.option.pane.error.destination.address.incorrect.text", destinationAddress),
-					langUtil.getString("send.cash.panel.option.pane.error.destination.address.incorrect.title"),
-					JOptionPane.DEFAULT_OPTION, 
-					JOptionPane.ERROR_MESSAGE,
-					null, 
-					options, 
-					options[0]);
-				
-			    return; // Do not send anything!
-			}
+			errorMessage = langUtil.getString("send.cash.panel.option.pane.error.destination.address.has.spaces");
 		}
-		
+				
 		if ((amount == null) || (amount.trim().length() <= 0))
 		{
 			errorMessage = langUtil.getString("send.cash.panel.option.pane.error.amount.invalid");
@@ -456,7 +435,6 @@ public class SendCashPanel
 			}
 		}
 
-
 		if (errorMessage != null)
 		{
 			JOptionPane.showMessageDialog(
@@ -464,6 +442,47 @@ public class SendCashPanel
 				errorMessage, langUtil.getString("send.cash.panel.option.pane.error.incorrect.sending.parameters"), JOptionPane.ERROR_MESSAGE);
 			return;
 		}
+		
+		// Prevent accidental sending to non-ZEN addresses (which zend supports) probably because of
+		// ZClassic compatibility
+		if (!installationObserver.isOnTestNet())
+		{
+			if (!(destinationAddress.startsWith("zc") || 
+				  destinationAddress.startsWith("zn") ||
+				  destinationAddress.startsWith("zs")))
+			{
+				Object[] options = { "OK" };
+
+				JOptionPane.showOptionDialog(
+					SendCashPanel.this.getRootPane().getParent(), 
+					langUtil.getString("send.cash.panel.option.pane.error.destination.address.incorrect.text", destinationAddress),
+					langUtil.getString("send.cash.panel.option.pane.error.destination.address.incorrect.title"),
+					JOptionPane.DEFAULT_OPTION, 
+					JOptionPane.ERROR_MESSAGE,
+					null, 
+					options, 
+					options[0]);
+				
+			    return; // Do not send anything!
+			}
+		}
+		
+		// If a memo is specified, make sure the destination is a Z address.
+		if ((!installationObserver.isOnTestNet()) && 
+			(!Util.stringIsEmpty(memo)) &&
+			(!Util.isZAddress(destinationAddress)))
+		{
+	        int reply = JOptionPane.showConfirmDialog(
+	        		SendCashPanel.this.getRootPane().getParent(), 
+					langUtil.getString("send.cash.panel.option.pane.error.destination.address.notz.text", destinationAddress),
+					langUtil.getString("send.cash.panel.option.pane.error.destination.address.notz.title"),
+			        JOptionPane.YES_NO_OPTION);
+			        
+			if (reply == JOptionPane.NO_OPTION) 
+			{
+			   	return;
+			}
+		}		
 		
 		// Check for encrypted wallet
 		final boolean bEncryptedWallet = this.clientCaller.isWalletEncrypted();
