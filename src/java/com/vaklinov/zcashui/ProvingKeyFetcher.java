@@ -21,7 +21,7 @@ import javax.swing.JOptionPane;
 import javax.swing.ProgressMonitorInputStream;
 import javax.xml.bind.DatatypeConverter;
 
-import com.vaklinov.zcashui.OSUtil.OS_TYPE;
+import org.apache.commons.lang3.SystemUtils;
 
 
 /**
@@ -49,14 +49,12 @@ public class ProvingKeyFetcher {
     private void verifyOrFetch(StartupProgressDialog parent) 
     	throws IOException 
     {
-    	OS_TYPE ost = OSUtil.getOSType();
-        
     	File zCashParams = null;
         // TODO: isolate getting ZcashParams in a utility method
-        if (ost == OS_TYPE.WINDOWS)  
+        if (SystemUtils.IS_OS_WINDOWS)
         {
         	zCashParams = new File(System.getenv("APPDATA") + "/ZcashParams");
-        } else if (ost == OS_TYPE.MAC_OS)
+        } else if (SystemUtils.IS_OS_MAC)
         {
         	File userHome = new File(System.getProperty("user.home"));
         	zCashParams = new File(userHome, "Library/Application Support/ZcashParams");

@@ -66,12 +66,12 @@ import com.eclipsesource.json.Json;
 import com.eclipsesource.json.JsonArray;
 import com.eclipsesource.json.JsonObject;
 
-import com.vaklinov.zcashui.OSUtil.OS_TYPE;
 import com.vaklinov.zcashui.ZCashClientCaller.NetworkAndBlockchainInfo;
 import com.vaklinov.zcashui.ZCashClientCaller.WalletBalance;
 import com.vaklinov.zcashui.ZCashClientCaller.WalletCallException;
 import com.vaklinov.zcashui.ZCashInstallationObserver.DAEMON_STATUS;
 import com.vaklinov.zcashui.ZCashInstallationObserver.DaemonInfo;
+import org.apache.commons.lang3.SystemUtils;
 
 
 /**
@@ -118,8 +118,7 @@ public class DashboardPanel
 	{
 		// Windows does not support the flag symbol (Windows 7 by default)
 		// TODO: isolate OS-specific symbol codes in a separate class
-		OS_TYPE os = OSUtil.getOSType();
-		if (os == OS_TYPE.WINDOWS)
+		if (SystemUtils.IS_OS_WINDOWS)
 		{
 			confirmedSymbol = " \u25B7";
 			notConfirmedSymbol = " \u25B6";

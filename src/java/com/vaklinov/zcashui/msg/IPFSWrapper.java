@@ -54,12 +54,12 @@ import javax.swing.JOptionPane;
 import com.vaklinov.zcashui.CommandExecutor;
 import com.vaklinov.zcashui.Log;
 import com.vaklinov.zcashui.OSUtil;
-import com.vaklinov.zcashui.OSUtil.OS_TYPE;
 import com.vaklinov.zcashui.Util;
 import com.vaklinov.zcashui.ZCashClientCaller;
 import com.vaklinov.zcashui.ZCashInstallationObserver;
 import com.vaklinov.zcashui.ZCashInstallationObserver.DAEMON_STATUS;
 import com.vaklinov.zcashui.ZCashInstallationObserver.DaemonInfo;
+import org.apache.commons.lang3.SystemUtils;
 
 
 /**
@@ -363,9 +363,8 @@ public class IPFSWrapper
 	private DaemonInfo getIPFSDaemonInfo()
 		throws IOException, InterruptedException
 	{
-		OS_TYPE os = OSUtil.getOSType();
-		
-		if (os == OS_TYPE.WINDOWS)
+
+		if (SystemUtils.IS_OS_WINDOWS)
 		{
 			return ZCashInstallationObserver.getDaemonInfoForWindowsOS("ipfs");
 		} else
@@ -394,8 +393,7 @@ public class IPFSWrapper
 	private String getIPFSExecutableName()
 	{
 		String ipfs = "ipfs";		
-		OS_TYPE os = OSUtil.getOSType();
-		if (os == OS_TYPE.WINDOWS)
+		if (SystemUtils.IS_OS_WINDOWS)
 		{
 			ipfs += ".exe";
 		}
