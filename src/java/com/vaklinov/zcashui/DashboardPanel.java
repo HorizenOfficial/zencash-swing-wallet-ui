@@ -489,7 +489,7 @@ public class DashboardPanel
 		long remainingTime = nowDate.getTime() - info.lastBlockDate.getTime();
 		
 		String percentage = "100";
-		if (remainingTime > 20 * 60 * 1000) // After 20 min we report 100% anyway
+		if (remainingTime > 30 * 60 * 1000) // After 30 min we report 100% anyway
 		{
 			double dPercentage = 100d - (((double)remainingTime / (double) fullTime) * 100d);
 			if (dPercentage < 0)
