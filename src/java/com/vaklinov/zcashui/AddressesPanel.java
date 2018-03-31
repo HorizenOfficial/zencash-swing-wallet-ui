@@ -60,8 +60,8 @@ import javax.swing.JTable;
 import javax.swing.Timer;
 import javax.swing.border.EtchedBorder;
 
-import com.vaklinov.zcashui.OSUtil.OS_TYPE;
 import com.vaklinov.zcashui.ZCashClientCaller.WalletCallException;
+import org.apache.commons.lang3.SystemUtils;
 
 
 /**
@@ -438,8 +438,7 @@ public class AddressesPanel
 
 		// Windows does not support the flag symbol (Windows 7 by default)
 		// TODO: isolate OS-specific symbol codes in a separate class
-		OS_TYPE os = OSUtil.getOSType();
-		if (os == OS_TYPE.WINDOWS)
+		if (SystemUtils.IS_OS_WINDOWS)
 		{
 			confirmed = " \u25B7";
 			notConfirmed = " \u25B6";

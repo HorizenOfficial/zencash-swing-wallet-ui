@@ -27,8 +27,8 @@ import javax.swing.SwingUtilities;
 
 import com.eclipsesource.json.JsonObject;
 import com.eclipsesource.json.JsonValue;
-import com.vaklinov.zcashui.OSUtil.OS_TYPE;
 import com.vaklinov.zcashui.ZCashClientCaller.WalletCallException;
+import org.apache.commons.lang3.SystemUtils;
 
 
 public class StartupProgressDialog extends JFrame {
@@ -81,8 +81,7 @@ public class StartupProgressDialog extends JFrame {
         InterruptedException,WalletCallException,InvocationTargetException {
         
         // special handling of Windows/Mac OS app launch
-    	OS_TYPE os = OSUtil.getOSType();
-        if ((os == OS_TYPE.WINDOWS) || (os == OS_TYPE.MAC_OS)) 
+        if (SystemUtils.IS_OS_WINDOWS || SystemUtils.IS_OS_MAC)
         {
             ProvingKeyFetcher keyFetcher = new ProvingKeyFetcher();
             keyFetcher.fetchIfMissing(this);

@@ -53,7 +53,7 @@ import com.eclipsesource.json.JsonObject;
 import com.eclipsesource.json.JsonValue;
 import com.eclipsesource.json.ParseException;
 import com.eclipsesource.json.WriterConfig;
-import com.vaklinov.zcashui.OSUtil.OS_TYPE;
+import org.apache.commons.lang3.SystemUtils;
 
 
 /**
@@ -242,8 +242,7 @@ public class ZCashClientCaller
 	{
 		String notListed = "\u26D4";
 		
-		OS_TYPE os = OSUtil.getOSType();
-		if (os == OS_TYPE.WINDOWS)
+		if (SystemUtils.IS_OS_WINDOWS)
 		{
 			notListed = " \u25B6";
 		}
@@ -1171,10 +1170,9 @@ public class ZCashClientCaller
 	// Used to wrap string parameters on the command line - not doing so causes problems on Windows.
 	public static String wrapStringParameter(String param)
 	{
-		OS_TYPE os = OSUtil.getOSType();
-		
+
 		// Fix is made for Windows only
-		if (os == OS_TYPE.WINDOWS)
+		if (SystemUtils.IS_OS_WINDOWS)
 		{
 			param = "\"" + param.replace("\"", "\\\"") + "\"";
 		}

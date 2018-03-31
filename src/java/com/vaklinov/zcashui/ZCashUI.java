@@ -61,13 +61,13 @@ import javax.swing.UIManager.LookAndFeelInfo;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import com.vaklinov.zcashui.OSUtil.OS_TYPE;
 import com.vaklinov.zcashui.ZCashClientCaller.NetworkAndBlockchainInfo;
 import com.vaklinov.zcashui.ZCashClientCaller.WalletCallException;
 import com.vaklinov.zcashui.ZCashInstallationObserver.DAEMON_STATUS;
 import com.vaklinov.zcashui.ZCashInstallationObserver.DaemonInfo;
 import com.vaklinov.zcashui.ZCashInstallationObserver.InstallationDetectionException;
 import com.vaklinov.zcashui.msg.MessagingPanel;
+import org.apache.commons.lang3.SystemUtils;
 
 
 /**
@@ -490,9 +490,8 @@ public class ZCashUI
 		this.pack();
 		Dimension currentSize = this.getSize();
 		
-		OS_TYPE os = OSUtil.getOSType();
 		int width = 1040;
-		if (os == OS_TYPE.MAC_OS)
+		if (SystemUtils.IS_OS_MAC)
 		{
 			width += 100; // Needs to be wider on Mac OS
 		}
@@ -525,9 +524,8 @@ public class ZCashUI
     {
         try
         {
-        	OS_TYPE os = OSUtil.getOSType();
-        	
-        	if ((os == OS_TYPE.WINDOWS) || (os == OS_TYPE.MAC_OS))
+
+        	if (SystemUtils.IS_OS_WINDOWS || SystemUtils.IS_OS_MAC)
         	{
         		possiblyCreateZENConfigFile();
         	}
@@ -535,13 +533,13 @@ public class ZCashUI
         	LanguageUtil langUtil = LanguageUtil.instance();
         	
         	Log.info("Starting ZENCash Swing Wallet ...");
-        	Log.info("OS: " + System.getProperty("os.name") + " = " + os);
+        	Log.info("OS: " + SystemUtils.OS_NAME + " = " + SystemUtils.OS_VERSION);
         	Log.info("Current directory: " + new File(".").getCanonicalPath());
-        	Log.info("Class path: " + System.getProperty("java.class.path"));
+        	Log.info("Class path: " + SystemUtils.JAVA_CLASS_PATH);
         	Log.info("Environment PATH: " + System.getenv("PATH"));
 
             // Look and feel settings - a custom OS-look and feel is set for Windows
-            if (os == OS_TYPE.WINDOWS)
+            if (SystemUtils.IS_OS_WINDOWS)
             {
             	// Custom Windows L&F and font settings
             	UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
@@ -549,7 +547,7 @@ public class ZCashUI
             	// This font looks good but on Windows 7 it misses some chars like the stars...
             	//FontUIResource font = new FontUIResource("Lucida Sans Unicode", Font.PLAIN, 11);
             	//UIManager.put("Table.font", font);
-            } else if (os == OS_TYPE.MAC_OS)
+            } else if (SystemUtils.IS_OS_MAC)
             {
             	// The MacOS L&F is active by default - the property sets the menu bar Mac style
             	System.setProperty("apple.laf.useScreenMenuBar", "true");

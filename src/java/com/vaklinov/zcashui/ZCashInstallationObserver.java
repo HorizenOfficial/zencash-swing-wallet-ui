@@ -37,7 +37,7 @@ import java.io.StringReader;
 import java.util.Properties;
 import java.util.StringTokenizer;
 
-import com.vaklinov.zcashui.OSUtil.OS_TYPE;
+import org.apache.commons.lang3.SystemUtils;
 
 
 /**
@@ -106,9 +106,8 @@ public class ZCashInstallationObserver
 	public synchronized DaemonInfo getDaemonInfo()
 			throws IOException, InterruptedException
 	{
-		OS_TYPE os = OSUtil.getOSType();
-		
-		if (os == OS_TYPE.WINDOWS)
+
+		if (SystemUtils.IS_OS_WINDOWS)
 		{
 			return getDaemonInfoForWindowsOS();
 		} else

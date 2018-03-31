@@ -29,6 +29,8 @@
 package com.vaklinov.zcashui;
 
 
+import org.apache.commons.lang3.SystemUtils;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.Locale;
@@ -42,70 +44,12 @@ import java.util.Locale;
 public class OSUtil
 {
 
-	public static enum OS_TYPE
-	{
-		LINUX, WINDOWS, MAC_OS, FREE_BSD, OTHER_BSD, SOLARIS, AIX, OTHER_UNIX, OTHER_OS
-	};
-	
-	
-	public static boolean isUnixLike(OS_TYPE os)
-	{
-		return os == OS_TYPE.LINUX || os == OS_TYPE.MAC_OS || os == OS_TYPE.FREE_BSD || 
-			   os == OS_TYPE.OTHER_BSD || os == OS_TYPE.SOLARIS || os == OS_TYPE.AIX || 
-			   os == OS_TYPE.OTHER_UNIX;
-	}
-	
-	
-	public static boolean isHardUnix(OS_TYPE os)
-	{
-		return os == OS_TYPE.FREE_BSD || 
-			   os == OS_TYPE.OTHER_BSD || os == OS_TYPE.SOLARIS || 
-			   os == OS_TYPE.AIX || os == OS_TYPE.OTHER_UNIX;
-	}
-	
-	
-	public static OS_TYPE getOSType()
-	{
-		String name = System.getProperty("os.name").toLowerCase(Locale.ROOT);
-		
-		if (name.contains("linux"))
-		{
-			return OS_TYPE.LINUX;
-		} else if (name.contains("windows"))
-		{
-			return OS_TYPE.WINDOWS;
-		} else if (name.contains("sunos") || name.contains("solaris"))
-		{
-			return OS_TYPE.SOLARIS;
-		} else if (name.contains("darwin") || name.contains("mac os") || name.contains("macos"))
-		{
-			return OS_TYPE.MAC_OS;
-		} else if (name.contains("free") && name.contains("bsd"))
-		{
-			return OS_TYPE.FREE_BSD;
-		} else if ((name.contains("open") || name.contains("net")) && name.contains("bsd"))
-		{
-			return OS_TYPE.OTHER_BSD;
-		} else if (name.contains("aix"))
-		{
-			return OS_TYPE.AIX;
-		} else if (name.contains("unix"))
-		{
-			return OS_TYPE.OTHER_UNIX;
-		} else
-		{
-			return OS_TYPE.OTHER_OS;
-		}
-	}
-	
-	
 	// Returns the name of the zcashd server - may vary depending on the OS.
 	public static String getZCashd()
 	{
 		String zcashd = "zend";
 		
-		OS_TYPE os = getOSType();
-		if (os == OS_TYPE.WINDOWS)
+		if (SystemUtils.IS_OS_WINDOWS)
 		{
 			zcashd += ".exe";
 		}
@@ -119,8 +63,7 @@ public class OSUtil
 	{
 		String zcashcli = "zen-cli";
 		
-		OS_TYPE os = getOSType();
-		if (os == OS_TYPE.WINDOWS)
+		if (SystemUtils.IS_OS_WINDOWS)
 		{
 			zcashcli += ".exe";
 		}
@@ -136,7 +79,7 @@ public class OSUtil
 		// TODO: this way of finding the dir is JAR name dependent - tricky, may not work
 		// if program is repackaged as different JAR!
 		final String JAR_NAME = "ZENCashSwingWalletUI.jar";
-		String cp = System.getProperty("java.class.path");
+		String cp = SystemUtils.JAVA_CLASS_PATH;
 		if ((cp != null) && (cp.indexOf(File.pathSeparator) == -1) &&
 			(cp.endsWith(JAR_NAME)))
 		{
@@ -187,7 +130,7 @@ public class OSUtil
 		}
 
 		// Current dir of the running JVM (expected)
-		String userDir = System.getProperty("user.dir");
+		String userDir = SystemUtils.USER_DIR;
 		if (userDir != null)
 		{
 			File ud = new File(userDir);
@@ -214,12 +157,10 @@ public class OSUtil
 	public static String getBlockchainDirectory()
 		throws IOException
 	{
-		OS_TYPE os = getOSType();
-		
-		if (os == OS_TYPE.MAC_OS)
+		if (SystemUtils.IS_OS_MAC)
 		{
 			return new File(System.getProperty("user.home") + "/Library/Application Support/Zen").getCanonicalPath();
-		} else if (os == OS_TYPE.WINDOWS)
+		} else if (SystemUtils.IS_OS_WINDOWS)
 		{
 			return new File(System.getenv("APPDATA") + "\\Zen").getCanonicalPath();
 		} else
@@ -233,14 +174,13 @@ public class OSUtil
 	public static String getSettingsDirectory()
 		throws IOException
 	{
-	    File userHome = new File(System.getProperty("user.home"));
+	    File userHome = SystemUtils.getUserHome();
 	    File dir;
-	    OS_TYPE os = getOSType();
-	    
-	    if (os == OS_TYPE.MAC_OS)
+
+	    if (SystemUtils.IS_OS_MAC)
 	    {
 	        dir = new File(userHome, "Library/Application Support/ZENCashSwingWalletUI");
-	    } else if (os == OS_TYPE.WINDOWS)
+	    } else if (SystemUtils.IS_OS_WINDOWS)
 		{
 			dir = new File(System.getenv("LOCALAPPDATA") + "\\ZENCashSwingWalletUI");
 		} else
@@ -263,17 +203,16 @@ public class OSUtil
 	public static String getSystemInfo()
 		throws IOException, InterruptedException
 	{
-		OS_TYPE os = getOSType();
-		
-		if (os == OS_TYPE.MAC_OS)
+
+		if (SystemUtils.IS_OS_MAC)
 		{
 			CommandExecutor uname = new CommandExecutor(new String[] { "uname", "-sr" });
 		    return uname.execute() + "; " + 
 		           System.getProperty("os.name") + " " + System.getProperty("os.version");
-		} else if (os == OS_TYPE.WINDOWS)
+		} else if (SystemUtils.IS_OS_WINDOWS)
 		{
 			// TODO: More detailed Windows information
-			return System.getProperty("os.name");
+			return SystemUtils.OS_NAME;
 		} else
 		{
 			CommandExecutor uname = new CommandExecutor(new String[] { "uname", "-srv" });
@@ -300,9 +239,8 @@ public class OSUtil
 	        }
 	    }
 	    
-	    OS_TYPE os = getOSType();
-	    
-	    if (isUnixLike(os))
+
+	    if (SystemUtils.IS_OS_UNIX)
 	    {
 	    	// The following search directories apply to UNIX-like systems only
 			final String dirs[] = new String[]
@@ -326,7 +264,7 @@ public class OSUtil
 				}
 			}
 			
-	    } else if (os == OS_TYPE.WINDOWS)
+	    } else if (SystemUtils.IS_OS_WINDOWS)
 	    {
 	    	// A probable Windows directory is a ZCash dir in Program Files
 	    	String programFiles = System.getenv("PROGRAMFILES");
