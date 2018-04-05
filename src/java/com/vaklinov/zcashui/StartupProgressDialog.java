@@ -204,6 +204,7 @@ public class StartupProgressDialog extends JFrame {
         SwingUtilities.invokeLater(new Runnable() {
 			@Override
 			public void run() {
+				Log.info("Startup progress info: {0}", text);
 				progressLabel.setText(text);
 			}
 	     });

@@ -229,7 +229,17 @@ public class DataTable
 			StringBuilder rowBuf = new StringBuilder();
 			for (int col = 0; col < this.getColumnCount(); col++)
 			{
-				rowBuf.append(this.getValueAt(row, col).toString());
+				String currentValue = this.getValueAt(row, col).toString();
+				// Make sure the field is escaped if it has commas
+				if (currentValue.contains(",") || currentValue.contains("\""))
+				{
+					if (currentValue.contains("\""))
+					{
+						currentValue = currentValue.replace("\"", "\"\"");
+					}
+					currentValue = "\"" + currentValue + "\"";
+				}
+				rowBuf.append(currentValue);
 				
 				if (col < (this.getColumnCount() - 1))
 				{
