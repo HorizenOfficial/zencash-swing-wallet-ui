@@ -30,6 +30,7 @@ package com.vaklinov.zcashui;
 
 
 import java.awt.BorderLayout;
+import java.awt.Cursor;
 import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
@@ -42,6 +43,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -484,28 +486,93 @@ public class SendCashPanel
 			}
 		}		
 		
-		// Check for encrypted wallet
-		final boolean bEncryptedWallet = this.clientCaller.isWalletEncrypted();
-		if (bEncryptedWallet)
+		// Get a confirmation from the user about the operation
+        String userDir = OSUtil.getSettingsDirectory();
+        File sendCashNotToBeShownFlagFile = new File(userDir + File.separator + "sendCashWarningNotToBeShown.flag");
+        if (!sendCashNotToBeShownFlagFile.exists())
+        {
+        	Object[] options = 
+        	{ 
+        		langUtil.getString("send.cash.panel.option.pane.confirm.operation.button.yes"),
+        		langUtil.getString("send.cash.panel.option.pane.confirm.operation.button.no"),
+        		langUtil.getString("send.cash.panel.option.pane.confirm.operation.button.not.again")
+        	};
+
+    		int option;
+    		
+    		if (Util.stringIsEmpty(memo))
+    		{
+    			option = JOptionPane.showOptionDialog(
+    				SendCashPanel.this.getRootPane().getParent(), 
+    				langUtil.getString("send.cash.panel.option.pane.confirm.operation.text", 
+    						           amount, sourceAddress, destinationAddress, fee), 
+    			    langUtil.getString("send.cash.panel.option.pane.confirm.operation.title"),
+    			    JOptionPane.DEFAULT_OPTION, 
+    			    JOptionPane.QUESTION_MESSAGE,
+    			    null, 
+    			    options, 
+    			    options[0]);
+    		} else
+    		{
+    			option = JOptionPane.showOptionDialog(
+       				SendCashPanel.this.getRootPane().getParent(), 
+       				langUtil.getString("send.cash.panel.option.pane.confirm.operation.text.with.memo", 
+       						           amount, sourceAddress, destinationAddress, fee, Util.blockWrapString(memo, 50)), 
+       			    langUtil.getString("send.cash.panel.option.pane.confirm.operation.title"),
+       			    JOptionPane.DEFAULT_OPTION, 
+       			    JOptionPane.QUESTION_MESSAGE,
+       			    null, 
+       			    options, 
+       			    options[0]);    			
+    		}
+    		
+    	    if (option == 2)
+    	    {
+    	    	sendCashNotToBeShownFlagFile.createNewFile();
+    	    }
+    	    
+    	    if (option == 1)
+    	    {
+    	    	return;
+    	    }
+    	    
+    	    // 4e075d661a12376b13e9bd95831bc6a002824e029ff50059bd1e28662971e055
+        } 
+				
+        boolean bEncryptedWallet = false;
+		// Backend operations are wrapped inside a wait cursor
+        Cursor oldCursor = this.getRootPane().getParent().getCursor();
+		try
 		{
-			PasswordDialog pd = new PasswordDialog((JFrame)(SendCashPanel.this.getRootPane().getParent()));
-			pd.setVisible(true);
-			
-			if (!pd.isOKPressed())
+			this.getRootPane().getParent().setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+			// Check for encrypted wallet
+			bEncryptedWallet = this.clientCaller.isWalletEncrypted();
+			if (bEncryptedWallet)
 			{
-				return;
+				this.getRootPane().getParent().setCursor(oldCursor);
+				PasswordDialog pd = new PasswordDialog((JFrame)(SendCashPanel.this.getRootPane().getParent()));
+				pd.setVisible(true);
+				this.getRootPane().getParent().setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+				
+				if (!pd.isOKPressed())
+				{
+					return;
+				}
+				
+				this.clientCaller.unlockWallet(pd.getPassword());
 			}
 			
-			this.clientCaller.unlockWallet(pd.getPassword());
-		}
-		
-		// Call the wallet send method
-		operationStatusID = this.clientCaller.sendCash(sourceAddress, destinationAddress, amount, memo, fee);
-				
-		// Make sure the keypool has spare addresses
-		if ((this.backupTracker.getNumTransactionsSinceLastBackup() % 5) == 0)
+			// Call the wallet send method
+			operationStatusID = this.clientCaller.sendCash(sourceAddress, destinationAddress, amount, memo, fee);
+					
+			// Make sure the keypool has spare addresses
+			if ((this.backupTracker.getNumTransactionsSinceLastBackup() % 5) == 0)
+			{
+				this.clientCaller.keypoolRefill(100);
+			}
+		} finally
 		{
-			this.clientCaller.keypoolRefill(100);
+			this.getRootPane().getParent().setCursor(oldCursor);
 		}
 		
 		// Disable controls after send
@@ -516,6 +583,8 @@ public class SendCashPanel
 		destinationMemoField.setEnabled(false);
 		transactionFeeField.setEnabled(false);
 		
+		
+		final boolean bEncryptedWalletForThread = bEncryptedWallet;
 		// Start a data gathering thread specific to the operation being executed - this is done is a separate 
 		// thread since the server responds more slowly during JoinSPlits and this blocks he GUI somewhat.
 		final DataGatheringThread<Boolean> opFollowingThread = new DataGatheringThread<Boolean>(
@@ -555,7 +624,7 @@ public class SendCashPanel
 							amount, sourceAddress, destinationAddress);
 						
 						// Lock the wallet again 
-						if (bEncryptedWallet)
+						if (bEncryptedWalletForThread)
 						{
 							SendCashPanel.this.clientCaller.lockWallet();
 						}

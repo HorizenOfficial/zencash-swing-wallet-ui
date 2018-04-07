@@ -151,7 +151,10 @@ public class AddressTable
 			                    "Label of the address...",
 			                    JOptionPane.PLAIN_MESSAGE, null, null, oldLabel);
 
-			            model.setValueAt(label, lastRow, 0);
+						if (!Util.stringIsEmpty(label))
+						{
+							model.setValueAt(label, lastRow, 0);
+						}
 			            
 			            AddressTable.this.invalidate();
 			            AddressTable.this.repaint();
