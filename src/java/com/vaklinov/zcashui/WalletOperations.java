@@ -448,8 +448,9 @@ public class WalletOperations
 			final File f = new File(fullPath);
 			if (f.exists()) {
 				int r = JOptionPane.showConfirmDialog((Component) null,
-						String.format("The file %s already exists, do you want proceed and delete it?", f.getName()),
-						"Alert", JOptionPane.YES_NO_OPTION);
+						langUtil.getString("wallet.operations.dialog.delete.file.confirmation", f.getName()),
+                        langUtil.getString("wallet.operations.dialog.delete.file.confirmation.title"),
+                        JOptionPane.YES_NO_OPTION);
 				if (r == 1) {
 					return;
 				}
@@ -465,7 +466,7 @@ public class WalletOperations
 			JProgressBar progressBar = new JProgressBar();
 			progressBar.setIndeterminate(true);
 			dialog.add(progressBar, BorderLayout.CENTER);
-			exportLabel.setText("Exporting wallet...");
+			exportLabel.setText(langUtil.getString("wallet.operations.dialog.export.label"));
 			exportLabel.setHorizontalAlignment(JLabel.CENTER);
 			exportLabel.setBorder(BorderFactory.createEmptyBorder(0, 0, 16, 0));
 
@@ -478,7 +479,7 @@ public class WalletOperations
 					try {
 						arizenWallet.createWallet(f);
 						Thread.sleep(750);
-						updateProgressText("Reading addresses and private keys...");
+						updateProgressText(langUtil.getString("wallet.operations.dialog.export.progress.reading.text"));
 						String[] zaddress = clientCaller.getWalletZAddresses();
 						String[] taddress = clientCaller.getWalletAllPublicAddresses();
 						String[] tAddressesWithUnspentOuts = clientCaller.getWalletPublicAddressesWithUnspentOutputs();
@@ -515,12 +516,12 @@ public class WalletOperations
 						addressPrivateSet.addAll(zMap.values());
 						Thread.sleep(500);
 
-						updateProgressText("Writing addresses and private keys...");
+						updateProgressText(langUtil.getString("wallet.operations.dialog.export.progress.writing.text"));
 						arizenWallet.insertAddressBatch(addressPublicSet);
 						arizenWallet.insertAddressBatch(addressPrivateSet);
 						Thread.sleep(1000);
 
-						updateProgressText("Wallet exported");
+						updateProgressText(langUtil.getString("wallet.operations.dialog.export.progress.finished.text"));
 						Thread.sleep(750);
 
 						SwingUtilities.invokeLater(new Runnable() {
@@ -528,10 +529,9 @@ public class WalletOperations
 							public void run() {
 								dialog.dispose();
 								JOptionPane.showConfirmDialog(parent,
-										new Object[]{String.format("The Arizen wallet is exported to: %s", strFullpath),
-												"Using Arizen to import select: Import UNENCRYPTED Arizen wallet",
-												"The wallet will be imported and encrypted"},
-										"Export Arizen wallet", JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE);
+										langUtil.getString("wallet.operations.option.pane.export.success.info.text", strFullpath),
+										langUtil.getString("wallet.operations.option.pane.export.success.info.title"),
+                                        JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE);
 							}
 						});
 
@@ -587,21 +587,12 @@ public class WalletOperations
             
         int reply = JOptionPane.showOptionDialog(
             this.parent,
-            "For security reasons the wallet may be backed up/private keys exported only if\n" +
-            "the zend parameter -exportdir=<dir> has been set. If you started zend \n" +
-            "manually, you ought to have provided this parameter. When zend is started \n" +
-            "automatically by the GUI wallet the directory provided as parameter to -exportdir\n" +
-            "is the user home directory: " + OSUtil.getUserHomeDirectory().getCanonicalPath() +"\n" +
-            "Please navigate to the directory provided as -exportdir=<dir> and select a\n"+ 
-            "filename in it to backup/export private keys. If you select another directory\n" +
-            "instead, the destination file will still end up in the directory provided as \n" +
-            "-exportdir=<dir>. If this parameter was not provided to zend, the process\n" +
-            "will fail with a security check error. The filename needs to consist of only\n" + 
-            "alphanumeric characters (e.g. dot is not allowed).\n",
-            "Wallet backup directory information", 
+            langUtil.getString("wallet.operations.option.pane.backup.directory.warning.text"),
+	        langUtil.getString("wallet.operations.option.pane.backup.directory.warning.title"),
 	        JOptionPane.YES_NO_OPTION,
 	        JOptionPane.INFORMATION_MESSAGE, 
-	        null, new String[] { "Do not show this again", "OK" }, 
+	        null, new String[] { langUtil.getString("wallet.operations.option.pane.backup.directory.warning.message"),
+                                      langUtil.getString("wallet.operations.option.pane.backup.directory.warning.message.ok")  },
 	        JOptionPane.NO_OPTION);
 	        
 	    if (reply == JOptionPane.NO_OPTION) 
