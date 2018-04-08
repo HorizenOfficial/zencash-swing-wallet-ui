@@ -254,21 +254,18 @@ public class WalletOperations
 				
 				JOptionPane.showMessageDialog(
 					this.parent, 
-					"An unexpected error occurred while exporting wallet private keys!" +
-					"\n" + wce.getMessage().replace(",", ",\n"),
-					"Error in exporting wallet private keys...", JOptionPane.ERROR_MESSAGE);
+					langUtil.getString("wallet.operations.dialog.export.private.keys.error.text",
+					"\n" + wce.getMessage().replace(",", ",\n")),
+					langUtil.getString("wallet.operations.dialog.export.private.keys.error.title"),
+                    JOptionPane.ERROR_MESSAGE);
 				return;
 			}
 			
 			JOptionPane.showMessageDialog(
-				this.parent, 
-				"The wallet private keys have been exported successfully to file:\n" + 
-				f.getName() + "\n" +
-				"in the backup directory provided to zend (-exportdir=<dir>).\nFull path is: " + 
-				path + "\n" +
-				"You need to protect this file from unauthorized access. Anyone who\n" +
-				"has access to the private keys can spend the ZENCash balance!",
-				"Wallet private key export...", JOptionPane.INFORMATION_MESSAGE);
+				this.parent,
+				langUtil.getString("wallet.operations.dialog.export.private.keys.success.text", f.getName(), path ),
+				langUtil.getString("wallet.operations.dialog.export.private.keys.success.title"),
+                JOptionPane.INFORMATION_MESSAGE);
 			
 		} catch (Exception e)
 		{
@@ -283,12 +280,8 @@ public class WalletOperations
 		
 	    int option = JOptionPane.showConfirmDialog(  
 		    this.parent,
-		    "Private key import is a potentially slow operation. It may take\n" +
-		    "several minutes during which the GUI will be non-responsive.\n" +
-		    "The data to import must be in the format used by the option:\n" +
-		    "\"Export private keys...\"\n\n" +
-		    "Are you sure you wish to import private keys?",
-		    "Private key import notice...",
+		    langUtil.getString("wallet.operations.dialog.import.private.keys.notice.text"),
+		    langUtil.getString("wallet.operations.dialog.import.private.keys.notice.title"),
 		    JOptionPane.YES_NO_OPTION);
 		if (option == JOptionPane.NO_OPTION)
 		{
@@ -298,7 +291,7 @@ public class WalletOperations
 		try
 		{
 			JFileChooser fileChooser = new JFileChooser();
-			fileChooser.setDialogTitle("Import wallet private keys from file...");
+			fileChooser.setDialogTitle(langUtil.getString("wallet.operations.file.chooser.import.private.keys.title"));
 			fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
 			 
 			int result = fileChooser.showOpenDialog(this.parent);
@@ -325,17 +318,17 @@ public class WalletOperations
 				
 				JOptionPane.showMessageDialog(
 					this.parent, 
-					"An unexpected error occurred while importing wallet private keys!" +
-					"\n" + wce.getMessage().replace(",", ",\n"),
-					"Error in importing wallet private keys...", JOptionPane.ERROR_MESSAGE);
+					langUtil.getString("wallet.operations.dialog.import.private.keys.error.text", wce.getMessage().replace(",", ",\n")),
+					langUtil.getString("wallet.operations.dialog.import.private.keys.error.title"),
+                    JOptionPane.ERROR_MESSAGE);
 				return;
 			}
 			
 			JOptionPane.showMessageDialog(
 				this.parent, 
-				"Wallet private keys have been imported successfully from location:\n" +
-				f.getCanonicalPath() + "\n\n",
-				"Wallet private key import...", JOptionPane.INFORMATION_MESSAGE);
+				langUtil.getString("wallet.operations.dialog.import.private.keys.success.text",f.getCanonicalPath()),
+				langUtil.getString("wallet.operations.dialog.import.private.keys.success.title"),
+                JOptionPane.INFORMATION_MESSAGE);
 			
 		} catch (Exception e)
 		{
@@ -350,9 +343,9 @@ public class WalletOperations
 		{
 			JOptionPane.showMessageDialog(
 				this.parent, 
-				"Please select an address in the \"Own addresses\" tab " +
-				"to view its private key",
-				"Please select an address...", JOptionPane.INFORMATION_MESSAGE);
+				langUtil.getString("wallet.operations.option.pane.own.address.view.private.key.text"),
+                langUtil.getString("wallet.operations.option.pane.own.address.view.private.key.title"),
+                JOptionPane.INFORMATION_MESSAGE);
 			this.tabs.setSelectedIndex(2);
 			return;
 		}
@@ -363,9 +356,9 @@ public class WalletOperations
 		{
 			JOptionPane.showMessageDialog(
 				this.parent, 
-				"Please select an address in the table of addresses " +
-				"to view its private key",
-				"Please select an address...", JOptionPane.INFORMATION_MESSAGE);
+				langUtil.getString("wallet.operations.option.pane.address.table.view.private.key.text"),
+				langUtil.getString("wallet.operations.option.pane.address.table.view.private.key.title"),
+                JOptionPane.INFORMATION_MESSAGE);
 			return;
 		}
 		
@@ -399,15 +392,12 @@ public class WalletOperations
 				
 			Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
 			clipboard.setContents(new StringSelection(privateKey), null);
-			
+			String adressType = isZAddress ? langUtil.getString("wallet.operations.private.address")
+                                           : langUtil.getString("wallet.operations.transparent.address");
 			JOptionPane.showMessageDialog(
 				this.parent, 
-				(isZAddress ? "Z (Private)" : "T (Transparent)") +  " address:\n" +
-				address + "\n" + 
-				"has private key:\n" +
-				privateKey + "\n\n" +
-				"The private key has also been copied to the clipboard.", 
-				"Private key information", JOptionPane.INFORMATION_MESSAGE);
+				langUtil.getString("wallet.operations.option.pane.address.information.text", adressType, address, privateKey),
+                langUtil.getString("wallet.operations.option.pane.address.information.title"), JOptionPane.INFORMATION_MESSAGE);
 		} catch (Exception ex)
 		{
 			this.errorReporter.reportError(ex, false);
@@ -435,16 +425,16 @@ public class WalletOperations
 	 */
 	public void exportToArizenWallet()
 	{
-		final JDialog dialog = new JDialog(this.parent, "Exporting Arizen wallet");
+		final JDialog dialog = new JDialog(this.parent, langUtil.getString("wallet.operations.dialog.export.arizen.title"));
 		final JLabel exportLabel = new JLabel();
 		final WalletRepo arizenWallet = new ArizenWallet();
 		try {
 			JFileChooser fileChooser = new JFileChooser();
-			fileChooser.setFileFilter(new FileNameExtensionFilter("Arizen wallet file", "uawd"));
-			fileChooser.setDialogTitle("Export wallet to Arizen wallet unencrypted format...");
+			fileChooser.setFileFilter(new FileNameExtensionFilter(langUtil.getString("wallet.operations.dialog.export.arizen.filechooser.filter"), "uawd"));
+			fileChooser.setDialogTitle(langUtil.getString("wallet.operations.dialog.export.arizen.filechooser.title"));
 			fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
 			fileChooser.setCurrentDirectory(OSUtil.getUserHomeDirectory());
-			int result = fileChooser.showDialog(this.parent, "Export");
+			int result = fileChooser.showDialog(this.parent, langUtil.getString("wallet.operations.dialog.export.arizen.filechooser.aprove.button"));
 
 			if (result != JFileChooser.APPROVE_OPTION) {
 				return;
