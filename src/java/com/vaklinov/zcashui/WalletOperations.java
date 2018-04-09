@@ -587,7 +587,8 @@ public class WalletOperations
             
         int reply = JOptionPane.showOptionDialog(
             this.parent,
-            langUtil.getString("wallet.operations.option.pane.backup.directory.warning.text"),
+            langUtil.getString("wallet.operations.option.pane.backup.directory.warning.text", 
+            		           OSUtil.getUserHomeDirectory().getCanonicalPath()),
 	        langUtil.getString("wallet.operations.option.pane.backup.directory.warning.title"),
 	        JOptionPane.YES_NO_OPTION,
 	        JOptionPane.INFORMATION_MESSAGE, 
