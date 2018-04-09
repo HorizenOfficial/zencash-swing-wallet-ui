@@ -532,7 +532,8 @@ public class ZCashClientCaller
 	}
 
 
-	// Returns OPID
+	// Returns OPID - this method is a bit old and could be improved, however it is known to work and would better not
+	// be changed unless there is a bug.
 	public synchronized String sendCash(String from, String to, String amount, String memo, String transactionFee)
 		throws WalletCallException, IOException, InterruptedException
 	{
@@ -634,6 +635,91 @@ public class ZCashClientCaller
                 " Got result: [" + strResponse + "]");
 
 		return strResponse.trim();
+	}
+	
+	
+	/**
+	 * Sends ZEN from a source address to a destination address. The change is sent back to the source address.
+	 * The amount of change is calculated based on the existing confirmed balance for the address (parameter).
+	 * This may not be 100% accurate if the blockchain is not synchronized.
+	 * 
+	 * @param from source address (T/Z)
+	 * @param to destination address (T/Z)
+	 * @param balance current confirmed balance of the source address
+	 * @param amount ZEN amount to send
+	 * @param memo text memo to include in the transaction
+	 * @param transactionFee transaction see to include
+	 * 
+	 * @return a zend operation ID for the send operation
+	 * 
+	 * @throws WalletCallException
+	 * @throws IOException
+	 * @throws InterruptedException
+	 */
+	public synchronized String sendCashWithReturnOfChnage_NOT_READY_FOR_PRODUCTION_DO_NOT_CALL(String from, String to, String balance, 
+			                                              String amount, String memo, String transactionFee)
+		throws WalletCallException, IOException, InterruptedException
+	{
+		// TODO: log initial amounts to start with ...
+		
+		final DecimalFormatSymbols decSymbols = new DecimalFormatSymbols(Locale.ROOT);
+		final DecimalFormat sendNumberFormat = new DecimalFormat("########0.00######", decSymbols);
+		
+		String hexMemo = Util.encodeHexString(memo);
+		// Form the main amount to send
+		JsonObject toDestinationArgument = new JsonObject();
+		toDestinationArgument.set("address", to);
+		if (hexMemo.length() >= 2)
+		{
+			toDestinationArgument.set("memo", hexMemo.toString());
+		}
+		String formattedAmountToSend = sendNumberFormat.format(new BigDecimal(amount));
+		toDestinationArgument.set("amount", formattedAmountToSend);
+		// Form the return amount - based on the balance
+		JsonObject backToSourceArgument = new JsonObject();
+		backToSourceArgument.set("address", from);
+		BigDecimal changeToSendBackBD = new BigDecimal(balance).subtract(new BigDecimal(formattedAmountToSend));
+		String formattedChangeToReturn = sendNumberFormat.format(changeToSendBackBD);
+		backToSourceArgument.set("amount", formattedChangeToReturn);
+
+		// Array of two addresses to send to
+		JsonArray toMany = new JsonArray();
+		toMany.add(toDestinationArgument);
+		toMany.add(backToSourceArgument);
+		
+		String toManyArrayStr =	toMany.toString(WriterConfig.MINIMAL);		
+		String[] sendCashParameters = new String[]
+	    {
+		    this.zcashcli.getCanonicalPath(), "z_sendmany", wrapStringParameter(from),
+		    wrapStringParameter(toManyArrayStr),
+		    // Default min confirmations for the input transactions is 1
+		    "1",
+		    // transaction fee
+		    sendNumberFormat.format(new BigDecimal(transactionFee))
+		};
+		
+		// Safeguard to make sure the monetary amount does not differ after formatting
+		BigDecimal bdAmout = new BigDecimal(amount);
+		JsonArray toManyVerificationArr = Json.parse(toManyArrayStr).asArray();
+		BigDecimal bdFinalAmount = 
+			new BigDecimal(toManyVerificationArr.get(0).asObject().getDouble("amount", -1));
+		BigDecimal amountCheckDifference = bdAmout.subtract(bdFinalAmount).abs();
+		if (amountCheckDifference.compareTo(new BigDecimal("0.0")) >= 0) // MUST be exact TODO: check with long fractional parts
+		{
+			throw new WalletCallException("Error in forming z_sendmany command: Amount differs after formatting: " + 
+		                                  amount + " | " + toManyArrayStr);
+		}
+
+		Log.info("The following send command will be issued: " +
+                sendCashParameters[0] + " " + sendCashParameters[1] + " " +
+                sendCashParameters[2] + " " + sendCashParameters[3] + " " +
+                sendCashParameters[4] + " " + sendCashParameters[5] + ".");
+		
+		
+		
+		
+		return null;
+		// TODO: Yet to be finished
 	}
 	
 	
@@ -1204,5 +1290,4 @@ public class ZCashClientCaller
 			map.put(name, val.toString());
 		}
 	}
-
 }

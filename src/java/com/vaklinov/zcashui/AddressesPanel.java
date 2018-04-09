@@ -307,7 +307,10 @@ public class AddressesPanel
             		langUtil.getString("panel.address.label.input.title"),
                     JOptionPane.PLAIN_MESSAGE, null, null, "");
 			
-            this.labelStorage.setLabel(address, label);
+            if (!Util.stringIsEmpty(label))
+            {
+            	this.labelStorage.setLabel(address, label);
+            }
             
 			JOptionPane.showMessageDialog(
 					this.getRootPane().getParent(),
