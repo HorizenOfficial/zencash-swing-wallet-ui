@@ -518,7 +518,10 @@ public class WalletOperations
 
 						updateProgressText(langUtil.getString("wallet.operations.dialog.export.progress.writing.text"));
 						arizenWallet.insertAddressBatch(addressPublicSet);
-						arizenWallet.insertAddressBatch(addressPrivateSet);
+						if (addressPrivateSet.size() > 0)
+						{
+							arizenWallet.insertAddressBatch(addressPrivateSet);
+						}
 						Thread.sleep(1000);
 
 						updateProgressText(langUtil.getString("wallet.operations.dialog.export.progress.finished.text"));

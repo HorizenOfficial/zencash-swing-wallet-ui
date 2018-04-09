@@ -441,9 +441,30 @@ public class ZCashUI
                     if (warningFlagFile.exists())
                     {
                         return;
-                    } else
+                    };
+                    
+                    Object[] options = 
+                   	{ 
+                   		langUtil.getString("main.frame.disclaimer.button.agree"),
+                   		langUtil.getString("main.frame.disclaimer.button.disagree")
+                   	};
+                    
+                    int option = JOptionPane.showOptionDialog(
+                    		ZCashUI.this.getRootPane().getParent(), 
+                            langUtil.getString("main.frame.disclaimer.text"),
+                            langUtil.getString("main.frame.disclaimer.title"),
+                            JOptionPane.DEFAULT_OPTION, 
+            			    JOptionPane.INFORMATION_MESSAGE,
+            			    null, 
+            			    options, 
+            			    options[0]);
+
+                    if (option == 0)
                     {
                         warningFlagFile.createNewFile();
+                    } else
+                    {
+                    	ZCashUI.this.exitProgram();
                     }
 
                 } catch (IOException ioe)
@@ -451,12 +472,6 @@ public class ZCashUI
                     /* TODO: report exceptions to the user */
                 	Log.error("Unexpected error: ", ioe);
                 }
-
-                JOptionPane.showMessageDialog(
-                    ZCashUI.this.getRootPane().getParent(),
-                        langUtil.getString("main.frame.disclaimer.text"),
-                        langUtil.getString("main.frame.disclaimer.title"),
-                        JOptionPane.INFORMATION_MESSAGE);
             }
         });
         
