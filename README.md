@@ -139,6 +139,3 @@ Windows you need to right-click on `ZENCashSwingWalletUI.exe` and choose option:
 ```
 Properties >> Compatibility >> Override High DPI scaling behavior >> Scaling Performed by (Application)
 ```
-Example:
-
-![DPI Scaling](https://github.com/ZencashOfficial/zencash-swing-wallet-ui/raw/master/docs/EXEScalingSettings.png "DPI Scaling")
