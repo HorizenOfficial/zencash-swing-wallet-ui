@@ -49,6 +49,7 @@ import javax.swing.JProgressBar;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 
+import com.vaklinov.zcashui.LabelStorage;
 import com.vaklinov.zcashui.Log;
 import com.vaklinov.zcashui.StatusUpdateErrorReporter;
 import com.vaklinov.zcashui.Util;
@@ -84,9 +85,13 @@ public class CreateGroupDialog
 	JButton okButon;
 	JButton cancelButon;
 	
+	LabelStorage labelStorage;
+	
 	protected MessagingIdentity createdGroup = null;
 	
-	public CreateGroupDialog(MessagingPanel msgPanel, JFrame parentFrame, MessagingStorage storage, StatusUpdateErrorReporter errorReporter, ZCashClientCaller caller)
+	public CreateGroupDialog(MessagingPanel msgPanel, JFrame parentFrame, MessagingStorage storage, 
+			                 StatusUpdateErrorReporter errorReporter, ZCashClientCaller caller,
+			                 LabelStorage labelStorage)
 		throws IOException
 	{
 		super(parentFrame);
@@ -96,6 +101,7 @@ public class CreateGroupDialog
 		this.storage       = storage;
 		this.errorReporter = errorReporter;
 		this.caller = caller;
+		this.labelStorage = labelStorage;
 		
 		this.setTitle("Add messaging group...");
 		this.setModal(true);
@@ -328,6 +334,12 @@ public class CreateGroupDialog
 				"Group already exists...",
 				JOptionPane.INFORMATION_MESSAGE);
 		}	
+		
+		// In any case set the label
+		if (!Util.stringIsEmpty(ZAddress))
+		{
+			this.labelStorage.setLabel(ZAddress, keyPhrase);
+		}
 		
 		SwingUtilities.invokeLater(new Runnable() 
 		{	

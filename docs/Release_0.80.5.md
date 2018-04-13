@@ -3,10 +3,20 @@
 This is a [ZENCash](https://zensystem.io/) Desktop GUI Wallet binary release 0.80.5 for Windows. 
 It requires a 64-bit Windows 7 or later version to run. It includes [ZENCash 2.0.11 binaries](https://github.com/ZencashOfficial/zen/releases/tag/v2.0.11). 
 
+**This wallet is targeted at advanced users who understand the implications of running a full Zen node on**
+**the local machine, maintaining a full local copy of the blockchain, maintaining and backing up up the**
+**Zen nodes's `wallet.dat` file etc! The wallet is not suitable for novice crypto-currency users!**
+
 **SECURITY WARNING: Encryption of the wallet.dat file is not yet supported for ZENCash. Using the wallet** 
 **on a system infected with malware may result in wallet data/funds being stolen. The**
 **wallet.dat needs to be backed up regularly (not just once - e.g. after every 30-40**
 **outgoing transactions) and it must also be backed up after creating a new Z address.**
+
+**STABILITY WARNING: The GUI wallet is known to exhibit occasional stability problems related to running a full Zen node.**
+**Specifically if the locally running `zend` cannot start properly due to issues with the local blockchain, the GUI cannot start either!**
+**Users need to be prepared to fix such problems manually as described in the [troubleshooting guide](TroubleshootingGuide.md).**
+**Doing so requires command line skills.**
+
 
 ### Installing the ZENCash Desktop GUI Wallet on Windows
 

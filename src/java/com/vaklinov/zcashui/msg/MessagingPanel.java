@@ -1910,7 +1910,7 @@ public class MessagingPanel
 		try
 		{
 			CreateGroupDialog cgd = new CreateGroupDialog(
-				this, this.parentFrame, this.messagingStorage, this.errorReporter, this.clientCaller);
+				this, this.parentFrame, this.messagingStorage, this.errorReporter, this.clientCaller, this.labelStorage);
 			cgd.setVisible(true);
 			
 			if (!cgd.isOKPressed())
