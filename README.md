@@ -8,7 +8,7 @@ presents the information in a user-friendly manner.
 ![Screenshot](https://github.com/ZencashOfficial/zencash-swing-wallet-ui/raw/master/docs/ZENCashWallet.png "Main Window")
 
 **This wallet is targeted at advanced users who understand the implications of running a full Zen node on**
-**the local machine, maintaining a full local copy of the blockchain, maintaining and backing up up the**
+**the local machine, maintaining a full local copy of the blockchain, maintaining and backing up the**
 **Zen nodes's `wallet.dat` file etc! The wallet is not suitable for novice crypto-currency users!**
 
 **SECURITY WARNING: Encryption of the wallet.dat file is not yet supported for ZENCash. Using the wallet** 
