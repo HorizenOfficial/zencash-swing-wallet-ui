@@ -16,7 +16,7 @@ presents the information in a user-friendly manner.
 **wallet.dat needs to be backed up regularly (not just once - e.g. after every 30-40**
 **outgoing transactions) and it must also be backed up after creating a new Z address.**
 
-**STABILITY WARNING: The GUI wallet is known to exhibit occasional stability problems related to running a full Zen node.**
+**STABILITY WARNING: The GUI wallet is as yet considered experimental! It is known to exhibit occasional stability problems related to running a full Zen node.**
 **Specifically if the locally running `zend` cannot start properly due to issues with the local blockchain, the GUI cannot start either!**
 **Users need to be prepared to fix such problems manually as described in the [troubleshooting guide](docs/TroubleshootingGuide.md).**
 **Doing so requires command line skills.**
