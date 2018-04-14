@@ -28,12 +28,14 @@
  **********************************************************************************/
 package com.vaklinov.zcashui;
 
+import java.awt.Desktop;
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.net.URL;
 
 import javax.swing.JFrame;
 import javax.swing.JMenuItem;
@@ -53,14 +55,16 @@ import javax.swing.table.TableModel;
 public class AddressTable 
 	extends DataTable 
 {	
-	LabelStorage labelStorage;
+	private LabelStorage labelStorage;
+	private ZCashInstallationObserver installationObserver;
 	
 	public AddressTable(final Object[][] rowData, final Object[] columnNames, 
-			            final ZCashClientCaller caller, LabelStorage labelStorage)
+			            final ZCashClientCaller caller, LabelStorage labelStorage, 	ZCashInstallationObserver installationObserver)
 	{
 		super(rowData, columnNames);
 		
 		this.labelStorage = labelStorage;
+		this.installationObserver = installationObserver;
 		
 		int accelaratorKeyMask = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
 		final LanguageUtil langUtil = LanguageUtil.instance();
@@ -175,7 +179,53 @@ public class AddressTable
 			}
 		});
 
+        JMenuItem showInExplorer = new JMenuItem(langUtil.getString("table.address.show.in.explorer"));
+		showInExplorer.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_X, accelaratorKeyMask));
+        popupMenu.add(showInExplorer);
+        
+        showInExplorer.addActionListener(new ActionListener() 
+        {	
+			@Override
+			public void actionPerformed(ActionEvent e) 
+			{
+				if ((lastRow >= 0) && (lastColumn >= 0))
+				{
+					try
+					{
+						String address = AddressTable.this.getModel().getValueAt(lastRow, 3).toString();
+						address = address.replaceAll("\"", ""); // In case it has quotes
+						
+						if ((!AddressTable.this.installationObserver.isOnTestNet()) && Util.isZAddress(address))
+						{
+				           JOptionPane.showMessageDialog(
+				               AddressTable.this.getRootPane().getParent(),
+				               langUtil.getString("table.address.show.in.explorer.zaddress.message", address),
+				               langUtil.getString("table.address.show.in.explorer.zaddress.title"),
+					           JOptionPane.ERROR_MESSAGE);
 
+							return;
+						}
+						
+						Log.info("Address for block explorer is: " + address);
+						
+						String urlPrefix = "https://explorer.zensystem.io/address/";
+						if (AddressTable.this.installationObserver.isOnTestNet())
+						{
+							urlPrefix = "https://explorer-testnet.zen-solutions.io/address/";
+						}
+						
+						Desktop.getDesktop().browse(new URL(urlPrefix + address).toURI());
+					} catch (Exception ex)
+					{
+						Log.error("Unexpected error: ", ex);
+						// TODO: report exception to user
+					}
+				} else
+				{
+					// Log perhaps
+				}
+			}
+		});
         
         // Model listener for labels
         this.getModel().addTableModelListener(new TableModelListener() 

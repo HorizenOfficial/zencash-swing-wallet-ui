@@ -158,7 +158,7 @@ public class ZCashUI
         this.dashboard.setDetailsPanelForSelection(this.transactionDetailsPanel);
         tabs.addTab(langUtil.getString("main.frame.tab.own.address.title"),
         		    new ImageIcon(cl.getResource("images/own-addresses.png")),
-        		    addresses = new AddressesPanel(this, clientCaller, errorReporter, labelStorage));
+        		    addresses = new AddressesPanel(this, clientCaller, errorReporter, labelStorage, installationObserver));
         tabs.addTab(langUtil.getString("main.frame.tab.send.cash.title"),
         		    new ImageIcon(cl.getResource("images/send.png")),
         		    sendPanel = new SendCashPanel(clientCaller, errorReporter, installationObserver, backupTracker));

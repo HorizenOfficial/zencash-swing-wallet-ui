@@ -94,15 +94,18 @@ public class AddressesPanel
 	
 	// Storage of labels
 	private LabelStorage labelStorage;
+	
+	private ZCashInstallationObserver installationObserver;
 
 
-	public AddressesPanel(JFrame parentFrame, ZCashClientCaller clientCaller, StatusUpdateErrorReporter errorReporter, LabelStorage labelStorage)
+	public AddressesPanel(JFrame parentFrame, ZCashClientCaller clientCaller, StatusUpdateErrorReporter errorReporter, LabelStorage labelStorage,
+			              ZCashInstallationObserver installationObserver)
 			throws IOException, InterruptedException, WalletCallException
 	{
 		this.parentFrame = parentFrame;
 		this.clientCaller = clientCaller;
 		this.errorReporter = errorReporter;
-		
+		this.installationObserver = installationObserver;
 		
 		this.labelStorage = labelStorage;
 		
@@ -393,9 +396,9 @@ public class AddressesPanel
 		}
 		
 		String columnNames[] = langUtil.getString("panel.address.table.create.address.header").split(":");
-        JTable table = new AddressTable(rowDataNew, columnNames, this.clientCaller, this.labelStorage);
+        JTable table = new AddressTable(rowDataNew, columnNames, this.clientCaller, this.labelStorage, this.installationObserver);
         table.setAutoResizeMode(JTable.AUTO_RESIZE_SUBSEQUENT_COLUMNS);
-        table.getColumnModel().getColumn(0).setPreferredWidth(220);
+        table.getColumnModel().getColumn(0).setPreferredWidth(280);
         table.getColumnModel().getColumn(1).setPreferredWidth(160);
         table.getColumnModel().getColumn(2).setPreferredWidth(140);
         table.getColumnModel().getColumn(3).setPreferredWidth(1000);
