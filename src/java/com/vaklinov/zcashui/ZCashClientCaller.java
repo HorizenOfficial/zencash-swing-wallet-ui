@@ -157,7 +157,7 @@ public class ZCashClientCaller
 	        new String[] 
 	        {
 	        	zcashd.getCanonicalPath(), 
-	        	"-exportdir=" + exportDir
+	        	"-exportdir=" + wrapStringParameter(exportDir)
 	        });
 	    
 	    return starter.startChildProcess();
@@ -628,7 +628,7 @@ public class ZCashClientCaller
 		  	throw new WalletCallException("Error response from wallet: " + strResponse);
 		}
 
-		Log.info("Sending cash with the following command: " +
+		Log.info("Sent cash with the following command: " +
                 sendCashParameters[0] + " " + sendCashParameters[1] + " " +
                 sendCashParameters[2] + " " + sendCashParameters[3] + " " +
                 sendCashParameters[4] + " " + sendCashParameters[5] + "." +
@@ -656,11 +656,13 @@ public class ZCashClientCaller
 	 * @throws IOException
 	 * @throws InterruptedException
 	 */
-	public synchronized String sendCashWithReturnOfChnage_NOT_READY_FOR_PRODUCTION_DO_NOT_CALL(String from, String to, String balance, 
+	private synchronized String sendCashWithReturnOfChnage_NOT_READY_FOR_PRODUCTION_DO_NOT_CALL(String from, String to, String balance, 
 			                                              String amount, String memo, String transactionFee)
 		throws WalletCallException, IOException, InterruptedException
 	{
-		// TODO: log initial amounts to start with ...
+		Log.info("Starting operation send cash with retrun of change. Parameters are: from address: {0}, to address: {1}, " + 
+	             "current balance: {2}, amount: {3}, memo: {4}, transaction fee: {5}",
+				 from, to, balance, amount, memo, transactionFee);
 		
 		final DecimalFormatSymbols decSymbols = new DecimalFormatSymbols(Locale.ROOT);
 		final DecimalFormat sendNumberFormat = new DecimalFormat("########0.00######", decSymbols);
@@ -674,11 +676,13 @@ public class ZCashClientCaller
 			toDestinationArgument.set("memo", hexMemo.toString());
 		}
 		String formattedAmountToSend = sendNumberFormat.format(new BigDecimal(amount));
+		String formattedTransactionFee = sendNumberFormat.format(new BigDecimal(transactionFee));
 		toDestinationArgument.set("amount", formattedAmountToSend);
 		// Form the return amount - based on the balance
 		JsonObject backToSourceArgument = new JsonObject();
 		backToSourceArgument.set("address", from);
-		BigDecimal changeToSendBackBD = new BigDecimal(balance).subtract(new BigDecimal(formattedAmountToSend));
+		BigDecimal changeToSendBackBD = new BigDecimal(balance).
+			subtract(new BigDecimal(formattedAmountToSend)).subtract(new BigDecimal(formattedTransactionFee));
 		String formattedChangeToReturn = sendNumberFormat.format(changeToSendBackBD);
 		backToSourceArgument.set("amount", formattedChangeToReturn);
 
@@ -695,31 +699,52 @@ public class ZCashClientCaller
 		    // Default min confirmations for the input transactions is 1
 		    "1",
 		    // transaction fee
-		    sendNumberFormat.format(new BigDecimal(transactionFee))
+		    formattedTransactionFee
 		};
 		
 		// Safeguard to make sure the monetary amount does not differ after formatting
-		BigDecimal bdAmout = new BigDecimal(amount);
+		BigDecimal bdAmout = new BigDecimal(amount); // original amount used for check
 		JsonArray toManyVerificationArr = Json.parse(toManyArrayStr).asArray();
 		BigDecimal bdFinalAmount = 
 			new BigDecimal(toManyVerificationArr.get(0).asObject().getDouble("amount", -1));
 		BigDecimal amountCheckDifference = bdAmout.subtract(bdFinalAmount).abs();
-		if (amountCheckDifference.compareTo(new BigDecimal("0.0")) >= 0) // MUST be exact TODO: check with long fractional parts
+		if (amountCheckDifference.compareTo(new BigDecimal("0.0")) >= 0) // MUST be exact
 		{
-			throw new WalletCallException("Error in forming z_sendmany command: Amount differs after formatting: " + 
-		                                  amount + " | " + toManyArrayStr);
-		}
-
-		Log.info("The following send command will be issued: " +
+			throw new WalletCallException("Error in forming z_sendmany command: Main amount differs after formatting: " + 
+					                      formattedAmountToSend + " | \n" + toManyArrayStr);
+		}		
+		// Amount + change + fee = balance // This must also match
+		BigDecimal bdFinalChange = new BigDecimal(toManyVerificationArr.get(1).asObject().getDouble("amount", -1));
+		amountCheckDifference = bdFinalChange.add(bdFinalAmount).add(new BigDecimal(formattedTransactionFee)).
+			subtract(new BigDecimal(balance)).abs(); // Original balance used after formatting
+		if (amountCheckDifference.compareTo(new BigDecimal("0.0")) >= 0) // MUST be exact
+		{
+			throw new WalletCallException("Error in forming z_sendmany command: Sum differs after formatting: " + 
+					                      formattedAmountToSend + " | \n" + toManyArrayStr);
+		}		
+		
+		Log.info("The following send command (with chnage retrun) will be issued: " +
                 sendCashParameters[0] + " " + sendCashParameters[1] + " " +
                 sendCashParameters[2] + " " + sendCashParameters[3] + " " +
                 sendCashParameters[4] + " " + sendCashParameters[5] + ".");
 		
-		
-		
-		
-		return null;
-		// TODO: Yet to be finished
+		// Create caller to send cash
+	    CommandExecutor caller = new CommandExecutor(sendCashParameters);
+	    String strResponse = caller.execute();
+
+		if (strResponse.trim().toLowerCase(Locale.ROOT).startsWith("error:") ||
+			strResponse.trim().toLowerCase(Locale.ROOT).startsWith("error code:"))
+		{
+		  	throw new WalletCallException("Error response from wallet: " + strResponse);
+		}
+
+		Log.info("Sent cash (with change back) with the following command: " +
+                sendCashParameters[0] + " " + sendCashParameters[1] + " " +
+                sendCashParameters[2] + " " + sendCashParameters[3] + " " +
+                sendCashParameters[4] + " " + sendCashParameters[5] + "." +
+                " Got result: [" + strResponse + "]");
+
+		return strResponse.trim();
 	}
 	
 	

@@ -45,11 +45,14 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Locale;
 import java.util.Set;
 
 import javax.swing.BorderFactory;
@@ -382,6 +385,10 @@ public class SendCashPanel
 		final String memo = this.destinationMemoField.getText();
 		final String amount = this.destinationAmountField.getText();
 		final String fee = this.transactionFeeField.getText();
+		
+		Log.info("Send button processing: Parameters are: from address: {0}, to address: {1}, " + 
+	             "amount: {2}, memo: {3}, transaction fee: {4}",
+	             sourceAddress, destinationAddress, amount, memo, fee);
 
 		// Verify general correctness.
 		String errorMessage = null;
@@ -485,6 +492,35 @@ public class SendCashPanel
 			   	return;
 			}
 		}		
+		
+        // Warn the user if there are too many fractional digits in the amount and fee
+		if (hasExcessiveFractionalDigits(amount))
+		{
+	        int reply = JOptionPane.showConfirmDialog(
+	        		SendCashPanel.this.getRootPane().getParent(), 
+					langUtil.getString("send.cash.panel.option.pane.error.destination.amount.fractional.digits", amount),
+					langUtil.getString("send.cash.panel.option.pane.error.destination.fractional.digits.title"),
+			        JOptionPane.YES_NO_OPTION);
+			        
+			if (reply == JOptionPane.NO_OPTION) 
+			{
+			   	return;
+			}
+		}
+		
+		if (hasExcessiveFractionalDigits(fee))
+		{
+	        int reply = JOptionPane.showConfirmDialog(
+	        		SendCashPanel.this.getRootPane().getParent(), 
+					langUtil.getString("send.cash.panel.option.pane.error.destination.fee.fractional.digits", fee),
+					langUtil.getString("send.cash.panel.option.pane.error.destination.fractional.digits.title"),
+			        JOptionPane.YES_NO_OPTION);
+			        
+			if (reply == JOptionPane.NO_OPTION) 
+			{
+			   	return;
+			}
+		}
 		
 		// Get a confirmation from the user about the operation
         String userDir = OSUtil.getSettingsDirectory();
@@ -835,5 +871,24 @@ public class SendCashPanel
 					langUtil.getString("send.cash.panel.option.pane.error.report.title"), JOptionPane.ERROR_MESSAGE);
 
 		}
+	}
+	
+	
+	// Checks if a number has more than 8 fractional digits. This is not normally allowed for ZEN
+	// Input must be a decimal number!
+	private boolean hasExcessiveFractionalDigits(String field)
+	{
+		BigDecimal num = new BigDecimal(field);
+		DecimalFormatSymbols decSymbols = new DecimalFormatSymbols(Locale.ROOT);
+		DecimalFormat longFormat = new DecimalFormat("############################0.00###############################", decSymbols);
+		String formattedNumber = longFormat.format(num);
+		String fractionalPart = formattedNumber.substring(formattedNumber.indexOf(".") + 1);
+			
+		if (fractionalPart.length() > 8)
+		{
+			return true;
+		}
+		
+		return false;
 	}
 }
