@@ -58,6 +58,7 @@ import java.util.Set;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -97,6 +98,8 @@ public class SendCashPanel
 	private JTextField destinationAmountField  = null;
 	private JTextField destinationMemoField    = null;	
 	private JTextField transactionFeeField     = null;	
+	
+	private JCheckBox  sendChangeBackToSourceAddress = null;
 	
 	private JButton    sendButton              = null;
 	
@@ -190,9 +193,17 @@ public class SendCashPanel
 		transactionFeeField.setHorizontalAlignment(SwingConstants.RIGHT);		
 		tempPanel.add(new JLabel(" ZEN"));
 		feePanel.add(tempPanel, BorderLayout.SOUTH);
+		
+		JPanel sendChangeBoxPanel = new JPanel(new BorderLayout());
+		sendChangeBoxPanel.add(new JLabel(" "), BorderLayout.NORTH);
+		tempPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+		tempPanel.add(new JLabel("      "));
+		tempPanel.add(sendChangeBackToSourceAddress = new JCheckBox(langUtil.getString("send.cash.panel.checkbox.send.change.back")));
+		sendChangeBoxPanel.add(tempPanel, BorderLayout.SOUTH);
 
 		amountAndFeePanel.add(amountPanel);
 		amountAndFeePanel.add(feePanel);
+		amountAndFeePanel.add(sendChangeBoxPanel);
 		sendCashPanel.add(amountAndFeePanel);		
 		
 		dividerLabel = new JLabel("   ");
@@ -598,8 +609,24 @@ public class SendCashPanel
 				this.clientCaller.unlockWallet(pd.getPassword());
 			}
 			
-			// Call the wallet send method
-			operationStatusID = this.clientCaller.sendCash(sourceAddress, destinationAddress, amount, memo, fee);
+			boolean sendChangeBackToAddres = this.sendChangeBackToSourceAddress.isSelected();
+			Log.info("Change send back flag: {0}", sendChangeBackToAddres);
+			if (sendChangeBackToAddres)
+			{
+				if (this.warnAndCheckConditionsForSendingBackChange(sourceAddress, destinationAddress, amount, memo, fee))
+				{
+					String balance = this.clientCaller.getBalanceForAddress(sourceAddress);
+					// Call the send method with change goign back to source address
+					operationStatusID = this.clientCaller.sendCashWithReturnOfChnage(sourceAddress, destinationAddress, balance, amount, memo, fee);
+				} else
+				{
+					return; // Stop the operation
+				}
+			} else
+			{
+				// Call the wallet send method - old style
+				operationStatusID = this.clientCaller.sendCash(sourceAddress, destinationAddress, amount, memo, fee);
+			}
 					
 			// Make sure the keypool has spare addresses
 			if ((this.backupTracker.getNumTransactionsSinceLastBackup() % 5) == 0)
@@ -610,6 +637,8 @@ public class SendCashPanel
 		{
 			this.getRootPane().getParent().setCursor(oldCursor);
 		}
+		
+		// TODO: Enable/disable for checkbox.
 		
 		// Disable controls after send
 		sendButton.setEnabled(false);
@@ -890,5 +919,39 @@ public class SendCashPanel
 		}
 		
 		return false;
+	}
+	
+	
+	/**
+	 * Checks the conditions necessary for sending back the change. Also issues a warning to the user on the nature of this operation.
+	 * 
+	 * @param sourceAddress
+	 * @param destinationAddress
+	 * @param amount
+	 * @param memo
+	 * @param fee
+	 * 
+	 * @return true if all conditions are met and the user has not cancelled the operation
+	 */
+	private boolean warnAndCheckConditionsForSendingBackChange(String sourceAddress, String destinationAddress, String amount, String memo, String fee)
+		throws WalletCallException, InterruptedException, IOException
+	{
+		String balance = this.clientCaller.getBalanceForAddress(sourceAddress);
+		
+		// TODO: General warning + more checks
+		
+		// Make sure the confirmed balance for the address is sufficient
+		if (new BigDecimal(balance).subtract(new BigDecimal(amount)).subtract(new BigDecimal(fee)).compareTo(new BigDecimal("0")) < 0)
+		{
+			JOptionPane.showMessageDialog(
+				SendCashPanel.this.getRootPane().getParent(), 
+				langUtil.getString("send.cash.panel.insufficient.balance", sourceAddress, balance, amount, fee),
+				langUtil.getString("send.cash.panel.insufficient.balance.title"), 
+				JOptionPane.ERROR_MESSAGE);
+			
+			return false;
+		}
+	
+		return true;
 	}
 }

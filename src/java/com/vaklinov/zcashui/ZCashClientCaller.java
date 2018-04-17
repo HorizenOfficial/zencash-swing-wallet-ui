@@ -656,7 +656,7 @@ public class ZCashClientCaller
 	 * @throws IOException
 	 * @throws InterruptedException
 	 */
-	private synchronized String sendCashWithReturnOfChnage_NOT_READY_FOR_PRODUCTION_DO_NOT_CALL(String from, String to, String balance, 
+	public synchronized String sendCashWithReturnOfChnage(String from, String to, String balance, 
 			                                              String amount, String memo, String transactionFee)
 		throws WalletCallException, IOException, InterruptedException
 	{
