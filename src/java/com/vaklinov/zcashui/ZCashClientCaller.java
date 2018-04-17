@@ -706,24 +706,24 @@ public class ZCashClientCaller
 		BigDecimal bdAmout = new BigDecimal(amount); // original amount used for check
 		JsonArray toManyVerificationArr = Json.parse(toManyArrayStr).asArray();
 		BigDecimal bdFinalAmount = 
-			new BigDecimal(toManyVerificationArr.get(0).asObject().getDouble("amount", -1));
+			new BigDecimal(toManyVerificationArr.get(0).asObject().getString("amount", "-1"));
 		BigDecimal amountCheckDifference = bdAmout.subtract(bdFinalAmount).abs();
-		if (amountCheckDifference.compareTo(new BigDecimal("0.0")) >= 0) // MUST be exact
+		if (amountCheckDifference.compareTo(new BigDecimal("0.0")) > 0) // MUST be exact
 		{
 			throw new WalletCallException("Error in forming z_sendmany command: Main amount differs after formatting: " + 
 					                      formattedAmountToSend + " | \n" + toManyArrayStr);
 		}		
 		// Amount + change + fee = balance // This must also match
-		BigDecimal bdFinalChange = new BigDecimal(toManyVerificationArr.get(1).asObject().getDouble("amount", -1));
+		BigDecimal bdFinalChange = new BigDecimal(toManyVerificationArr.get(1).asObject().getString("amount", "-1"));
 		amountCheckDifference = bdFinalChange.add(bdFinalAmount).add(new BigDecimal(formattedTransactionFee)).
 			subtract(new BigDecimal(balance)).abs(); // Original balance used after formatting
-		if (amountCheckDifference.compareTo(new BigDecimal("0.0")) >= 0) // MUST be exact
+		if (amountCheckDifference.compareTo(new BigDecimal("0.0")) > 0) // MUST be exact
 		{
 			throw new WalletCallException("Error in forming z_sendmany command: Sum differs after formatting: " + 
 					                      formattedAmountToSend + " | \n" + toManyArrayStr);
 		}		
 		
-		Log.info("The following send command (with chnage retrun) will be issued: " +
+		Log.info("The following send command (with change retrun) will be issued: " +
                 sendCashParameters[0] + " " + sendCashParameters[1] + " " +
                 sendCashParameters[2] + " " + sendCashParameters[3] + " " +
                 sendCashParameters[4] + " " + sendCashParameters[5] + ".");
