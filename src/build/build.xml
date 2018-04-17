@@ -60,7 +60,11 @@
 	    <os family="unix" />
 	</condition>
 	
-	<!-- TARGETS -->
+    <condition property="isJava9">
+	    <equals arg1="${ant.java.version}" arg2="9" />
+    </condition>	
+	
+    <!-- TARGETS -->
 	
     <target name="clean">
         <delete dir="${build.dir}"/>
@@ -76,14 +80,22 @@
     	</copy>
     </target>
 
-    <target name="compile" depends="clean">
+    <target name="compileJDK9" depends="clean" if="isJava9">
+        <mkdir dir="${classes.dir}"/>
+        <javac srcdir="${src.dir}" destdir="${classes.dir}" debug="on">
+        	<compilerarg line="--add-modules java.xml.bind" />
+        	<classpath refid="main-classpath"/>
+        </javac>
+    </target>
+	
+    <target name="compile" depends="clean" unless="isJava9">
         <mkdir dir="${classes.dir}"/>
         <javac srcdir="${src.dir}" destdir="${classes.dir}" debug="on">
         	<classpath refid="main-classpath"/>
         </javac>
     </target>
 
-    <target name="jar" depends="compile,copyResources">
+    <target name="jar" depends="compile,compileJDK9,copyResources">
         <mkdir dir="${jar.dir}"/>
         <jar destfile="${jar.dir}/${ant.project.name}.jar" 
         	 basedir="${classes.dir}"
@@ -176,6 +188,7 @@
 	</target>
 	
     <target name="buildit" depends="clean,jar,copyothers,ubuntuPackage">
+    	<echo message="Built ZENCash Desktop GUI Wallet with JDK ${ant.java.version}"/>
     	<!-- Final cleanup -->
     	<delete dir="${classes.dir}"/>
     	<delete dir="${temp.dir}"/>
