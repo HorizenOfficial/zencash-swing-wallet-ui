@@ -638,9 +638,8 @@ public class SendCashPanel
 			this.getRootPane().getParent().setCursor(oldCursor);
 		}
 		
-		// TODO: Enable/disable for checkbox.
-		
 		// Disable controls after send
+		sendChangeBackToSourceAddress.setEnabled(false);
 		sendButton.setEnabled(false);
 		balanceAddressCombo.setEnabled(false);
 		destinationAddressField.setEnabled(false);
@@ -701,6 +700,7 @@ public class SendCashPanel
 						operationStatusTimer = null;
 						operationStatusProhgressBar.setValue(0);
 						
+						sendChangeBackToSourceAddress.setEnabled(true);
 						sendButton.setEnabled(true);
 						balanceAddressCombo.setEnabled(true);
 						destinationAddressField.setEnabled(true);
@@ -938,7 +938,38 @@ public class SendCashPanel
 	{
 		String balance = this.clientCaller.getBalanceForAddress(sourceAddress);
 		
-		// TODO: General warning + more checks
+		// Get a confirmation from the user about the operation - general warning
+        String userDir = OSUtil.getSettingsDirectory();
+        File sendChangeBackNotToBeShownFlagFile = new File(userDir + File.separator + "sendBackChangeWarningNotToBeShown.flag");
+        if (!sendChangeBackNotToBeShownFlagFile.exists())
+        {
+        	Object[] options = 
+        	{ 
+        		langUtil.getString("send.cash.panel.option.pane.confirm.operation.button.yes"),
+        		langUtil.getString("send.cash.panel.option.pane.confirm.operation.button.no"),
+        		langUtil.getString("send.cash.panel.option.pane.confirm.operation.button.not.again")
+        	};
+
+    		int option = JOptionPane.showOptionDialog(
+    				SendCashPanel.this.getRootPane().getParent(), 
+    				langUtil.getString("send.cash.panel.send.change.back.general.warning"), 
+    			    langUtil.getString("send.cash.panel.send.change.back.general.warning.title"),
+    			    JOptionPane.DEFAULT_OPTION, 
+    			    JOptionPane.WARNING_MESSAGE,
+    			    null, 
+    			    options, 
+    			    options[0]);
+    		
+    	    if (option == 2)
+    	    {
+    	    	sendChangeBackNotToBeShownFlagFile.createNewFile();
+    	    }
+    	    
+    	    if (option == 1)
+    	    {
+    	    	return false;
+    	    }
+        }
 		
 		// Make sure the confirmed balance for the address is sufficient
 		if (new BigDecimal(balance).subtract(new BigDecimal(amount)).subtract(new BigDecimal(fee)).compareTo(new BigDecimal("0")) < 0)
