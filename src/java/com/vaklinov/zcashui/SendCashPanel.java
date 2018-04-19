@@ -435,6 +435,10 @@ public class SendCashPanel
 			try 
 			{
 				double d = Double.valueOf(amount);
+				if (d < 0)
+				{
+					errorMessage = langUtil.getString("send.cash.panel.option.pane.error.amount.negative");
+				}
 			} catch (NumberFormatException nfe)
 			{
 				errorMessage = langUtil.getString("send.cash.panel.option.pane.error.amount.not.number");
@@ -449,6 +453,10 @@ public class SendCashPanel
 			try 
 			{
 				double d = Double.valueOf(fee);
+				if (d < 0)
+				{
+					errorMessage = langUtil.getString("send.cash.panel.option.pane.error.fee.negative");
+				}
 			} catch (NumberFormatException nfe)
 			{
 				errorMessage = langUtil.getString("send.cash.panel.option.pane.error.fee.not.number");
