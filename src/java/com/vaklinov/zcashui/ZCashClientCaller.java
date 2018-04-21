@@ -537,6 +537,10 @@ public class ZCashClientCaller
 	public synchronized String sendCash(String from, String to, String amount, String memo, String transactionFee)
 		throws WalletCallException, IOException, InterruptedException
 	{
+		Log.info("Starting operation send-cash. Parameters are: from address: {0}, to address: {1}, " + 
+	             "amount: {2}, memo: {3}, transaction fee: {4}",
+				 from, to, amount, memo, transactionFee);
+		
 		StringBuilder hexMemo = new StringBuilder();
 		for (byte c : memo.getBytes("UTF-8"))
 		{
@@ -656,7 +660,7 @@ public class ZCashClientCaller
 	 * @throws IOException
 	 * @throws InterruptedException
 	 */
-	public synchronized String sendCashWithReturnOfChnage(String from, String to, String balance, 
+	public synchronized String sendCashWithReturnOfChange(String from, String to, String balance, 
 			                                              String amount, String memo, String transactionFee)
 		throws WalletCallException, IOException, InterruptedException
 	{
@@ -683,13 +687,26 @@ public class ZCashClientCaller
 		backToSourceArgument.set("address", from);
 		BigDecimal changeToSendBackBD = new BigDecimal(balance).
 			subtract(new BigDecimal(formattedAmountToSend)).subtract(new BigDecimal(formattedTransactionFee));
+		boolean changeIsZero = false;
+		if (changeToSendBackBD.compareTo(new BigDecimal("0")) < 0)
+		{
+			throw new WalletCallException("Error: change was calculated negative");
+		} else if (changeToSendBackBD.compareTo(new BigDecimal("0")) == 0)
+		{
+			Log.info("Change was calculated exactly zero - will not be sent back!");
+			changeIsZero = true;
+		}
+		
 		String formattedChangeToReturn = sendNumberFormat.format(changeToSendBackBD);
 		backToSourceArgument.set("amount", formattedChangeToReturn);
 
 		// Array of two addresses to send to
 		JsonArray toMany = new JsonArray();
 		toMany.add(toDestinationArgument);
-		toMany.add(backToSourceArgument);
+		if (!changeIsZero)
+		{
+			toMany.add(backToSourceArgument);
+		}
 		
 		String toManyArrayStr =	toMany.toString(WriterConfig.MINIMAL);		
 		String[] sendCashParameters = new String[]
@@ -714,7 +731,8 @@ public class ZCashClientCaller
 					                      formattedAmountToSend + " | \n" + toManyArrayStr);
 		}		
 		// Amount + change + fee = balance // This must also match
-		BigDecimal bdFinalChange = new BigDecimal(toManyVerificationArr.get(1).asObject().getString("amount", "-1"));
+		BigDecimal bdFinalChange = changeIsZero ?  
+			new BigDecimal("0") : new BigDecimal(toManyVerificationArr.get(1).asObject().getString("amount", "-1"));
 		amountCheckDifference = bdFinalChange.add(bdFinalAmount).add(new BigDecimal(formattedTransactionFee)).
 			subtract(new BigDecimal(balance)).abs(); // Original balance used after formatting
 		if (amountCheckDifference.compareTo(new BigDecimal("0.0")) > 0) // MUST be exact

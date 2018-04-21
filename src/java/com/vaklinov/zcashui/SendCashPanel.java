@@ -625,7 +625,7 @@ public class SendCashPanel
 				{
 					String balance = this.clientCaller.getBalanceForAddress(sourceAddress);
 					// Call the send method with change goign back to source address
-					operationStatusID = this.clientCaller.sendCashWithReturnOfChnage(sourceAddress, destinationAddress, balance, amount, memo, fee);
+					operationStatusID = this.clientCaller.sendCashWithReturnOfChange(sourceAddress, destinationAddress, balance, amount, memo, fee);
 				} else
 				{
 					return; // Stop the operation
