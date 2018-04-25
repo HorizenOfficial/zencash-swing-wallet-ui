@@ -21,6 +21,10 @@ presents the information in a user-friendly manner.
 **Users need to be prepared to fix such problems manually as described in the [troubleshooting guide](docs/TroubleshootingGuide.md).**
 **Doing so requires command line skills.**
 
+**AUTO-DEPRECATION WARNING: Wallet binary releases for Mac/Windows contain ZEN full node binaries. These have an auto-deprecation feature:**
+**they are considered outdated after 18 weeks and stop working. So they need to be updated to a newer version before this term expires.**
+**Users need to ensure they use an up-to-date version of the wallet (e.g. update the wallet every two months or so).**
+
 #### New/Experimental: [ZENCash Desktop GUI Wallet packages for Debian/Ubuntu Linux](https://github.com/ZencashOfficial/zencash-swing-wallet-ui/blob/master/docs/ReleaseUbuntuRepository.md) are available
 
 #### New/Experimental: [ZENCash Desktop GUI Wallet for Mac OS](https://github.com/ZencashOfficial/zencash-swing-wallet-ui/blob/master/docs/Release_0.81.0.md) is available
