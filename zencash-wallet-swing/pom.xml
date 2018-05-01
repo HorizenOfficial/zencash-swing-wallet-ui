@@ -12,6 +12,10 @@
 
     <artifactId>zencash-wallet-swing</artifactId>
     <packaging>jar</packaging>
+
+    <properties>
+        <main.class>com.vaklinov.zcashui.ZCashUI</main.class>
+    </properties>
     <build>
         <plugins>
             <plugin>
@@ -21,7 +25,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>com.vaklinov.zcashui.ZCashUI</mainClass>
+                            <mainClass>${main.class}</mainClass>
                         </manifest>
                     </archive>
                 </configuration>

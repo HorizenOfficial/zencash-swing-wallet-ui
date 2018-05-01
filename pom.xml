@@ -11,13 +11,14 @@
     <name>ZENCash Official Swing Wallet UI</name>
 
     <properties>
-
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <source.version>1.8</source.version>
     </properties>
 
     <licenses>
         <license>
             <name>MIT License</name>
-            <url>LICENSE</url>
+            <url>http://www.opensource.org/licenses/mit-license.php</url>
         </license>
     </licenses>
 
@@ -27,18 +28,17 @@
     </modules>
 
     <build>
-        <pluginManagement>
-            <plugins>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-compiler-plugin</artifactId>
-                    <configuration>
-                        <source>1.8</source>
-                        <target>1.8</target>
-                    </configuration>
-                </plugin>
-            </plugins>
-        </pluginManagement>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.7.0</version>
+                <configuration>
+                    <source>${source.version}</source>
+                    <target>${source.version}</target>
+                </configuration>
+            </plugin>
+        </plugins>
     </build>
 
     <dependencies>
