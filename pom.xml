@@ -12,6 +12,7 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <swing.module.name>zencash-wallet-swing</swing.module.name>
         <source.version>1.8</source.version>
     </properties>
 
@@ -27,12 +28,56 @@
         <module>zencash-wallet-swing</module>
     </modules>
 
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>junit</groupId>
+                <artifactId>junit</artifactId>
+                <version>3.8.1</version>
+            </dependency>
+
+            <!-- https://mvnrepository.com/artifact/org.bitcoinj/bitcoinj-core -->
+            <dependency>
+                <groupId>org.bitcoinj</groupId>
+                <artifactId>bitcoinj-core</artifactId>
+                <version>0.14.5</version>
+            </dependency>
+            <!-- https://mvnrepository.com/artifact/org.xerial/sqlite-jdbc -->
+            <dependency>
+                <groupId>org.xerial</groupId>
+                <artifactId>sqlite-jdbc</artifactId>
+                <version>3.21.0</version>
+            </dependency>
+            <!-- https://mvnrepository.com/artifact/com.eclipsesource.minimal-json/minimal-json -->
+            <dependency>
+                <groupId>com.eclipsesource.minimal-json</groupId>
+                <artifactId>minimal-json</artifactId>
+                <version>0.9.5</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+
     <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>3.7.0</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.vafer</groupId>
+                    <artifactId>jdeb</artifactId>
+                    <version>1.6</version>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.7.0</version>
                 <configuration>
                     <source>${source.version}</source>
                     <target>${source.version}</target>
@@ -45,7 +90,6 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>3.8.1</version>
             <scope>test</scope>
         </dependency>
 
@@ -53,21 +97,69 @@
         <dependency>
             <groupId>org.bitcoinj</groupId>
             <artifactId>bitcoinj-core</artifactId>
-            <version>0.14.5</version>
         </dependency>
         <!-- https://mvnrepository.com/artifact/org.xerial/sqlite-jdbc -->
         <dependency>
             <groupId>org.xerial</groupId>
             <artifactId>sqlite-jdbc</artifactId>
-            <version>3.21.0</version>
         </dependency>
         <!-- https://mvnrepository.com/artifact/com.eclipsesource.minimal-json/minimal-json -->
         <dependency>
             <groupId>com.eclipsesource.minimal-json</groupId>
             <artifactId>minimal-json</artifactId>
-            <version>0.9.5</version>
         </dependency>
     </dependencies>
 
-
+    <profiles>
+        <profile>
+            <id>deb</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.vafer</groupId>
+                        <artifactId>jdeb</artifactId>
+                        <executions>
+                            <execution>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>jdeb</goal>
+                                </goals>
+                                <configuration>
+                                    <dataSet>
+                                        <data>
+                                            <src>${basedir}/${swing.module.name}/${project.build.directory}/${swing.module.name}-${project.version}.jar</src>
+                                            <type>file</type>
+                                            <mapper>
+                                                <type>perm</type>
+                                                <prefix>/usr/share/jdeb/lib</prefix>
+                                            </mapper>
+                                        </data>
+                                    </dataSet>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>java9</id>
+            <activation>
+                <jdk>9</jdk>
+            </activation>
+            <build>
+                <plugins>
+                    <!-- target Java 9 -->
+                    <plugin>
+                        <artifactId>maven-compiler-plugin</artifactId>
+                        <configuration>
+                            <!-- fork compilation and use the specified executable -->
+                            <fork>true</fork>
+                            <executable>javac9</executable>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>
