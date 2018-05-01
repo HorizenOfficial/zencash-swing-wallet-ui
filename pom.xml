@@ -14,6 +14,13 @@
 
     </properties>
 
+    <licenses>
+        <license>
+            <name>MIT License</name>
+            <url>LICENSE</url>
+        </license>
+    </licenses>
+
 
     <modules>
         <module>zencash-wallet-swing</module>
