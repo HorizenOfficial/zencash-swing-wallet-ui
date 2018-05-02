@@ -71,6 +71,15 @@
                     <artifactId>jdeb</artifactId>
                     <version>1.6</version>
                 </plugin>
+                <plugin>
+                    <artifactId>maven-resources-plugin</artifactId>
+                    <version>2.3</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-dependency-plugin</artifactId>
+                    <version>3.1.0</version>
+                </plugin>
             </plugins>
         </pluginManagement>
 
@@ -86,61 +95,12 @@
         </plugins>
     </build>
 
-    <dependencies>
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <scope>test</scope>
-        </dependency>
 
-        <!-- https://mvnrepository.com/artifact/org.bitcoinj/bitcoinj-core -->
-        <dependency>
-            <groupId>org.bitcoinj</groupId>
-            <artifactId>bitcoinj-core</artifactId>
-        </dependency>
-        <!-- https://mvnrepository.com/artifact/org.xerial/sqlite-jdbc -->
-        <dependency>
-            <groupId>org.xerial</groupId>
-            <artifactId>sqlite-jdbc</artifactId>
-        </dependency>
-        <!-- https://mvnrepository.com/artifact/com.eclipsesource.minimal-json/minimal-json -->
-        <dependency>
-            <groupId>com.eclipsesource.minimal-json</groupId>
-            <artifactId>minimal-json</artifactId>
-        </dependency>
-    </dependencies>
 
     <profiles>
         <profile>
             <id>deb</id>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.vafer</groupId>
-                        <artifactId>jdeb</artifactId>
-                        <executions>
-                            <execution>
-                                <phase>package</phase>
-                                <goals>
-                                    <goal>jdeb</goal>
-                                </goals>
-                                <configuration>
-                                    <dataSet>
-                                        <data>
-                                            <src>${basedir}/${swing.module.name}/${project.build.directory}/${swing.module.name}-${project.version}.jar</src>
-                                            <type>file</type>
-                                            <mapper>
-                                                <type>perm</type>
-                                                <prefix>/usr/share/jdeb/lib</prefix>
-                                            </mapper>
-                                        </data>
-                                    </dataSet>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
+
         </profile>
         <profile>
             <id>java9</id>
