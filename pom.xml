@@ -12,7 +12,6 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <swing.module.name>zencash-wallet-swing</swing.module.name>
         <source.version>1.8</source.version>
     </properties>
 
@@ -98,10 +97,6 @@
 
 
     <profiles>
-        <profile>
-            <id>deb</id>
-
-        </profile>
         <profile>
             <id>java9</id>
             <activation>

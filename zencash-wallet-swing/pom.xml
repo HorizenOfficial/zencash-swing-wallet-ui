@@ -15,7 +15,7 @@
 
     <properties>
         <main.class>com.vaklinov.zcashui.ZCashUI</main.class>
-        <project.build.finalName>ZENCashSwingWalletUI</project.build.finalName>
+        <application.finalName>ZENCashSwingWalletUI</application.finalName>
     </properties>
 
     <dependencies>
@@ -112,6 +112,7 @@
                             <dataSet>
                                 <data>
                                     <src>${project.build.directory}/${project.build.finalName}.jar</src>
+                                    <dst>${application.finalName}.jar</dst>
                                     <type>file</type>
                                     <mapper>
                                         <type>perm</type>
