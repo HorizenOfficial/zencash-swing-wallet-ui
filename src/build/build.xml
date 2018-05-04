@@ -30,7 +30,7 @@
 <project name="ZENCashSwingWalletUI" basedir="../.." default="buildit">
 	
     <property name="zencash.swing.module.dir"     value="${basedir}/zencash-wallet-swing"/>
-    <property name="src.dir"     value="${zencash.swing.module.dir}/src/main"/>
+    <property name="src.dir"     value="src"/>
 	<property name="lib.dir"     value="lib"/>
 	<property name="deb.dir"  value="${zencash.swing.module.dir}/src/deb"/>
 	<property name="deb.resource.dir"  value="${deb.dir}/resources"/>
