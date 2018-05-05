@@ -29,8 +29,11 @@
 -->
 <project name="ZENCashSwingWalletUI" basedir="../.." default="buildit">
 	
+    <property name="zencash.swing.module.dir"     value="${basedir}/zencash-wallet-swing"/>
     <property name="src.dir"     value="src"/>
 	<property name="lib.dir"     value="lib"/>
+	<property name="deb.dir"  value="${zencash.swing.module.dir}/src/deb"/>
+	<property name="deb.resource.dir"  value="${deb.dir}/resources"/>
     <property name="build.dir"   value="build"/>
     <property name="classes.dir" value="${build.dir}/classes"/>
 	<property name="temp.dir"    value="${build.dir}/temp"/>
@@ -113,7 +116,7 @@
     <target name="ubuntuPackage" depends="jar,copyothers">	
     	<mkdir dir="${ubuntu.package.dir}"/>
 	    <deb destfile="${ubuntu.package.dir}/zencash-desktop-gui-wallet_0.82.9_all.deb" 
-	    	 control="${src.dir}/resources/ubuntu-package" 
+	    	 control="${deb.dir}/control"
 	    	 verbose="true">
 	    	
 	      <data src="${jar.dir}/${ant.project.name}.jar" type="file">
@@ -143,13 +146,13 @@
               <mapper type="perm" filemode="755" prefix="/usr/lib/zencash-gui-wallet/go-ipfs"/>
             </data>
             -->
-	      <data src="${src.dir}/resources/ubuntu-package/zencash-desktop-gui-wallet" type="file">
+	      <data src="${deb.resource.dir}/zencash-desktop-gui-wallet" type="file">
 	        <mapper type="perm" filemode="755" prefix="/usr/bin"/>
 	      </data>
-	      <data src="${src.dir}/resources/ubuntu-package/ZENCashWallet.desktop" type="file">
+	      <data src="${deb.resource.dir}/ZENCashWallet.desktop" type="file">
 	        <mapper type="perm" filemode="755" prefix="/usr/share/applications"/>
 	      </data>
-	      <data src="${src.dir}/resources/ubuntu-package/ZEN-icon.png" type="file">
+	      <data src="${deb.resource.dir}/ZEN-icon.png" type="file">
 	        <mapper type="perm" filemode="755" prefix="/usr/lib/zencash-gui-wallet"/>
 	      </data>	    	
 	    </deb>
