@@ -6,7 +6,7 @@
  *   / /__| |____| |\  | |___| (_| \__ \ | | | |__| | |__| |_| |_   \  /\  / (_| | | |  __/ |_ 
  *  /_____|______|_| \_|\_____\__,_|___/_| |_|\_____|\____/|_____|   \/  \/ \__,_|_|_|\___|\__|
  *                                                                                             
- * Copyright (c) 2017 Ivan Vaklinov <ivan@vaklinov.com>
+ * Copyright (c) 2016-2018 The ZEN Developers
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -95,8 +95,6 @@ import com.vaklinov.zcashui.msg.Message.VERIFICATION_TYPE;
 
 /**
  * Main panel for messaging
- *
- * @author Ivan Vaklinov <ivan@vaklinov.com>
  */
 public class MessagingPanel
 	extends WalletTabPanel
