@@ -1,0 +1,4 @@
+<langpack>
+    <str id="installer.reversetitle" txt="$APP_NAME $APP_VER"/>
+    <str id="installation.panel.header" txt="ZENCash Desktop GUI Wallet binary release 0.80.5 for Windows"/>
+</langpack>
