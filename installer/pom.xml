@@ -69,7 +69,6 @@
                             </execution>
                         </executions>
                   </plugin>
-                    <!--
                   <plugin>
                         <groupId>org.codehaus.mojo</groupId>
                         <artifactId>wagon-maven-plugin</artifactId>
@@ -89,7 +88,6 @@
                             </execution>
                         </executions>
                     </plugin>
-                    -->
                     <plugin>
                         <artifactId>maven-antrun-plugin</artifactId>
                         <version>1.8</version>
