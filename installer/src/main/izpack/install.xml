@@ -32,7 +32,6 @@
     <res id="ZencashLogo" src="images/zencash-logo.png"/>
 
     <res id="TargetPanel.dir.windows" src="TargetDirWindows.txt"/>
-    <res id="TargetPanel.dir.unix" src="TargetDirUnix.txt"/>
     <res id="packsLang.xml_eng" src="i18n/zencashPacksLang.xml_eng"/>
     <res id="CustomLangPack.xml_eng" src="i18n/customLangPack.xml_eng" />
 
