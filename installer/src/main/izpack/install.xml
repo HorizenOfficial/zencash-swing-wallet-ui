@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<installation version="5.0">
+  <info>
+    <appname>ZencashOfficialSwingWalletUI</appname>
+    <appversion>0.82.9</appversion>
+    <url>https://zencash.com</url>
+    <authors>
+        <author name="Ivan Vaklinov" email="ivan@vaklinov.com"/>
+        <author name="Armand Ballaci" email="aballaci@gmail.com"/>
+    </authors>
+  </info>
+  <guiprefs height="400" resizable="no" width="640">
+    <modifier key="useButtonIcons" value="yes"/>
+    <modifier key="useLabelIcons" value="no"/>
+    <modifier key="labelGap" value="2"/>
+    <modifier key="layoutAnchor" value="NORTHWEST"/>
+    <modifier key="useHeadingPanel" value="no"/>
+    <modifier key="headingImageOnLeft" value="yes"/>
+    <modifier key="headingLineCount" value="1"/>
+    <modifier key="headingFontSize" value="1.5"/>
+    <modifier key="headingBackgroundColor" value="#1E2940"/>
+    <modifier key="headingPanelCounter" value="progressbar"/>
+    <modifier key="headingPanelCounterPos" value="inNavigationPanel"/>
+  </guiprefs>
+  <locale>
+    <langpack iso3="eng"/>
+  </locale>
+  <resources>
+    <res id="LicencePanel.licence" src="@{main.basedir}/../LICENSE"/>
+    <res id="HTMLHelloPanel.welcome" src="welcome.html"/>
+    <res id="HTMLInfoPanel.welcome" src="welcome.html"/>
+    <res id="ZencashLogo" src="images/zencash-logo.png"/>
+
+    <res id="TargetPanel.dir.windows" src="TargetDirWindows.txt"/>
+    <res id="packsLang.xml_eng" src="i18n/zencashPacksLang.xml_eng"/>
+    <res id="CustomLangPack.xml_eng" src="i18n/customLangPack.xml_eng" />
+
+    <res id="Installer.image.0" src=""/>
+    <res id="Installer.image.install_dir" src="images/left.2.png"/>
+    <res id="Installer.image.3" src="images/left.3.png"/>
+    <res id="Installer.image.6" src="images/left.6.png"/>
+    <res id="JFrameIcon" src="images/JFrameIcon.png"/>
+
+    <res id="customicons.xml" src="customicons.xml" />
+    <res id="shortcutSpec.xml" src="default_shortcut_spec.xml"/>
+  </resources>
+  <variables>
+    <variable name="InstallerFrame.logfilePath" value="Default"/>
+    <variable name="WELCOME_TEXT" value="Zencash Swing Wallet Installation"/>
+    <variable name="WELCOME_VERSION" value="Version: 0.82.9"/>
+    <variable name="WELCOME_BG_COLOR" value="#404B62"/>
+    <variable name="WELCOME_TEXT_COLOR" value="#ffffff"/>
+  </variables>
+
+
+  <panels>
+    
+    <!-- FIXME why doesn't HTMLHelloPanel work any more?  it is nice not to have the "Please read the following information" text ... -->
+    <panel classname="HTMLInfoPanel" id="welcome"/>
+
+    <panel classname="LicencePanel" id="panel.license">
+          <configuration>
+              <param name="console-text-paging" value="false" />
+              <param name="console-text-wordwrap" value="false" />
+          </configuration>
+    </panel>
+    <!-- this is our custom panel, loaded from the izpack-panels.jar file -->
+    <!--panel classname="com.zencash.installer.panels.ZencashInstallerPanel" id="zencash-installer-panel"/-->
+    <panel classname="TargetPanel" id="install_dir"/>
+    <panel classname="PacksPanel" id="sdk_pack_select"/>
+    <panel classname="InstallPanel" id="install"/>
+    <panel classname="ShortcutPanel" id="shortcutpanel"/>
+    <panel classname="FinishPanel" id="finish"/>
+  </panels>
+
+    <natives>
+      <native type="izpack" name="ShellLink.dll"/>
+      <native type="izpack" name="ShellLink_x64.dll"/>
+      <native type="izpack" name="WinSetupAPI.dll">
+        <os family="windows"/>
+      </native>
+      <native type="izpack" name="WinSetupAPI_x64.dll">
+        <os family="windows"/>
+      </native>
+      <native type="3rdparty" name="COIOSHelper.dll" stage="both">
+        <os family="windows"/>
+      </native>
+      <native type="3rdparty" name="COIOSHelper_x64.dll" stage="both">
+        <os family="windows"/>
+      </native>
+    </natives>
+
+  <listeners>
+    <listener classname="RegistryInstallerListener" stage="install" >
+      <os family="windows"/>
+    </listener>
+    <listener classname="RegistryUninstallerListener" stage="uninstall" >
+      <os family="windows"/>
+    </listener>
+      <listener classname="SummaryLoggerInstallerListener" stage="install">
+        <os family="windows"/>
+      </listener>
+  </listeners>
+  
+  <packs>
+    <pack name="shortcuts_windows" id="win.short.pack" hidden="true" required="true">
+        <description>Shortcut for Windows</description>
+        <os family="windows"/>
+        <fileset dir="@{staging.dir}/win-shortcut" targetdir="${INSTALL_PATH}"/>
+    </pack>
+    <pack name="Core" required="yes" id="pack.core">
+    <description>Core files</description>
+    <fileset dir="@{staging.dir}/custom" targetdir="${INSTALL_PATH}/app">
+      <exclude name="installer-panels.jar" />
+    </fileset>
+    <fileset dir="@{staging.dir}/licences" targetdir="${INSTALL_PATH}/licences"/>
+    </pack>
+    <pack name="Zen Binaries" preselected="yes" required="yes">
+          <description>Zencash Binaries</description>
+          <fileset dir="@{staging.dir}/zen-win-binaries" targetdir="$INSTALL_PATH/app"/>
+    </pack>
+  </packs>
+</installation>

@@ -1,0 +1,229 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>com.zencash</groupId>
+        <artifactId>ZENCashOfficialSwingWalletUI</artifactId>
+        <version>0.82.9-SNAPSHOT</version>
+    </parent>
+
+  <artifactId>installer</artifactId>
+  <name>Zencash Wallet Installer</name>
+
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <staging.dir>${project.build.directory}/staging</staging.dir>
+    <installer-output-filename>zencash-wallet-installer</installer-output-filename>
+    <zen.project.url>https://github.com</zen.project.url>
+    <zen.binaries.file.name.windows>ZencashOfficial/zen/releases/download/v2.0.11/Zen_Win_binaries_v2.0.11.zip</zen.binaries.file.name.windows>
+    <izpack.version>5.0.6</izpack.version>
+  </properties>
+
+  <dependencies>
+      <dependency>
+          <groupId>com.zencash</groupId>
+          <artifactId>zencash-wallet-swing</artifactId>
+          <version>${project.version}</version>
+      </dependency>
+  </dependencies>
+
+    <profiles>
+        <profile>
+            <id>installer</id>
+              <build>
+                <defaultGoal>package</defaultGoal>
+                <plugins>
+                  <!-- copy all resources to the staging directory. -->
+                  <plugin>
+                        <artifactId>maven-resources-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>copy-resources</id>
+                                <!-- here the phase you need -->
+                                <phase>validate</phase>
+                                <goals>
+                                    <goal>copy-resources</goal>
+                                </goals>
+                                <configuration>
+                                    <outputDirectory>${staging.dir}</outputDirectory>
+                                  <!-- recursive copy of all resource under src/main/izpack. this is the stuff to install
+                                  as well as install.xml and panel data and such -->
+                                    <resources>
+                                        <resource>
+                                            <directory>src/main/izpack</directory>
+                                            <includes>
+                                                <include>**/*</include>
+                                            </includes>
+                                            <filtering>false</filtering>
+                                        </resource>
+                                        <resource>
+                                            <directory>../zencash-wallet-swing/src/deb/resources</directory>
+                                            <includes>
+                                                <include>licences/*</include>
+                                            </includes>
+                                            <filtering>false</filtering>
+                                        </resource>
+                                    </resources>
+                                </configuration>
+                            </execution>
+                        </executions>
+                  </plugin>
+                  <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>wagon-maven-plugin</artifactId>
+                        <version>1.0</version>
+                        <executions>
+                            <execution>
+                                <id>download-zen</id>
+                                <phase>validate</phase>
+                                <goals>
+                                    <goal>download-single</goal>
+                                </goals>
+                                <configuration>
+                                    <url>${zen.project.url}</url>
+                                    <fromFile>${zen.binaries.file.name.windows}</fromFile>
+                                    <toFile>${project.build.directory}/staging/zen-win-binaries.zip</toFile>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <artifactId>maven-antrun-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <phase>generate-resources</phase>
+                                <configuration>
+                                    <tasks>
+                                        <echo message="unzipping file" />
+                                        <unzip src="${project.build.directory}/staging/zen-win-binaries.zip"
+                                               dest="${project.build.directory}/staging/zen-win-binaries">
+                                            <patternset>
+                                                <include name="**/zen-cli.exe"/>
+                                                <include name="**/zen-tx.exe"/>
+                                                <include name="**/zend.exe"/>
+                                            </patternset>
+                                            <mapper type="flatten"/>
+                                        </unzip>
+                                    </tasks>
+                                </configuration>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                  <plugin>
+                   <artifactId>maven-dependency-plugin</artifactId>
+                      <executions>
+                         <execution>
+                           <!-- copy izpack custom (custom panels, etc.) jars to izpack staging custom -->
+                           <id>copy-izpack-dependencies</id>
+                           <phase>prepare-package</phase>
+                           <goals>
+                              <goal>copy-dependencies</goal>
+                           </goals>
+                           <configuration>
+                              <outputDirectory>${staging.dir}/custom</outputDirectory>
+                              <excludeTransitive>false</excludeTransitive>
+                              <stripVersion>true</stripVersion>
+                              <overWriteReleases>true</overWriteReleases>
+                              <overWriteSnapshots>true</overWriteSnapshots>
+                              <overWriteIfNewer>true</overWriteIfNewer>
+                              <includeArtifactIds>zencash-wallet-swing,bitcoinj-core,sqlite-jdbc,minimal-json</includeArtifactIds>
+                           </configuration>
+                        </execution>
+                   </executions>
+                  </plugin>
+
+                <!--
+                 We need to tell the izpack-maven-plugin what to use as the base directory (this is our staging area), and also tell it the install file to use:
+                -->
+                <plugin>
+                   <groupId>org.codehaus.izpack</groupId>
+                   <artifactId>izpack-maven-plugin</artifactId>
+                   <version>${izpack.version}</version>
+                   <executions>
+                      <execution>
+                         <phase>package</phase>
+                         <goals><goal>izpack</goal></goals>
+                         <configuration>
+                            <!-- base for relative paths in izpack descriptor -->
+                            <baseDir>${staging.dir}</baseDir>
+                            <installFile>${staging.dir}/install.xml</installFile>
+                             <output>${project.build.directory}/${installer-output-filename}.jar</output>
+                         </configuration>
+                      </execution>
+                   </executions>
+                   <!-- must have a dependency here on any code used in the installer, otherwise the classloader
+                   will not find it.  So in this case we need our panels and then the package that contains the base classes
+                   for the panels -->
+                   <dependencies>
+                      <dependency>
+                        <groupId>com.zencash</groupId>
+                        <artifactId>zencash-wallet-swing</artifactId>
+                          <version>${project.version}</version>
+                      </dependency>
+                    </dependencies>
+                </plugin>
+               <plugin>
+                   <groupId>com.akathist.maven.plugins.launch4j</groupId>
+                   <artifactId>launch4j-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>l4j-gui</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>launch4j</goal>
+                                </goals>
+                                <configuration>
+                                    <icon>${staging.dir}/win-shortcut/zencash.ico</icon>
+                                    <headerType>gui</headerType>
+                                    <jar>${project.build.directory}/${installer-output-filename}.jar</jar>
+                                    <outfile>${project.build.directory}/${installer-output-filename}.exe</outfile>
+                                    <classPath>
+                                        <mainClass>com.izforge.izpack.installer.bootstrap.Installer</mainClass>
+                                    </classPath>
+                                    <jre>
+                                        <bundledJre64Bit>false</bundledJre64Bit>
+                                        <bundledJreAsFallback>false</bundledJreAsFallback>
+                                        <minVersion>1.8.0</minVersion>
+                                        <jdkPreference>preferJre</jdkPreference>
+                                        <runtimeBits>64/32</runtimeBits>
+                                    </jre>
+                                    <versionInfo>
+                                        <fileVersion>1.0.0.0</fileVersion>
+                                        <txtFileVersion>1.0.0.0</txtFileVersion>
+                                        <fileDescription>${project.name}</fileDescription>
+                                        <copyright>C</copyright>
+                                        <productVersion>1.0.0.0</productVersion>
+                                        <txtProductVersion>1.0.0.0</txtProductVersion>
+                                        <productName>${project.name}</productName>
+                                        <internalName>${installer-output-filename}</internalName>
+                                        <originalFilename>${installer-output-filename}.exe</originalFilename>
+                                    </versionInfo>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <artifactId>maven-assembly-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>assembly</id>
+                                <phase>package</phase>
+                                <goals><goal>single</goal></goals>
+                                <configuration>
+                                    <outputDirectory>${project.build.directory}</outputDirectory>
+                                    <descriptors>
+                                        <descriptor>${staging.dir}/assembly.xml</descriptor>
+                                    </descriptors>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+              </build>
+        </profile>
+    </profiles>
+</project>
