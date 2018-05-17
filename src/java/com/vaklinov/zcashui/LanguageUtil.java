@@ -43,7 +43,7 @@ public class LanguageUtil {
     }
 
     private void loadBundle(){
-        Locale currentLocale = DEFAULT_LOCALE;
+        Locale currentLocale = getUsersPrferedLocale();
         rb = ResourceBundle.getBundle(RESOURCE_BUNDLE_FILE_NAME, currentLocale);
         Log.info("Loading locale: " + currentLocale.toString());
     }
@@ -89,10 +89,10 @@ public class LanguageUtil {
             bufferedReader.close();
             return supportedLocale.get(country);
         } catch (FileNotFoundException e) {
-            Log.error("Loading Locale Failed!!!!", e);
+            Log.error("Loading Language file Failed!!!!", e);
             return DEFAULT_LOCALE;
         } catch (IOException e) {
-            Log.error("Loading Locale Failed!!!!", e);
+            Log.error("Loading Language file Failed!!!!", e);
             return DEFAULT_LOCALE;
         }
     }
