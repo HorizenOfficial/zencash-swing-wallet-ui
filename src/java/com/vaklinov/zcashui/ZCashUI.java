@@ -45,18 +45,10 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
 import java.util.Date;
+import java.util.Locale;
 import java.util.Random;
 
-import javax.swing.ImageIcon;
-import javax.swing.JFrame;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
-import javax.swing.JTabbedPane;
-import javax.swing.KeyStroke;
-import javax.swing.SwingUtilities;
-import javax.swing.UIManager;
+import javax.swing.*;
 import javax.swing.UIManager.LookAndFeelInfo;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -148,7 +140,7 @@ public class ZCashUI
         		    new ImageIcon(cl.getResource("images/overview.png")),
         		    dashboard = new DashboardPanel(this, installationObserver, clientCaller, 
         		    		                       errorReporter, backupTracker, labelStorage));
-        tabs.addTab("Transactions ",
+        tabs.addTab(langUtil.getString("main.frame.tab.transactions.title"),
     		        new ImageIcon(cl.getResource("images/transactions.png")),
     		        transactionDetailsPanel = new TransactionsDetailPanel(
     		        	this, tabs, installationObserver, clientCaller, 
@@ -226,6 +218,45 @@ public class ZCashUI
         menuItemShareFileViaIPFS.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F, accelaratorKeyMask));
         
         mb.add(messaging);
+
+        ActionListener languageSelectionAction = new ActionListener(  ) {
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    Log.info("Action ["+e.getActionCommand(  )+"] performed");
+                    LanguageMenuItem item = (LanguageMenuItem) e.getSource();
+                    langUtil.updatePreferedLanguage(item.getLocale());
+                    JOptionPane.showMessageDialog(
+                            ZCashUI.this.getRootPane().getParent(),
+                            langUtil.getString("dialog.message.language.prefs.update"),
+                            langUtil.getString("dialog.message.language.prefs.update.title"),
+                            JOptionPane.INFORMATION_MESSAGE);
+                } catch (Exception ex) { ex.printStackTrace(  ); }
+            }
+        };
+        JMenu languageMenu = new JMenu(langUtil.getString("menu.label.language"));
+        LanguageMenuItem italian = new
+                LanguageMenuItem(langUtil.getString("menu.label.language.italian"),
+                new ImageIcon(cl.getResource("images/italian.png")), Locale.ITALY);
+        italian.setHorizontalTextPosition(JMenuItem.RIGHT);
+
+        italian.addActionListener(languageSelectionAction);
+
+
+        LanguageMenuItem english = new
+                LanguageMenuItem(langUtil.getString("menu.label.language.english"),
+                new ImageIcon(cl.getResource("images/uk.png")), Locale.US);
+        english.setHorizontalTextPosition(JMenuItem.RIGHT);
+
+        english.addActionListener(languageSelectionAction);
+
+        ButtonGroup group = new ButtonGroup(  );
+        group.add(italian);
+        group.add(english);
+
+        languageMenu.add(italian);
+        languageMenu.add(english);
+
+        mb.add(languageMenu);
 
         this.setJMenuBar(mb);
 
