@@ -46,6 +46,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.Arrays;
 
 import com.eclipsesource.json.Json;
 import com.eclipsesource.json.JsonArray;
@@ -151,12 +152,12 @@ public class ZCashClientCaller
 	{
 		String exportDir = OSUtil.getUserHomeDirectory().getCanonicalPath();
 		
-	    CommandExecutor starter = new CommandExecutor(
-	        new String[] 
-	        {
-	        	zcashd.getCanonicalPath(), 
-	        	"-exportdir=" + wrapStringParameter(exportDir)
-	        });
+        String[] zend_commands = StartupProgressDialog.commands.isEmpty() ?
+			new String[] {zcashd.getCanonicalPath(), "-exportdir=" + wrapStringParameter(exportDir)} :
+			new String[] {zcashd.getCanonicalPath(), "-exportdir=" + wrapStringParameter(exportDir), StartupProgressDialog.commands};
+		
+		CommandExecutor starter = new CommandExecutor(zend_commands);
+		Log.info("Starting " + Arrays.toString(zend_commands));
 	    
 	    return starter.startChildProcess();
 	}

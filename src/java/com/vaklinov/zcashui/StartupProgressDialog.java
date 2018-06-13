@@ -7,9 +7,12 @@ import java.awt.Component;
 import java.awt.Container;
 import java.awt.FlowLayout;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
+import java.rmi.server.ExportException;
 import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -46,6 +49,7 @@ public class StartupProgressDialog extends JFrame {
     private ImageIcon imageIcon;
     
     private final ZCashClientCaller clientCaller;
+    public static String commands = "";
     
     public StartupProgressDialog(ZCashClientCaller clientCaller) 
     {
@@ -111,6 +115,10 @@ public class StartupProgressDialog extends JFrame {
         {
         	Log.info("Splash: zend will be started...");
         }
+
+        //Read commands from file.
+        Log.info("Startup: Reading commands from file");
+        readAndShowProcess();
         
         final Process daemonProcess = 
         	shouldStartZCashd ? clientCaller.startDaemon() : null;
@@ -165,6 +173,7 @@ public class StartupProgressDialog extends JFrame {
 	                	
 	                	if (end - start > 15 * 1000)
 	                	{
+                            Log.info("Stopping Daemon . . .");
 	                		clientCaller.stopDaemon();
 	                		daemonProcess.destroy();
 	                	}
@@ -261,5 +270,32 @@ public class StartupProgressDialog extends JFrame {
 		}
 		
 		return false;
+    }
+
+    public void readAndShowProcess() {
+        File commandsFile = new File("commands.conf");
+        Log.info("Reading commands from file: " + commandsFile.getPath());
+        try (FileInputStream streamReadCommands = new FileInputStream(commandsFile)) {
+
+            if (!commandsFile.exists()){
+                commandsFile.createNewFile();
+            }
+
+            Log.info("Bytes to read from file: " + streamReadCommands.available());
+            int commandsToRead;
+            while ((commandsToRead = streamReadCommands.read()) != -1){
+                commands += (char)commandsToRead;
+            }
+            Log.info("Done reading commands from file: " + commandsFile.getPath());
+
+            Log.info("Emptying commands.conf");
+            PrintWriter pw = new PrintWriter(commandsFile);
+            pw.print("");
+            pw.close();
+
+        } catch (IOException ex) {
+            Log.error("Unexpected Error:", ex);
+
+        }
     }
 }
