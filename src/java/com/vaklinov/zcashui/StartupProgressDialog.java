@@ -273,29 +273,39 @@ public class StartupProgressDialog extends JFrame {
     }
 
     public void readAndShowProcess() {
-        File commandsFile = new File("commands.conf");
-        Log.info("Reading commands from file: " + commandsFile.getPath());
-        try (FileInputStream streamReadCommands = new FileInputStream(commandsFile)) {
+        try{
+            File commandsFile = new File(OSUtil.getSettingsDirectory() + File.separator + "commands.conf");
 
             if (!commandsFile.exists()){
                 commandsFile.createNewFile();
             }
 
-            Log.info("Bytes to read from file: " + streamReadCommands.available());
-            int commandsToRead;
-            while ((commandsToRead = streamReadCommands.read()) != -1){
-                commands += (char)commandsToRead;
+            try (FileInputStream streamReadCommands = new FileInputStream(commandsFile)) {
+
+                Log.info("Reading commands from file: " + commandsFile.getPath());
+
+                int commandsToRead;
+                while ((commandsToRead = streamReadCommands.read()) != -1){
+                    commands += (char)commandsToRead;
+                }
+                Log.info("Done reading commands from file: " + commandsFile.getPath());
+
+                long fileSize = streamReadCommands.getChannel().size();
+                if(fileSize > 0) {
+                    Log.info("Emptying commands.conf");
+                    try (PrintWriter pw = new PrintWriter(commandsFile)) {
+                        pw.print("");
+                    } catch (IOException e) {
+                        Log.error("Unexpected IO Error:", e);
+                    }
+                }
+
+            } catch (IOException ex) {
+                Log.error("Unexpected IO Error:", ex);
             }
-            Log.info("Done reading commands from file: " + commandsFile.getPath());
 
-            Log.info("Emptying commands.conf");
-            PrintWriter pw = new PrintWriter(commandsFile);
-            pw.print("");
-            pw.close();
-
-        } catch (IOException ex) {
-            Log.error("Unexpected Error:", ex);
-
+        }catch (IOException e) {
+            Log.error("Unexpected IO Error:", e);
         }
     }
 }

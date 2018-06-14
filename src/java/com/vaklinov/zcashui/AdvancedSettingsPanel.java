@@ -169,28 +169,29 @@ public class AdvancedSettingsPanel extends JPanel {
     }
 
     public void writeAndNotifyProcess() {
-        File commandsFile = new File("commands.conf");
+        try {
+            File commandsFile = new File(OSUtil.getSettingsDirectory() + File.separator + "commands.conf");
 
-        Log.info("Preparing commands to file: " + commandsFile.getPath());
-        try(FileOutputStream streamCommands = new FileOutputStream(commandsFile)) {
+            Log.info("Preparing commands to file: " + commandsFile.getPath());
+            try(FileOutputStream streamCommands = new FileOutputStream(commandsFile)) {
 
-            if (!commandsFile.exists()){
-                Log.info("Checking if file exists: " + commandsFile.getPath());
-                commandsFile.createNewFile();
+                Log.info("Writing to File: " + commandsFile.getPath());
+                byte[] commandsInByte = taCommandLineParameters.getText().getBytes();
+                streamCommands.write(commandsInByte);
+
+                streamCommands.flush();
+                Log.info("Done writing commands to file: " + commandsFile.getPath());
+
+                lbStatusBar.setText(langUtil.getString("domain.fronting.status.label.restart"));
+
+            } catch (IOException ex) {
+                Log.error("Unexpected IO Error:", ex);
             }
-
-            Log.info("Writing to File: " + commandsFile.getPath());
-            byte[] commandsInByte = taCommandLineParameters.getText().getBytes();
-            streamCommands.write(commandsInByte);
-
-            streamCommands.flush();
-            Log.info("Done writing commands to file: " + commandsFile.getPath());
-
-            lbStatusBar.setText(langUtil.getString("domain.fronting.status.label.restart"));
-
-        } catch (IOException ex) {
-            Log.error("Unexpected Error:", ex);
+        }catch(IOException e){
+            Log.error("Unexpected IO Error:", e);
         }
+
+
     }
 
     private static void open(URI uri)   {
