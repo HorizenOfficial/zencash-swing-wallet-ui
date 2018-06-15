@@ -6,10 +6,7 @@ import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.FlowLayout;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.PrintWriter;
+import java.io.*;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.rmi.server.ExportException;
@@ -273,38 +270,36 @@ public class StartupProgressDialog extends JFrame {
     }
 
     public void readAndShowProcess() {
-        try{
+        try {
             File commandsFile = new File(OSUtil.getSettingsDirectory() + File.separator + "commands.conf");
+            if (commandsFile.exists()) {
+                try (BufferedReader reader = new BufferedReader(new FileReader(commandsFile))) {
 
-            if (!commandsFile.exists()){
-                commandsFile.createNewFile();
-            }
+                    Log.info("Reading commands from file: " + commandsFile.getPath());
 
-            try (FileInputStream streamReadCommands = new FileInputStream(commandsFile)) {
-
-                Log.info("Reading commands from file: " + commandsFile.getPath());
-
-                int commandsToRead;
-                while ((commandsToRead = streamReadCommands.read()) != -1){
-                    commands += (char)commandsToRead;
-                }
-                Log.info("Done reading commands from file: " + commandsFile.getPath());
-
-                long fileSize = streamReadCommands.getChannel().size();
-                if(fileSize > 0) {
-                    Log.info("Emptying commands.conf");
-                    try (PrintWriter pw = new PrintWriter(commandsFile)) {
-                        pw.print("");
-                    } catch (IOException e) {
-                        Log.error("Unexpected IO Error:", e);
+                    int fileSize = 0;
+                    String _commands;
+                    while ((_commands = reader.readLine()) != null) {
+                        commands = _commands;
+                        fileSize++;
                     }
+                    Log.info("Done reading commands from file: " + commandsFile.getPath());
+
+                    Log.info("Commands: " + commands);
+
+                    if (fileSize > 0) {
+                        Log.info("Emptying commands.conf");
+                        try (PrintWriter pw = new PrintWriter(commandsFile)) {
+                            pw.print("");
+                        } catch (IOException e) {
+                            Log.error("Unexpected IO Error:", e);
+                        }
+                    }
+                } catch (IOException ex) {
+                    Log.error("Unexpected IO Error:", ex);
                 }
-
-            } catch (IOException ex) {
-                Log.error("Unexpected IO Error:", ex);
-            }
-
-        }catch (IOException e) {
+        }
+        }catch(IOException e){
             Log.error("Unexpected IO Error:", e);
         }
     }
