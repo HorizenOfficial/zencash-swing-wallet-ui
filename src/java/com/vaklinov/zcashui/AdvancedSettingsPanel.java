@@ -15,11 +15,13 @@ import java.net.URISyntaxException;
 public class AdvancedSettingsPanel extends JPanel {
 
     private JCheckBox cbAdvanceSettings = null;
+    private JCheckBox cbApplyOptionOnce = null;
     private JTextArea taCommandLineParameters = null;
 
     private JLabel lbAdvancedSettings = null;
     private JLabel lbWarningLabel = null;
     private JLabel lbStatusBar = null;
+    private JLabel lbSpacer = null;
 
     private JButton btnApplySettings = null;
     private JButton btnLinkCommands = null;
@@ -40,14 +42,19 @@ public class AdvancedSettingsPanel extends JPanel {
         lbAdvancedSettings = new JLabel(langUtil.getString("domain.fronting.status.header.text"));
         lbWarningLabel = new JLabel(langUtil.getString("domain.fronting.message.warning"));
         lbStatusBar = new JLabel(langUtil.getString("domain.fronting.status.label.no.changes"));
+        lbSpacer = new JLabel("  ");
 
         cbAdvanceSettings = new JCheckBox("Enable advanced mode");
+        cbApplyOptionOnce = new JCheckBox("Apply option/s once");
+        cbApplyOptionOnce.setEnabled(false);
 
         taCommandLineParameters = new JTextArea(6, 10);
         taCommandLineParameters.setBackground(Color.lightGray);
         taCommandLineParameters.setEditable(false);
-        //Do not save commands.
-        //taCommandLineParameters.setText(StartupProgressDialog.commands);
+
+        /*if (!StartupProgressDialog.runOnce) {
+            taCommandLineParameters.setText(StartupProgressDialog.commands);
+        }*/
 
         btnApplySettings = new JButton("Apply");
         btnApplySettings.setEnabled(false);
@@ -64,8 +71,6 @@ public class AdvancedSettingsPanel extends JPanel {
         btnLinkCommands.setBorder(borderEmpty);
         btnLinkCommands.setBackground(Color.lightGray);
         btnLinkCommands.setToolTipText(uri.toString());
-
-
 
         //TODO: Start building UI.
         this.setLayout(new BorderLayout(0, 0));
@@ -87,6 +92,8 @@ public class AdvancedSettingsPanel extends JPanel {
 
         JPanel panelAdvancedMode = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
         panelAdvancedMode.add(cbAdvanceSettings);
+        panelAdvancedMode.add(lbSpacer);
+        panelAdvancedMode.add(cbApplyOptionOnce);
         panelAdvancedSettings.add(panelAdvancedMode);
 
         panelAdvancedSettings.add(taCommandLineParameters);
@@ -146,7 +153,7 @@ public class AdvancedSettingsPanel extends JPanel {
             }
         });
 
-        //Wire checkbox
+        //Wire enable advanced settings checkbox
         cbAdvanceSettings.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
@@ -155,10 +162,12 @@ public class AdvancedSettingsPanel extends JPanel {
                         taCommandLineParameters.setEditable(true);
                         taCommandLineParameters.setBackground(Color.white);
                         btnApplySettings.setEnabled(true);
+                        cbApplyOptionOnce.setEnabled(true);
                     } else {
                         taCommandLineParameters.setEditable(false);
                         taCommandLineParameters.setBackground(Color.lightGray);
                         btnApplySettings.setEnabled(false);
+                        cbApplyOptionOnce.setEnabled(false);
                     }
                 } catch (Exception ex) {
                     Log.error("Unexpected Error:", ex);
@@ -176,7 +185,16 @@ public class AdvancedSettingsPanel extends JPanel {
             try(FileOutputStream streamCommands = new FileOutputStream(commandsFile)) {
 
                 Log.info("Writing to File: " + commandsFile.getPath());
-                byte[] commandsInByte = taCommandLineParameters.getText().getBytes();
+                String option_string = taCommandLineParameters.getText();
+
+                if(cbAdvanceSettings.isSelected()){
+                    option_string += "\nRunOnce=1";
+                }else {
+                    option_string += "\nRunOnce=0";
+                }
+
+                byte[] commandsInByte = option_string.getBytes();
+
                 streamCommands.write(commandsInByte);
 
                 streamCommands.flush();

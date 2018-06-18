@@ -12,6 +12,7 @@ import java.net.URL;
 import java.rmi.server.ExportException;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Scanner;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -47,6 +48,7 @@ public class StartupProgressDialog extends JFrame {
     
     private final ZCashClientCaller clientCaller;
     public static String commands = "";
+    public static boolean runOnce = parseRunOnce();
     
     public StartupProgressDialog(ZCashClientCaller clientCaller) 
     {
@@ -273,21 +275,20 @@ public class StartupProgressDialog extends JFrame {
         try {
             File commandsFile = new File(OSUtil.getSettingsDirectory() + File.separator + "commands.conf");
             if (commandsFile.exists()) {
+
                 try (BufferedReader reader = new BufferedReader(new FileReader(commandsFile))) {
 
                     Log.info("Reading commands from file: " + commandsFile.getPath());
-
-                    int fileSize = 0;
                     String _commands;
-                    while ((_commands = reader.readLine()) != null) {
+                    if((_commands = reader.readLine()) != null) {
                         commands = _commands;
-                        fileSize++;
                     }
+
                     Log.info("Done reading commands from file: " + commandsFile.getPath());
 
-                    Log.info("Commands: " + commands);
+                    Log.info("Commands: " + commands + " Run: " + runOnce);
 
-                    if (fileSize > 0) {
+                    if (runOnce) {
                         Log.info("Emptying commands.conf");
                         try (PrintWriter pw = new PrintWriter(commandsFile)) {
                             pw.print("");
@@ -298,9 +299,36 @@ public class StartupProgressDialog extends JFrame {
                 } catch (IOException ex) {
                     Log.error("Unexpected IO Error:", ex);
                 }
+
         }
         }catch(IOException e){
             Log.error("Unexpected IO Error:", e);
         }
+    }
+
+    public static boolean parseRunOnce(){
+        String run_option = "";
+        try{
+            File commandsFile = new File(OSUtil.getSettingsDirectory() + File.separator + "commands.conf");
+            try(Scanner filescanner = new Scanner(commandsFile)){
+
+                while(filescanner.hasNextLine()){
+                    String line = filescanner.nextLine();
+
+                    if (line.startsWith("RunOnce=")){
+                        run_option = line.substring(line.lastIndexOf("=") + 1);
+                    }
+                }
+
+            }catch (IOException e){
+                Log.error("Unexpected IO Error:", e);
+            }
+
+        }catch (FileNotFoundException e){
+            Log.error("File not found Error:", e);
+        }catch (IOException e){
+            Log.error("Unexpected IO Error:", e);
+        }
+        return (run_option.trim().equals("1")) ? true : false;
     }
 }
