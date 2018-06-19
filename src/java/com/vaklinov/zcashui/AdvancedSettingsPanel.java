@@ -11,6 +11,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Properties;
 
 public class AdvancedSettingsPanel extends JPanel {
 
@@ -47,14 +48,11 @@ public class AdvancedSettingsPanel extends JPanel {
         cbAdvanceSettings = new JCheckBox("Enable advanced mode");
         cbApplyOptionOnce = new JCheckBox("Apply option/s once");
         cbApplyOptionOnce.setEnabled(false);
+        cbApplyOptionOnce.setSelected(StartupProgressDialog.runOnce);
 
         taCommandLineParameters = new JTextArea(6, 10);
         taCommandLineParameters.setBackground(Color.lightGray);
         taCommandLineParameters.setEditable(false);
-
-        /*if (!StartupProgressDialog.runOnce) {
-            taCommandLineParameters.setText(StartupProgressDialog.commands);
-        }*/
 
         btnApplySettings = new JButton("Apply");
         btnApplySettings.setEnabled(false);
@@ -179,37 +177,18 @@ public class AdvancedSettingsPanel extends JPanel {
 
     public void writeAndNotifyProcess() {
         try {
-            File commandsFile = new File(OSUtil.getSettingsDirectory() + File.separator + "commands.conf");
+            Properties prop = new Properties();
+            int restart_check = cbApplyOptionOnce.isSelected() ? 1 : 0;
 
-            Log.info("Preparing commands to file: " + commandsFile.getPath());
-            try(FileOutputStream streamCommands = new FileOutputStream(commandsFile)) {
+            //Set properties value.
+            prop.setProperty("ZendCommands", taCommandLineParameters.getText());
+            prop.setProperty("RunOnce", String.valueOf(restart_check));
 
-                Log.info("Writing to File: " + commandsFile.getPath());
-                String option_string = taCommandLineParameters.getText();
+            prop.store(new FileOutputStream(OSUtil.getSettingsDirectory() + File.separator + "commands.conf"), null);
 
-                if(cbAdvanceSettings.isSelected()){
-                    option_string += "\nRunOnce=1";
-                }else {
-                    option_string += "\nRunOnce=0";
-                }
-
-                byte[] commandsInByte = option_string.getBytes();
-
-                streamCommands.write(commandsInByte);
-
-                streamCommands.flush();
-                Log.info("Done writing commands to file: " + commandsFile.getPath());
-
-                lbStatusBar.setText(langUtil.getString("domain.fronting.status.label.restart"));
-
-            } catch (IOException ex) {
-                Log.error("Unexpected IO Error:", ex);
-            }
-        }catch(IOException e){
+        } catch (IOException e) {
             Log.error("Unexpected IO Error:", e);
         }
-
-
     }
 
     private static void open(URI uri)   {

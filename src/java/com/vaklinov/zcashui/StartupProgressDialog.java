@@ -12,6 +12,7 @@ import java.net.URL;
 import java.rmi.server.ExportException;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Scanner;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
@@ -33,7 +34,6 @@ import com.vaklinov.zcashui.ZCashClientCaller.WalletCallException;
 
 
 public class StartupProgressDialog extends JFrame {
-    
 
     private static final int POLL_PERIOD = 1500;
     private static final int STARTUP_ERROR_CODE = -28;
@@ -48,11 +48,15 @@ public class StartupProgressDialog extends JFrame {
     
     private final ZCashClientCaller clientCaller;
     public static String commands = "";
-    public static boolean runOnce = parseRunOnce();
+    public static boolean runOnce;
     
     public StartupProgressDialog(ZCashClientCaller clientCaller) 
     {
         this.clientCaller = clientCaller;
+
+        //Config Creation
+        createConfig();
+        runOnce = applyZendCommands();
         
         URL iconUrl = this.getClass().getClassLoader().getResource("images/ZEN-yellow.orange-logo.png");
         imageIcon = new ImageIcon(iconUrl);
@@ -114,10 +118,6 @@ public class StartupProgressDialog extends JFrame {
         {
         	Log.info("Splash: zend will be started...");
         }
-
-        //Read commands from file.
-        Log.info("Startup: Reading commands from file");
-        readAndShowProcess();
         
         final Process daemonProcess = 
         	shouldStartZCashd ? clientCaller.startDaemon() : null;
@@ -271,64 +271,52 @@ public class StartupProgressDialog extends JFrame {
 		return false;
     }
 
-    public void readAndShowProcess() {
+    public boolean applyZendCommands() {
+        Properties config_file = new Properties();
+        boolean run_option = false;
         try {
-            File commandsFile = new File(OSUtil.getSettingsDirectory() + File.separator + "commands.conf");
-            if (commandsFile.exists()) {
+            config_file.load(new FileInputStream(OSUtil.getSettingsDirectory() + File.separator + "commands.conf"));
+            commands = config_file.getProperty("ZendCommands");
+            run_option = config_file.getProperty("RunOnce").trim().equals("1") ? true : false;
 
-                try (BufferedReader reader = new BufferedReader(new FileReader(commandsFile))) {
+            if (run_option){
+                Log.info("Resetting config file: " + run_option);
+                setConfig();
+            }
 
-                    Log.info("Reading commands from file: " + commandsFile.getPath());
-                    String _commands;
-                    if((_commands = reader.readLine()) != null) {
-                        commands = _commands;
-                    }
-
-                    Log.info("Done reading commands from file: " + commandsFile.getPath());
-
-                    Log.info("Commands: " + commands + " Run: " + runOnce);
-
-                    if (runOnce) {
-                        Log.info("Emptying commands.conf");
-                        try (PrintWriter pw = new PrintWriter(commandsFile)) {
-                            pw.print("");
-                        } catch (IOException e) {
-                            Log.error("Unexpected IO Error:", e);
-                        }
-                    }
-                } catch (IOException ex) {
-                    Log.error("Unexpected IO Error:", ex);
-                }
-
-        }
+            Log.info("Applied command/s: " + commands);
         }catch(IOException e){
             Log.error("Unexpected IO Error:", e);
         }
+
+        return run_option;
     }
 
-    public static boolean parseRunOnce(){
-        String run_option = "";
-        try{
+    public void createConfig(){
+        try {
             File commandsFile = new File(OSUtil.getSettingsDirectory() + File.separator + "commands.conf");
-            try(Scanner filescanner = new Scanner(commandsFile)){
-
-                while(filescanner.hasNextLine()){
-                    String line = filescanner.nextLine();
-
-                    if (line.startsWith("RunOnce=")){
-                        run_option = line.substring(line.lastIndexOf("=") + 1);
-                    }
-                }
-
-            }catch (IOException e){
-                Log.error("Unexpected IO Error:", e);
+            if (!commandsFile.exists()) {
+                setConfig();
             }
-
-        }catch (FileNotFoundException e){
-            Log.error("File not found Error:", e);
         }catch (IOException e){
             Log.error("Unexpected IO Error:", e);
         }
-        return (run_option.trim().equals("1")) ? true : false;
+
     }
+
+    public void setConfig() {
+        try {
+            Properties prop = new Properties();
+
+            //Set properties value.
+            prop.setProperty("ZendCommands", "");
+            prop.setProperty("RunOnce", "1");
+
+            prop.store(new FileOutputStream(OSUtil.getSettingsDirectory() + File.separator + "commands.conf"), null);
+
+        } catch (IOException e) {
+            Log.error("Unexpected IO Error:", e);
+        }
+    }
+
 }
