@@ -44,8 +44,12 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
+import java.lang.management.ManagementFactory;
+import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Locale;
+import java.util.List;
 import java.util.Random;
 
 import javax.swing.*;
@@ -60,6 +64,7 @@ import com.vaklinov.zcashui.ZCashInstallationObserver.DAEMON_STATUS;
 import com.vaklinov.zcashui.ZCashInstallationObserver.DaemonInfo;
 import com.vaklinov.zcashui.ZCashInstallationObserver.InstallationDetectionException;
 import com.vaklinov.zcashui.msg.MessagingPanel;
+import sun.awt.OSInfo;
 
 
 /**
@@ -97,12 +102,13 @@ public class ZCashUI
     private SendCashPanel    sendPanel;
     private AddressBookPanel addressBookPanel;
     private MessagingPanel   messagingPanel;
+    private AdvancedSettingsPanel advancedSettingsPanel;
     private LanguageUtil langUtil;
 
     JTabbedPane tabs;
 
     public ZCashUI(StartupProgressDialog progressDialog)
-        throws IOException, InterruptedException, WalletCallException
+            throws IOException, InterruptedException, WalletCallException, URISyntaxException
     {
 
         langUtil = LanguageUtil.instance();
@@ -158,6 +164,9 @@ public class ZCashUI
         tabs.addTab(langUtil.getString("main.frame.tab.messaging.title"),
 		            new ImageIcon(cl.getResource("images/messaging.png")),
 		            messagingPanel = new MessagingPanel(this, sendPanel, tabs, clientCaller, errorReporter, labelStorage));
+        tabs.addTab(langUtil.getString("menu.label.advanced.settings"),
+                    new ImageIcon(cl.getResource("images/lock_opengreen_s.png")),
+                    advancedSettingsPanel = new AdvancedSettingsPanel(this, clientCaller));
         contentPane.add(tabs);
 
         this.walletOps = new WalletOperations(
@@ -562,6 +571,84 @@ public class ZCashUI
         ZCashUI.this.dispose();
 
         System.exit(0);
+    }
+
+    //TODO: Need to improve for next release.
+    public void restartProgram() throws IOException
+    {
+        OS_TYPE os = OSUtil.getOSType();
+        try {
+            //Note issues arise when not stopping the Daemon process first.
+            clientCaller.stopDaemon();
+
+            //Add little delay
+            Thread.sleep(2000);
+
+            //Java Binary
+            final String java = System.getProperty("java.home") + "/bin/java";
+
+            //Get program JVM arguments
+            List<String> vmArgs = ManagementFactory.getRuntimeMXBean().getInputArguments();
+            StringBuffer vmArgsOneLine = new StringBuffer();
+
+            for (String arg : vmArgs) {
+                if (!arg.contains("-agentlib")) {
+                    vmArgsOneLine.append(arg);
+                    vmArgsOneLine.append(" ");
+                }
+            }
+            //Log to see if JVM commands is not null
+            Log.info("Check (sun.java.command) = " + System.getProperty("sun.java.command"));
+
+            //Initialize commands to execute.
+            final StringBuffer cmd = new StringBuffer("\"" + java + "\"" + vmArgsOneLine);
+
+            if (os == OS_TYPE.WINDOWS){
+                //Still experimental will improve this code.
+                Log.info("Windows OS - Clean commands and add executable");
+                cmd.setLength(0);
+                cmd.append("ZENCashDesktopGUIWallet.exe");
+            }
+            else {
+                String[] mainCommand = System.getProperty("sun.java.command").split(" ");
+                Log.info("Path: " + new File(mainCommand[0]).getPath());
+
+                //Program is a JAR.
+                if (mainCommand[0].endsWith(".jar")) {
+                    cmd.append(" -jar " + new File(mainCommand[0]).getPath());
+                    Log.info("Application is in JAR mode, file found");
+                } else {
+                    cmd.append("-cp \"" + System.getProperty("java.class.path") + "\" " + mainCommand[0]);
+                    //still need to work on restarting the application in Development mode.
+                    Log.info("Application is in development mode, restart still not supported");
+                }
+
+                //Adding program arguments.
+                for (int i = 1; i < mainCommand.length; i++) {
+                    cmd.append(" ");
+                    cmd.append(mainCommand[i]);
+                }
+                Log.info("Command: " + cmd.toString() + " " + new File(mainCommand[0]).getPath());
+            }
+
+            //Execute command
+            Runtime.getRuntime().addShutdownHook(new Thread() {
+                @Override
+                public void run() {
+                    try {
+                        Runtime.getRuntime().exec(cmd.toString());
+                    } catch (IOException ex) {
+                        Log.error("Exception: ", ex);
+                    }
+                }
+            });
+
+            Log.info("Restarting...");
+            ZCashUI.this.exitProgram();
+        }catch (Exception e){
+            throw new IOException("Error while trying to restart the application", e);
+        }
+
     }
 
     public static void main(String argv[])

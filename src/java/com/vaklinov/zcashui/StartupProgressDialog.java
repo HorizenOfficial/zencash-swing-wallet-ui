@@ -6,12 +6,14 @@ import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.FlowLayout;
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
+import java.rmi.server.ExportException;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Properties;
+import java.util.Scanner;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -32,7 +34,6 @@ import com.vaklinov.zcashui.ZCashClientCaller.WalletCallException;
 
 
 public class StartupProgressDialog extends JFrame {
-    
 
     private static final int POLL_PERIOD = 1500;
     private static final int STARTUP_ERROR_CODE = -28;
@@ -46,10 +47,16 @@ public class StartupProgressDialog extends JFrame {
     private ImageIcon imageIcon;
     
     private final ZCashClientCaller clientCaller;
+    public static String commands = "";
+    public static boolean runOnce;
     
     public StartupProgressDialog(ZCashClientCaller clientCaller) 
     {
         this.clientCaller = clientCaller;
+
+        //Config Creation
+        createConfig();
+        runOnce = applyZendCommands();
         
         URL iconUrl = this.getClass().getClassLoader().getResource("images/ZEN-yellow.orange-logo.png");
         imageIcon = new ImageIcon(iconUrl);
@@ -165,6 +172,7 @@ public class StartupProgressDialog extends JFrame {
 	                	
 	                	if (end - start > 15 * 1000)
 	                	{
+                            Log.info("Stopping Daemon . . .");
 	                		clientCaller.stopDaemon();
 	                		daemonProcess.destroy();
 	                	}
@@ -262,4 +270,53 @@ public class StartupProgressDialog extends JFrame {
 		
 		return false;
     }
+
+    public boolean applyZendCommands() {
+        Properties config_file = new Properties();
+        boolean run_option = false;
+        try {
+            config_file.load(new FileInputStream(OSUtil.getSettingsDirectory() + File.separator + "commands.conf"));
+            commands = config_file.getProperty("ZendCommands");
+            run_option = config_file.getProperty("RunOnce").trim().equals("1") ? true : false;
+
+            if (run_option){
+                Log.info("Resetting config file: " + run_option);
+                setConfig();
+            }
+
+            Log.info("Applied command/s: " + commands);
+        }catch(IOException e){
+            Log.error("Unexpected IO Error:", e);
+        }
+
+        return run_option;
+    }
+
+    public void createConfig(){
+        try {
+            File commandsFile = new File(OSUtil.getSettingsDirectory() + File.separator + "commands.conf");
+            if (!commandsFile.exists()) {
+                setConfig();
+            }
+        }catch (IOException e){
+            Log.error("Unexpected IO Error:", e);
+        }
+
+    }
+
+    public void setConfig() {
+        try {
+            Properties prop = new Properties();
+
+            //Set properties value.
+            prop.setProperty("ZendCommands", "");
+            prop.setProperty("RunOnce", "1");
+
+            prop.store(new FileOutputStream(OSUtil.getSettingsDirectory() + File.separator + "commands.conf"), null);
+
+        } catch (IOException e) {
+            Log.error("Unexpected IO Error:", e);
+        }
+    }
+
 }
