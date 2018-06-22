@@ -141,6 +141,7 @@ public class AdvancedSettingsPanel extends JPanel {
                     );
                     if (option == JOptionPane.YES_OPTION) {
                         writeAndNotifyProcess();
+                        lbStatusBar.setText(langUtil.getString("domain.fronting.status.label.restart"));
                         //TODO: Restart needs improvement in all platforms.
                         //parent.restartProgram();
                     }
