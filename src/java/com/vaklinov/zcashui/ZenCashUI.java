@@ -46,7 +46,6 @@ import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
 import java.lang.management.ManagementFactory;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.Locale;
 import java.util.List;
@@ -64,13 +63,12 @@ import com.vaklinov.zcashui.ZCashInstallationObserver.DAEMON_STATUS;
 import com.vaklinov.zcashui.ZCashInstallationObserver.DaemonInfo;
 import com.vaklinov.zcashui.ZCashInstallationObserver.InstallationDetectionException;
 import com.vaklinov.zcashui.msg.MessagingPanel;
-import sun.awt.OSInfo;
 
 
 /**
  * Main ZENCash Window.
  */
-public class ZCashUI
+public class ZenCashUI
     extends JFrame
 {
     private ZCashInstallationObserver installationObserver;
@@ -107,7 +105,7 @@ public class ZCashUI
 
     JTabbedPane tabs;
 
-    public ZCashUI(StartupProgressDialog progressDialog)
+    public ZenCashUI(StartupProgressDialog progressDialog)
             throws IOException, InterruptedException, WalletCallException, URISyntaxException
     {
 
@@ -235,7 +233,7 @@ public class ZCashUI
                     LanguageMenuItem item = (LanguageMenuItem) e.getSource();
                     langUtil.updatePreferedLanguage(item.getLocale());
                     JOptionPane.showMessageDialog(
-                            ZCashUI.this.getRootPane().getParent(),
+                            ZenCashUI.this.getRootPane().getParent(),
                             langUtil.getString("dialog.message.language.prefs.update"),
                             langUtil.getString("dialog.message.language.prefs.update.title"),
                             JOptionPane.INFORMATION_MESSAGE);
@@ -276,7 +274,7 @@ public class ZCashUI
                 @Override
                 public void actionPerformed(ActionEvent e)
                 {
-                    ZCashUI.this.exitProgram();
+                    ZenCashUI.this.exitProgram();
                 }
             }
         );
@@ -289,12 +287,12 @@ public class ZCashUI
                 {
                 	try
                 	{
-                		AboutDialog ad = new AboutDialog(ZCashUI.this);
+                		AboutDialog ad = new AboutDialog(ZenCashUI.this);
                 		ad.setVisible(true);
                 	} catch (UnsupportedEncodingException uee)
                 	{
                 		Log.error("Unexpected error: ", uee);
-                		ZCashUI.this.errorReporter.reportError(uee);
+                		ZenCashUI.this.errorReporter.reportError(uee);
                 	}
                 }
             }
@@ -306,7 +304,7 @@ public class ZCashUI
                 @Override
                 public void actionPerformed(ActionEvent e)
                 {
-                    ZCashUI.this.walletOps.backupWallet();
+                    ZenCashUI.this.walletOps.backupWallet();
                 }
             }
         );
@@ -318,7 +316,7 @@ public class ZCashUI
                 @Override
                 public void actionPerformed(ActionEvent e)
                 {
-                    ZCashUI.this.walletOps.encryptWallet();
+                    ZenCashUI.this.walletOps.encryptWallet();
                 }
             }
         );
@@ -330,7 +328,7 @@ public class ZCashUI
                 @Override
                 public void actionPerformed(ActionEvent e)
                 {
-                    ZCashUI.this.walletOps.exportWalletPrivateKeys();
+                    ZenCashUI.this.walletOps.exportWalletPrivateKeys();
                 }
             }
        );
@@ -341,7 +339,7 @@ public class ZCashUI
                 @Override
                 public void actionPerformed(ActionEvent e)
                 {
-                    ZCashUI.this.walletOps.importWalletPrivateKeys();
+                    ZenCashUI.this.walletOps.importWalletPrivateKeys();
                 }
             }
        );
@@ -352,7 +350,7 @@ public class ZCashUI
                 @Override
                 public void actionPerformed(ActionEvent e)
                 {
-                    ZCashUI.this.walletOps.showPrivateKey();
+                    ZenCashUI.this.walletOps.showPrivateKey();
                 }
             }
        );
@@ -363,7 +361,7 @@ public class ZCashUI
                @Override
                public void actionPerformed(ActionEvent e)
                {
-                   ZCashUI.this.walletOps.importSinglePrivateKey();
+                   ZenCashUI.this.walletOps.importSinglePrivateKey();
                }
            }
        );
@@ -374,7 +372,7 @@ public class ZCashUI
                    @Override
                    public void actionPerformed(ActionEvent e)
                    {
-            			ZCashUI.this.messagingPanel.openOwnIdentityDialog();
+            			ZenCashUI.this.messagingPanel.openOwnIdentityDialog();
                    }
                }
         );
@@ -385,7 +383,7 @@ public class ZCashUI
                    @Override
                    public void actionPerformed(ActionEvent e)
                    {
-            			ZCashUI.this.messagingPanel.exportOwnIdentity();
+            			ZenCashUI.this.messagingPanel.exportOwnIdentity();
                    }
                }
         );
@@ -396,7 +394,7 @@ public class ZCashUI
                    @Override
                    public void actionPerformed(ActionEvent e)
                    {
-            			ZCashUI.this.messagingPanel.importContactIdentity();
+            			ZenCashUI.this.messagingPanel.importContactIdentity();
                    }
                }
         );
@@ -407,7 +405,7 @@ public class ZCashUI
                    @Override
                    public void actionPerformed(ActionEvent e)
                    {
-            			ZCashUI.this.messagingPanel.addMessagingGroup();
+            			ZenCashUI.this.messagingPanel.addMessagingGroup();
                    }
                }
         );
@@ -418,7 +416,7 @@ public class ZCashUI
                    @Override
                    public void actionPerformed(ActionEvent e)
                    {
-            			ZCashUI.this.messagingPanel.removeSelectedContact();
+            			ZenCashUI.this.messagingPanel.removeSelectedContact();
                    }
                }
         );
@@ -429,7 +427,7 @@ public class ZCashUI
                    @Override
                    public void actionPerformed(ActionEvent e)
                    {
-            			ZCashUI.this.messagingPanel.openOptionsDialog();
+            			ZenCashUI.this.messagingPanel.openOptionsDialog();
                    }
                }
        );
@@ -440,7 +438,7 @@ public class ZCashUI
                    @Override
                    public void actionPerformed(ActionEvent e)
                    {
-            			ZCashUI.this.messagingPanel.shareFileViaIPFS();
+            			ZenCashUI.this.messagingPanel.shareFileViaIPFS();
                    }
                }
        );
@@ -451,7 +449,7 @@ public class ZCashUI
                     @Override
                     public void actionPerformed(ActionEvent e)
                     {
-                        ZCashUI.this.walletOps.exportToArizenWallet();
+                        ZenCashUI.this.walletOps.exportToArizenWallet();
                     }
                 }
         );
@@ -463,7 +461,7 @@ public class ZCashUI
             @Override
             public void windowClosing(WindowEvent e)
             {
-                ZCashUI.this.exitProgram();
+                ZenCashUI.this.exitProgram();
             }
         });
 
@@ -488,7 +486,7 @@ public class ZCashUI
                    	};
                     
                     int option = JOptionPane.showOptionDialog(
-                    		ZCashUI.this.getRootPane().getParent(), 
+                    		ZenCashUI.this.getRootPane().getParent(),
                             langUtil.getString("main.frame.disclaimer.text"),
                             langUtil.getString("main.frame.disclaimer.title"),
                             JOptionPane.DEFAULT_OPTION, 
@@ -502,7 +500,7 @@ public class ZCashUI
                         warningFlagFile.createNewFile();
                     } else
                     {
-                    	ZCashUI.this.exitProgram();
+                    	ZenCashUI.this.exitProgram();
                     }
 
                 } catch (IOException ioe)
@@ -529,7 +527,7 @@ public class ZCashUI
     				JTabbedPane tabs = (JTabbedPane)e.getSource();
     				if (tabs.getSelectedIndex() == 5)
     				{
-    					ZCashUI.this.messagingPanel.tabSelected();
+    					ZenCashUI.this.messagingPanel.tabSelected();
     				}
     			}
     		}
@@ -567,8 +565,8 @@ public class ZCashUI
         this.sendPanel.stopThreadsAndTimers();
         this.messagingPanel.stopThreadsAndTimers();
         
-        ZCashUI.this.setVisible(false);
-        ZCashUI.this.dispose();
+        ZenCashUI.this.setVisible(false);
+        ZenCashUI.this.dispose();
 
         System.exit(0);
     }
@@ -644,7 +642,7 @@ public class ZCashUI
             });
 
             Log.info("Restarting...");
-            ZCashUI.this.exitProgram();
+            ZenCashUI.this.exitProgram();
         }catch (Exception e){
             throw new IOException("Error while trying to restart the application", e);
         }
@@ -743,7 +741,7 @@ public class ZCashUI
             initialClientCaller = null;
             
             // Main GUI is created here
-            ZCashUI ui = new ZCashUI(startupBar);
+            ZenCashUI ui = new ZenCashUI(startupBar);
             ui.setVisible(true);
 
         } catch (InstallationDetectionException ide)

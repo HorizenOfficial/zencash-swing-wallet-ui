@@ -14,7 +14,7 @@
     <packaging>jar</packaging>
 
     <properties>
-        <main.class>com.vaklinov.zcashui.ZCashUI</main.class>
+        <main.class>com.vaklinov.zcashui.ZenCashUI</main.class>
         <application.finalName>ZENCashSwingWalletUI</application.finalName>
     </properties>
 
