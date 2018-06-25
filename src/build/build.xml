@@ -40,7 +40,7 @@
     <property name="jar.dir"     value="${build.dir}/jars"/>
 	<property name="ubuntu.package.dir" value="${build.dir}/ubuntu-package"/>
 
-    <property name="main-class"  value="com.vaklinov.zcashui.ZCashUI"/>
+    <property name="main-class"  value="com.vaklinov.zcashui.ZenCashUI"/>
 
 	<path id="main-classpath">
 		<pathelement path="${basedir}/lib/bitcoinj-core-0.14.5.jar" />

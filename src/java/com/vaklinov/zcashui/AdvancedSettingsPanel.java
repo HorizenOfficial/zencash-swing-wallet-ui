@@ -28,11 +28,11 @@ public class AdvancedSettingsPanel extends JPanel {
     private JButton btnLinkCommands = null;
     private LanguageUtil langUtil;
 
-    private ZCashUI parent;
+    private ZenCashUI parent;
     private final ZCashClientCaller clientCaller;
 
 
-    public AdvancedSettingsPanel(ZCashUI parent, ZCashClientCaller clientCaller)
+    public AdvancedSettingsPanel(ZenCashUI parent, ZCashClientCaller clientCaller)
             throws IOException, InterruptedException, URISyntaxException {
         super();
         langUtil = LanguageUtil.instance();
