@@ -1,7 +1,10 @@
-## [ZENCash](https://zensystem.io/) Desktop GUI Wallet binary release 0.83.0 for Windows
+## [ZENCash](https://zensystem.io/) Desktop GUI Wallet binary release 0.83.1 for Mac OS Sierra/High Sierra
 
-This is a [ZENCash](https://zensystem.io/) Desktop GUI Wallet binary release 0.83.0 for Windows. 
-It requires a 64-bit Windows 7 or later version to run. It includes [ZENCash 2.0.14 binaries](https://github.com/ZencashOfficial/zen/releases/tag/v2.0.14). 
+This is a [ZENCash](https://zensystem.io/) Desktop GUI Wallet binary release 0.83.1 for Mac OS. 
+It includes [ZENCash 2.0.14 binaries](https://github.com/ZencashOfficial/zen/releases/tag/v2.0.14).
+
+**This release does not support OS X 10.11 El Capitan anymore which is end of life,**
+**to migrate to a different wallet follow this [GUIDE](https://documentation.zencash.com/x/tAJP).**
 
 **This wallet is targeted at advanced users who understand the implications of running a full Zen node on**
 **the local machine, maintaining a full local copy of the blockchain, maintaining and backing up the**
@@ -21,27 +24,26 @@ It requires a 64-bit Windows 7 or later version to run. It includes [ZENCash 2.0
 **they are considered outdated after 16 weeks and stop working. So they need to be updated to a newer version before this term expires.**
 **Users need to ensure they use an up-to-date version of the wallet (e.g. update the wallet every two months or so).**
 
-### Installing the ZENCash Desktop GUI Wallet on Windows
+### Installing the ZENCash Desktop GUI Wallet on Mac OS
 
-1. Download the Wallet ZIP file 
-[ZENCashDesktopGUIWallet_0.83.0.zip](https://github.com/ZencashOfficial/zencash-swing-wallet-ui/releases/download/0.83.0/ZENCashDesktopGUIWallet_0.83.0.zip). 
+1. Download the Wallet image file 
+[ZENCashWallet-0.83.1.dmg](https://github.com/ZencashOfficial/zencash-swing-wallet-ui/releases/download/0.83.1/ZENCashWallet-0.83.1.dmg). 
 
-2. Security check: You may decide to run a virus scan on it, before proceeding... In addition using a tool 
+2. Security check: You may decide to run a virus scan on it before proceeding... In addition using a tool 
 such as [http://quickhash-gui.org/](http://quickhash-gui.org/) you may calculate the its SHA256 checksum. The 
 result should be:
 ```
-fba2adcc7ded9a9de345243214d78556a3061d91d4bb165be916654ea3393fd4 *ZENCashDesktopGUIWallet_0.83.0.zip
+10f69731236e6ce6029168ffba24dcf4e74d3940549d8e84928080a7997b4873  ZENCashWallet-0.83.1.dmg
 ```
-**If the resulting checksum is not `fba2adcc7ded9a9de345243214d78556a3061d91d4bb165be916654ea3393fd4` then**
+**If the resulting checksum is not `10f69731236e6ce6029168ffba24dcf4e74d3940549d8e84928080a7997b4873` then**
 **something is wrong and you should discard the downloaded wallet!**
 
-3. Unzip the Wallet ZIP file `ZENCashDesktopGUIWallet_0.83.0.zip` in some directory that it will run from.
+3. Install the wallet like any other downloaded Mac OS application: Open the disk image `ZENCashWallet-0.83.1.dmg`
+and copy the ZENCashWallet application to the Applications folder. You can then discard the disk image.
    
-### Running the ZENCash Desktop GUI Wallet on Windows
+### Running the ZENCash Desktop GUI Wallet on Mac OS
 
-Double click on `ZENCashDesktopGUIWallet.exe`. On first run (only) the wallet will download the cryptographic keys 
-(900MB or so). In case of problems logs are written in `%LOCALAPPDATA%\ZENCashSwingWalletUI\` for diagnostics.
-
+Simply click on ZENCashWallet in the Mac OS application launchpad.
 
 ### Disclaimer
 
@@ -54,8 +56,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 ### Some known issues and limitations
-1. If a system has a high resolution monitor with DPI scaling enabled, not all GUI elements scale alike.
-As a result the Wallet UI may feel inconvenient to use at scaling above 1.5x or even unusable at scaling above 3x.
-This problem will be fixed in future versions.
 1. Limitation: The list of transactions does not show all outgoing ones (specifically outgoing Z address 
 transactions).  
+1. Limitation: if two users exchange text messages via the messaging UI TAB and one of them has a system clock, substantially running slow or fast by more than 1 minute, it is possible that this user will see text messages appearing out of order. 
+1. Limitation: if a messaging identity has been created (happens on first click on the messaging UI tab), then replacing the `wallet.dat` or changing the node configuration between mainnet and testnet will make the identity invalid. This will result in a wallet update error. To remove the error the directory `~/.ZENCashSwingWalletUI/messaging` may be manually renamed or deleted (when the wallet is stopped). **CAUTION: all messaging history will be lost in this case!**
