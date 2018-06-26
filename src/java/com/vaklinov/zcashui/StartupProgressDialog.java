@@ -47,16 +47,10 @@ public class StartupProgressDialog extends JFrame {
     private ImageIcon imageIcon;
     
     private final ZCashClientCaller clientCaller;
-    public static String commands = "";
-    public static boolean runOnce;
     
     public StartupProgressDialog(ZCashClientCaller clientCaller) 
     {
         this.clientCaller = clientCaller;
-
-        //Config Creation
-        createConfig();
-        runOnce = applyZendCommands();
         
         URL iconUrl = this.getClass().getClassLoader().getResource("images/ZEN-yellow.orange-logo.png");
         imageIcon = new ImageIcon(iconUrl);
@@ -269,54 +263,6 @@ public class StartupProgressDialog extends JFrame {
 		}
 		
 		return false;
-    }
-
-    public boolean applyZendCommands() {
-        Properties config_file = new Properties();
-        boolean run_option = false;
-        try {
-            config_file.load(new FileInputStream(OSUtil.getSettingsDirectory() + File.separator + "commands.conf"));
-            commands = config_file.getProperty("ZendCommands");
-            run_option = config_file.getProperty("RunOnce").trim().equals("1") ? true : false;
-
-            if (run_option){
-                Log.info("Resetting config file: " + run_option);
-                setConfig();
-            }
-
-            Log.info("Applied command/s: " + commands);
-        }catch(IOException e){
-            Log.error("Unexpected IO Error:", e);
-        }
-
-        return run_option;
-    }
-
-    public void createConfig(){
-        try {
-            File commandsFile = new File(OSUtil.getSettingsDirectory() + File.separator + "commands.conf");
-            if (!commandsFile.exists()) {
-                setConfig();
-            }
-        }catch (IOException e){
-            Log.error("Unexpected IO Error:", e);
-        }
-
-    }
-
-    public void setConfig() {
-        try {
-            Properties prop = new Properties();
-
-            //Set properties value.
-            prop.setProperty("ZendCommands", "");
-            prop.setProperty("RunOnce", "1");
-
-            prop.store(new FileOutputStream(OSUtil.getSettingsDirectory() + File.separator + "commands.conf"), null);
-
-        } catch (IOException e) {
-            Log.error("Unexpected IO Error:", e);
-        }
     }
 
 }
