@@ -48,7 +48,7 @@ public class AdvancedSettingsPanel extends JPanel {
         cbAdvanceSettings = new JCheckBox("Enable advanced mode");
         cbApplyOptionOnce = new JCheckBox("Apply option/s once");
         cbApplyOptionOnce.setEnabled(false);
-        cbApplyOptionOnce.setSelected(StartupProgressDialog.runOnce);
+        cbApplyOptionOnce.setSelected(clientCaller.runOnce);
 
         taCommandLineParameters = new JTextArea(6, 10);
         taCommandLineParameters.setBackground(Color.lightGray);
