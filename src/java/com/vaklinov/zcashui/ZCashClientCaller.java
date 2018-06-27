@@ -83,8 +83,8 @@ public class ZCashClientCaller
 	}
 
 	// ZenCash Advanced settings variables
-	public String commands = "";
-	public boolean runOnce = applyZendCommands();
+	public String commands;
+	public boolean runOnce;
 
 	// ZCash client program and daemon
 	private File zcashcli, zcashd;
@@ -104,6 +104,10 @@ public class ZCashClientCaller
 	public ZCashClientCaller(String installDir)
 		throws IOException
 	{
+		// Initialize variables
+		commands = "";
+		runOnce = applyZendCommands();
+
 		// Detect daemon and client tools installation
 		File dir = new File(installDir);
 	    zcashcli = new File(dir, OSUtil.getZCashCli());
