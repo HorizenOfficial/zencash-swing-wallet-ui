@@ -1334,7 +1334,7 @@ public class ZCashClientCaller
 			run_option = config_file.getProperty("RunOnce").trim().equals("1") ? true : false;
 
 			if (run_option){
-				Log.info("Resetting config file: " + run_option);
+				Log.info("RunOnce config file: " + run_option);
 				setConfig();
 			}
 

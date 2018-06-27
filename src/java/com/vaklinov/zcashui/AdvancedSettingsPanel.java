@@ -54,6 +54,12 @@ public class AdvancedSettingsPanel extends JPanel {
         taCommandLineParameters.setBackground(Color.lightGray);
         taCommandLineParameters.setEditable(false);
 
+        // Retain commands in text area
+        if (!clientCaller.runOnce){
+            Log.info("Retaining config commands");
+            taCommandLineParameters.setText(clientCaller.commands);
+        }
+
         btnApplySettings = new JButton("Apply");
         btnApplySettings.setEnabled(false);
 
