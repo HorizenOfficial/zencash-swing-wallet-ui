@@ -22,14 +22,14 @@ presents the information in a user-friendly manner.
 **Doing so requires command line skills.**
 
 **AUTO-DEPRECATION WARNING: Wallet binary releases for Mac/Windows contain ZEN full node binaries. These have an auto-deprecation feature:**
-**they are considered outdated after 18 weeks and stop working. So they need to be updated to a newer version before this term expires.**
+**they are considered outdated after 16 weeks and stop working. So they need to be updated to a newer version before this term expires.**
 **Users need to ensure they use an up-to-date version of the wallet (e.g. update the wallet every two months or so).**
 
 #### New/Experimental: [ZENCash Desktop GUI Wallet packages for Debian/Ubuntu Linux](https://github.com/ZencashOfficial/zencash-swing-wallet-ui/blob/master/docs/ReleaseUbuntuRepository.md) are available
 
-#### New/Experimental: [ZENCash Desktop GUI Wallet for Mac OS](https://github.com/ZencashOfficial/zencash-swing-wallet-ui/blob/master/docs/Release_0.81.0.md) is available
+#### New/Experimental: [ZENCash Desktop GUI Wallet for Mac OS](https://github.com/ZencashOfficial/zencash-swing-wallet-ui/blob/master/docs/Release_0.83.1.md) is available
 
-#### New/Experimental: [ZENCash Desktop GUI Wallet for Windows](https://github.com/ZencashOfficial/zencash-swing-wallet-ui/blob/master/docs/Release_0.80.5.md) is available
+#### New/Experimental: [ZENCash Desktop GUI Wallet for Windows](https://github.com/ZencashOfficial/zencash-swing-wallet-ui/blob/master/docs/Release_0.83.0.md) is available
 
 #### Information on diagnosing some common problems may be found in this [troubleshooting guide](docs/TroubleshootingGuide.md).
 
@@ -46,7 +46,7 @@ The details of how to build it are described below (easy to follow).
 
 1. Operating system and tools
 
-   As of January 2018 (ZENCash v1.0.10) this program supports Linux and Mac OS X and Windows.
+   As of July 2018 (ZENCash v2.0.14) this program supports Linux, macOS Sierra/High Sierra and Windows.
    The Linux tools you need to build and run the Wallet GUI are Git, Java (JDK8) and
    Ant. If using Ubuntu Linux, they may be installed via command: 
    ```
@@ -89,7 +89,7 @@ The details of how to build it are described below (easy to follow).
 
    3.1. If you have built ZENCash from source code:
 
-     Assuming you have already built from source code [ZENCash](https://zensystem.io/) in directory `/home/user/zen/src` (for example - this is the typical build dir. for ZENCash v1.0.9) which contains the command line tools `zen-cli` and `zend` you need to take the created JAR files and copy them to directory `/home/user/zen/src` (the same dir. that contains `zen-cli` and `zend`). Example copy command:
+     Assuming you have already built from source code [ZENCash](https://github.com/ZencashOfficial/zen) in directory `/home/user/zen/src` (for example - this is the typical build dir. for ZENCash v2.0.14) which contains the command line tools `zen-cli` and `zend` you need to take the created JAR files and copy them to directory `/home/user/zen/src` (the same dir. that contains `zen-cli` and `zend`). Example copy command:
       ```
       user@ubuntu:~/build-dir/zencash-swing-wallet-ui$ cp -R -v ./build/jars/* /home/user/zen/src    
       ```
