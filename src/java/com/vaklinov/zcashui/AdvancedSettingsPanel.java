@@ -146,7 +146,7 @@ public class AdvancedSettingsPanel extends JPanel {
                             JOptionPane.WARNING_MESSAGE
                     );
                     if (option == JOptionPane.YES_OPTION) {
-                        writeAndNotifyProcess();
+                        writeAndNotifyProcess(clientCaller);
                         lbStatusBar.setText(langUtil.getString("domain.fronting.status.label.restart"));
                         //TODO: Restart needs improvement in all platforms.
                         //parent.restartProgram();
@@ -182,16 +182,10 @@ public class AdvancedSettingsPanel extends JPanel {
 
     }
 
-    public void writeAndNotifyProcess() {
+    public void writeAndNotifyProcess(ZCashClientCaller clientCaller) {
+        int restart_check = cbApplyOptionOnce.isSelected() ? 1 : 0;
         try {
-            Properties prop = new Properties();
-            int restart_check = cbApplyOptionOnce.isSelected() ? 1 : 0;
-
-            //Set properties value.
-            prop.setProperty("ZendCommands", taCommandLineParameters.getText());
-            prop.setProperty("RunOnce", String.valueOf(restart_check));
-
-            prop.store(new FileOutputStream(OSUtil.getSettingsDirectory() + File.separator + "commands.conf"), null);
+            clientCaller.setConfig(taCommandLineParameters.getText(), String.valueOf(restart_check));
 
         } catch (IOException e) {
             Log.error("Unexpected IO Error:", e);

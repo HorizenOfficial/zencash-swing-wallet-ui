@@ -1327,17 +1327,21 @@ public class ZCashClientCaller
 
 	public boolean applyZendCommands() {
 		Properties config_file = new Properties();
+
 		boolean run_option = false;
 		try {
-			config_file.load(new FileInputStream(OSUtil.getSettingsDirectory() + File.separator + "commands.conf"));
-			commands = config_file.getProperty("ZendCommands");
-			run_option = config_file.getProperty("RunOnce").trim().equals("1") ? true : false;
+			File commandsFile = new File(OSUtil.getSettingsDirectory() + File.separator + "commands.conf");
 
-			if (run_option){
-				Log.info("RunOnce config file: " + run_option);
-				setConfig();
+			if(commandsFile.exists()) {
+				config_file.load(new FileInputStream(commandsFile));
+				commands = config_file.getProperty("ZendCommands");
+				run_option = config_file.getProperty("RunOnce").trim().equals("1") ? true : false;
+
+				if (run_option) {
+					Log.info("RunOnce config file: " + run_option);
+					setConfig("", "1");
+				}
 			}
-
 		}catch(IOException e){
 			Log.error("Unexpected IO Error:", e);
 		}
@@ -1345,25 +1349,15 @@ public class ZCashClientCaller
 		return run_option;
 	}
 
-	public void createConfig(){
-		try {
-			File commandsFile = new File(OSUtil.getSettingsDirectory() + File.separator + "commands.conf");
-			if (!commandsFile.exists()) {
-				setConfig();
-			}
-		}catch (IOException e){
-			Log.error("Unexpected IO Error:", e);
-		}
-
-	}
-
-	public void setConfig() {
+	public void setConfig(String commands, String RunOnce)
+			throws IOException
+	{
 		try {
 			Properties prop = new Properties();
 
 			//Set properties value.
-			prop.setProperty("ZendCommands", "");
-			prop.setProperty("RunOnce", "1");
+			prop.setProperty("ZendCommands", commands);
+			prop.setProperty("RunOnce", RunOnce);
 
 			prop.store(new FileOutputStream(OSUtil.getSettingsDirectory() + File.separator + "commands.conf"), null);
 
