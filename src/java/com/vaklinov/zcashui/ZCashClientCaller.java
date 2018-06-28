@@ -1337,9 +1337,10 @@ public class ZCashClientCaller
 				commands = config_file.getProperty("ZendCommands");
 				run_option = config_file.getProperty("RunOnce").trim().equals("1") ? true : false;
 
-				if (run_option) {
-					Log.info("RunOnce config file: " + run_option);
-					setConfig("", "1");
+				if (run_option && commandsFile.delete()) {
+					Log.info("Config deleted successfully");
+				}else{
+					Log.error("Config not deleted");
 				}
 			}
 		}catch(IOException e){
