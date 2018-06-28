@@ -29,23 +29,11 @@
 package com.vaklinov.zcashui;
 
 
-import java.io.File;
-import java.io.IOException;
-import java.io.LineNumberReader;
-import java.io.StringReader;
+import java.io.*;
 import java.math.BigDecimal;
-import java.util.Date;
-import java.util.HashMap;
+import java.util.*;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
 
 import com.eclipsesource.json.Json;
 import com.eclipsesource.json.JsonArray;
@@ -94,6 +82,9 @@ public class ZCashClientCaller
 		}
 	}
 
+	// ZenCash Advanced settings variables
+	public String commands;
+	public boolean runOnce;
 
 	// ZCash client program and daemon
 	private File zcashcli, zcashd;
@@ -110,11 +101,13 @@ public class ZCashClientCaller
 		new HashMap<String, String>());
 	private long lastTransactionConfirmationsAccess = System.currentTimeMillis();
 
-	
-
 	public ZCashClientCaller(String installDir)
 		throws IOException
 	{
+		// Initialize variables
+		commands = "";
+		runOnce = applyZendCommands();
+
 		// Detect daemon and client tools installation
 		File dir = new File(installDir);
 	    zcashcli = new File(dir, OSUtil.getZCashCli());
@@ -150,13 +143,13 @@ public class ZCashClientCaller
 		throws IOException, InterruptedException 
 	{
 		String exportDir = OSUtil.getUserHomeDirectory().getCanonicalPath();
+
+        String[] zend_commands = commands.isEmpty() ?
+			new String[] {zcashd.getCanonicalPath(), "-exportdir=" + wrapStringParameter(exportDir)} :
+			new String[] {zcashd.getCanonicalPath(), "-exportdir=" + wrapStringParameter(exportDir), commands};
 		
-	    CommandExecutor starter = new CommandExecutor(
-	        new String[] 
-	        {
-	        	zcashd.getCanonicalPath(), 
-	        	"-exportdir=" + wrapStringParameter(exportDir)
-	        });
+		CommandExecutor starter = new CommandExecutor(zend_commands);
+		Log.info("Starting " + Arrays.toString(zend_commands));
 	    
 	    return starter.startChildProcess();
 	}
@@ -1331,4 +1324,47 @@ public class ZCashClientCaller
 			map.put(name, val.toString());
 		}
 	}
+
+	public boolean applyZendCommands() {
+		Properties config_file = new Properties();
+
+		boolean run_option = false;
+		try {
+			File commandsFile = new File(OSUtil.getSettingsDirectory() + File.separator + "commands.conf");
+
+			if(commandsFile.exists()) {
+				config_file.load(new FileInputStream(commandsFile));
+				commands = config_file.getProperty("ZendCommands");
+				run_option = config_file.getProperty("RunOnce").trim().equals("1") ? true : false;
+
+				if (run_option && commandsFile.delete()) {
+					Log.info("Config deleted successfully");
+				}else{
+					Log.error("Config not deleted");
+				}
+			}
+		}catch(IOException e){
+			Log.error("Unexpected IO Error:", e);
+		}
+
+		return run_option;
+	}
+
+	public void setConfig(String commands, String RunOnce)
+			throws IOException
+	{
+		try {
+			Properties prop = new Properties();
+
+			//Set properties value.
+			prop.setProperty("ZendCommands", commands);
+			prop.setProperty("RunOnce", RunOnce);
+
+			prop.store(new FileOutputStream(OSUtil.getSettingsDirectory() + File.separator + "commands.conf"), null);
+
+		} catch (IOException e) {
+			Log.error("Unexpected IO Error:", e);
+		}
+	}
+
 }

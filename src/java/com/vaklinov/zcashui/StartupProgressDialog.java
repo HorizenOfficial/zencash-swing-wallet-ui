@@ -6,12 +6,14 @@ import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.FlowLayout;
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
+import java.rmi.server.ExportException;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Properties;
+import java.util.Scanner;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -32,7 +34,6 @@ import com.vaklinov.zcashui.ZCashClientCaller.WalletCallException;
 
 
 public class StartupProgressDialog extends JFrame {
-    
 
     private static final int POLL_PERIOD = 1500;
     private static final int STARTUP_ERROR_CODE = -28;
@@ -165,6 +166,7 @@ public class StartupProgressDialog extends JFrame {
 	                	
 	                	if (end - start > 15 * 1000)
 	                	{
+                            Log.info("Stopping Daemon . . .");
 	                		clientCaller.stopDaemon();
 	                		daemonProcess.destroy();
 	                	}
@@ -262,4 +264,5 @@ public class StartupProgressDialog extends JFrame {
 		
 		return false;
     }
+
 }
