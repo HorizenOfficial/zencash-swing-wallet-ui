@@ -151,7 +151,7 @@ public class ZCashUI
         		    addresses = new AddressesPanel(this, clientCaller, errorReporter, labelStorage, installationObserver));
         tabs.addTab(langUtil.getString("main.frame.tab.send.cash.title"),
         		    new ImageIcon(cl.getResource("images/send.png")),
-        		    sendPanel = new SendCashPanel(clientCaller, errorReporter, installationObserver, backupTracker));
+        		    sendPanel = new SendCashPanel(clientCaller, errorReporter, installationObserver, backupTracker, labelStorage));
         tabs.addTab(langUtil.getString("main.frame.tab.address.book.title"),
     		        new ImageIcon(cl.getResource("images/address-book.png")),
     		        addressBookPanel = new AddressBookPanel(sendPanel, tabs, labelStorage));

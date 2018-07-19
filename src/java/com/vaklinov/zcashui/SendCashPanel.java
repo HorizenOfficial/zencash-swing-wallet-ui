@@ -85,6 +85,7 @@ public class SendCashPanel
 	private StatusUpdateErrorReporter errorReporter;
 	private ZCashInstallationObserver installationObserver;
 	private BackupTracker             backupTracker;
+	private LabelStorage labelStorage;
 	
 	private JComboBox  balanceAddressCombo     = null;
 	private JPanel     comboBoxParentPanel     = null;
@@ -109,10 +110,12 @@ public class SendCashPanel
 	private int          operationStatusCounter      = 0;
 	private LanguageUtil langUtil;
 
+	
 	public SendCashPanel(ZCashClientCaller clientCaller,  
 			             StatusUpdateErrorReporter errorReporter,
 			             ZCashInstallationObserver installationObserver,
-			             BackupTracker backupTracker)
+			             BackupTracker backupTracker,
+			             LabelStorage labelStorage)
 		throws IOException, InterruptedException, WalletCallException
 	{
 		langUtil = LanguageUtil.instance();
@@ -123,6 +126,7 @@ public class SendCashPanel
 		this.errorReporter = errorReporter;
 		this.installationObserver = installationObserver;
 		this.backupTracker = backupTracker;
+		this.labelStorage = labelStorage;
 		
 		// Build content
 		this.setBorder(BorderFactory.createEmptyBorder(3, 3, 3, 3));
@@ -764,10 +768,23 @@ public class SendCashPanel
 		comboBoxItems = new String[lastAddressBalanceData.length];
 		for (int i = 0; i < lastAddressBalanceData.length; i++)
 		{
+			// Form the current combo item for sending cash. If an address label is available, it gets 
+			// displayed first. If the overall string is too long it gets cut at 120 chars
+			String address = lastAddressBalanceData[i][1];
+			String formattedBalance = new DecimalFormat("########0.00######").format(Double.valueOf(lastAddressBalanceData[i][0]));
+			String label = this.labelStorage.getLabel(address); // Empty str if not found
+			if (label.length() > 0)
+			{
+				label = "[" + label + "] ";
+			}
+			String item = label + formattedBalance + " ZEN - " + address;
+			if (item.length() > 120)
+			{
+				item = item.substring(0, 118) + "...";
+			}
+			
 			// Do numeric formatting or else we may get 1.1111E-5
-			comboBoxItems[i] = 
-				new DecimalFormat("########0.00######").format(Double.valueOf(lastAddressBalanceData[i][0]))  + 
-				" - " + lastAddressBalanceData[i][1];
+			comboBoxItems[i] = item;
 		}
 		
 		int selectedIndex = balanceAddressCombo.getSelectedIndex();
