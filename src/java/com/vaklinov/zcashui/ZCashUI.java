@@ -44,6 +44,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
+import java.security.SecureRandom;
 import java.util.Date;
 import java.util.Locale;
 import java.util.Random;
@@ -739,7 +740,8 @@ public class ZCashUI
 			Log.info("ZEN configuration file " + zenConfigFile.getCanonicalPath() + 
 					 " does not exist. It will be created with default settings.");
 			
-			Random r = new Random(System.currentTimeMillis());
+			Random r = new Random(System.nanoTime());
+			SecureRandom r2 = new SecureRandom(); // Improved randomness
 			
 			PrintStream configOut = new PrintStream(new FileOutputStream(zenConfigFile));
 			
@@ -753,10 +755,10 @@ public class ZCashUI
 			configOut.println("#############################################################################");
 			configOut.println("");
 			configOut.println("# The rpcuser/rpcpassword are used for the local call to zend");
-			configOut.println("rpcuser=User" + Math.abs(r.nextInt()));
+			configOut.println("rpcuser=User" + Math.abs(r2.nextInt()));
 			configOut.println("rpcpassword=Pass" + Math.abs(r.nextInt()) + "" + 
-			                                       Math.abs(r.nextInt()) + "" + 
-					                               Math.abs(r.nextInt()));
+			                                       Math.abs(r2.nextInt()) + "" + 
+					                               Math.abs(r2.nextInt()));
 			configOut.println("");			
 			configOut.close();
 		}
