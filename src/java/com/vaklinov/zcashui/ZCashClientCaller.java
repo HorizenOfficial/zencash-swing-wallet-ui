@@ -30,7 +30,10 @@ package com.vaklinov.zcashui;
 
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.LineNumberReader;
 import java.io.StringReader;
 import java.math.BigDecimal;
@@ -151,12 +154,30 @@ public class ZCashClientCaller
 	{
 		String exportDir = OSUtil.getUserHomeDirectory().getCanonicalPath();
 		
-	    CommandExecutor starter = new CommandExecutor(
-	        new String[] 
-	        {
-	        	zcashd.getCanonicalPath(), 
-	        	"-exportdir=" + wrapStringParameter(exportDir)
-	        });
+		List<String> zendOptions = Util.loadZendParameters();
+		Log.info("Custom zend options to be used are: {0}", zendOptions.toString());
+		
+		String zendFullCommandLine[] = new String[zendOptions.size() + 1];
+		zendFullCommandLine[0] = zcashd.getCanonicalPath();
+		
+		// Transfer the zend parameters, also possibly wrap them
+		for (int i = 0; i < zendOptions.size(); i++)
+		{
+			String option = zendOptions.get(i);
+			boolean containEq = option.contains("=");
+			boolean containsSpaces = option.contains(" ") || option.contains("\t");
+			
+			// The options come trimmed, however it is possible that they have weird content and need to be wrapped
+			// on Windows
+			if ((!containEq) || (containsSpaces))
+			{
+				option = wrapStringParameter(option);
+			}
+			
+			zendFullCommandLine[i+1] = option;
+		}
+		
+	    CommandExecutor starter = new CommandExecutor(zendFullCommandLine);
 	    
 	    return starter.startChildProcess();
 	}
@@ -1330,5 +1351,5 @@ public class ZCashClientCaller
 		{
 			map.put(name, val.toString());
 		}
-	}
+	}	
 }

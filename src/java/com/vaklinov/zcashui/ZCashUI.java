@@ -467,7 +467,7 @@ public class ZCashUI
                 try
                 {
                     String userDir = OSUtil.getSettingsDirectory();
-                    File warningFlagFile = new File(userDir + File.separator + "initialInfoShown_0.82.flag");
+                    File warningFlagFile = new File(userDir + File.separator + "initialInfoShown_0.84.flag");
                     if (warningFlagFile.exists())
                     {
                         return;
