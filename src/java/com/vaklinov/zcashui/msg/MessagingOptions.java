@@ -56,7 +56,7 @@ public class MessagingOptions
 	
 	public MessagingOptions()
 	{
-		// Default values set if not loade etc.
+		// Default values set if not loaded etc.
 		this.automaticallyAddUsersIfNotExplicitlyImported = true;
 		this.amountToSend = this.transactionFee = 0.0001d;
 	}
