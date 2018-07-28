@@ -296,8 +296,8 @@ public class JContactListPanel
 		        int reply = JOptionPane.showConfirmDialog(
 			        this.parentFrame, 
 			        "The contact: " + id.getDiplayString() + "\n" +
-			        "is anonymous. Sending your contact details to him will reveal your messaging\n" +
-			        "identity! Are you sure you want to send your contact details to him?", 
+			        "is anonymous. Sending your contact details to them will reveal your messaging\n" +
+			        "identity! Are you sure you want to send your contact details to them?", 
 			        "Are you sure you want to send your contact details", 
 			        JOptionPane.YES_NO_OPTION);
 			        
