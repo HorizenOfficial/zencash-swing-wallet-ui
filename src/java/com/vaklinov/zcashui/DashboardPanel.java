@@ -629,7 +629,7 @@ public class DashboardPanel
 			DecimalFormat usdDF = new DecimalFormat("########0.00");
 			String formattedUSDVal = usdDF.format(usdBalance);
 			
-			// make sure the ZEN and USD are aligned
+			// make sure ZEN and USD are aligned
 			int diff = totalUCBalance.length() - formattedUSDVal.length();
 			while (diff-- > 0)
 			{
@@ -1057,12 +1057,12 @@ public class DashboardPanel
 			extends JPanel
 		{			
 			// TODO: depends on the format of the gathering thread
-			public SingleTransactionPanel(String[] transactionFeilds)
+			public SingleTransactionPanel(String[] transactionFields)
 			{
 				this.setLayout(new FlowLayout(FlowLayout.LEFT, 3, 3));
 				this.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.RAISED));
 				
-				String destinationAddress = transactionFeilds[5];
+				String destinationAddress = transactionFields[5];
 
 				String label = DashboardPanel.this.labelStorage.getLabel(destinationAddress);
 				if ((label != null) && (label.length() > 0))
@@ -1077,12 +1077,12 @@ public class DashboardPanel
 				
 				// Set the correct icon for input/output
 				ImageIcon inOutIcon = inoutTransactionIcon;
-				if (transactionFeilds[1] != null)
+				if (transactionFields[1] != null)
 				{
-					if (transactionFeilds[1].contains("IN"))
+					if (transactionFields[1].contains("IN"))
 					{
 						inOutIcon = inputTransactionIcon;
-					} else if (transactionFeilds[1].contains("OUT"))
+					} else if (transactionFields[1].contains("OUT"))
 					{
 						inOutIcon = outputTransactionIcon;
 					}
@@ -1094,10 +1094,10 @@ public class DashboardPanel
 				
 				// Set the two icons for public/private and confirmations
 				ImageIcon confirmationIcon = 
-					transactionFeilds[2].contains((langUtil.getString("panel.dashboard.table.transactions.confirmed.yes"))) 
+					transactionFields[2].contains((langUtil.getString("panel.dashboard.table.transactions.confirmed.yes"))) 
 					? confirmedTXIcon : unConfirmedTXIcon;
 				ImageIcon pubPrivIcon = 
-						transactionFeilds[0].contains("Private") ? lockClosedIcon : lockOpenIcon;
+						transactionFields[0].contains("Private") ? lockClosedIcon : lockOpenIcon;
 				JPanel iconsPanel = new JPanel(new BorderLayout(0, 1));
 				iconsPanel.add(new JLabel(pubPrivIcon), BorderLayout.SOUTH);
 				iconsPanel.add(new JLabel(confirmationIcon), BorderLayout.NORTH);
@@ -1106,17 +1106,17 @@ public class DashboardPanel
 				this.add(new JLabel("<html>&nbsp;</html>"));
 				
 				// Set the transaction information
-				JLabel transacitonInfo = new JLabel(
+				JLabel transactionInfo = new JLabel(
 						langUtil.getString("panel.dashboard.transactions.info",
-								transactionFeilds[0],
-								transactionFeilds[1],
-								transactionFeilds[2],
-								transactionFeilds[3],
-								transactionFeilds[4],
+								transactionFields[0],
+								transactionFields[1],
+								transactionFields[2],
+								transactionFields[3],
+								transactionFields[4],
 								destinationAddress
 						)
 				);
-				this.add(transacitonInfo);
+				this.add(transactionInfo);
 			}
 		}
 	}
