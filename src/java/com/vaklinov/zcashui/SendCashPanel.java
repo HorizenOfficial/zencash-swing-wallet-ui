@@ -626,7 +626,7 @@ public class SendCashPanel
 				if (this.warnAndCheckConditionsForSendingBackChange(sourceAddress, destinationAddress, amount, memo, fee))
 				{
 					String balance = this.clientCaller.getBalanceForAddress(sourceAddress);
-					// Call the send method with change goign back to source address
+					// Call the send method with change going back to source address
 					operationStatusID = this.clientCaller.sendCashWithReturnOfChange(sourceAddress, destinationAddress, balance, amount, memo, fee);
 				} else
 				{
@@ -659,8 +659,8 @@ public class SendCashPanel
 		
 		
 		final boolean bEncryptedWalletForThread = bEncryptedWallet;
-		// Start a data gathering thread specific to the operation being executed - this is done is a separate 
-		// thread since the server responds more slowly during JoinSPlits and this blocks he GUI somewhat.
+		// Start a data gathering thread specific to the operation being executed - this is done in a separate 
+		// thread since the server responds more slowly during JoinSplits and this blocks the GUI somewhat.
 		final DataGatheringThread<Boolean> opFollowingThread = new DataGatheringThread<Boolean>(
 			new DataGatheringThread.DataGatherer<Boolean>() 
 			{

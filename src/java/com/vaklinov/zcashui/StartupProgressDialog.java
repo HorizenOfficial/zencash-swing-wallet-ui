@@ -80,7 +80,7 @@ public class StartupProgressDialog extends JFrame {
     public void waitForStartup() throws IOException,
         InterruptedException,WalletCallException,InvocationTargetException {
         
-        // special handling of Windows/Mac OS app launch
+        // special handling of Windows/macOS app launch
     	OS_TYPE os = OSUtil.getOSType();
         if ((os == OS_TYPE.WINDOWS) || (os == OS_TYPE.MAC_OS)) 
         {

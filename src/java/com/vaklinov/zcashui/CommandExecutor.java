@@ -37,7 +37,7 @@ import java.io.Reader;
 
 
 /**
- * Executes a command and retruns the result.
+ * Executes a command and returns the result.
  */
 public class CommandExecutor 
 {	
