@@ -35,7 +35,7 @@ public class Test1
 		//System.out.println(hexify("\n"));
 		
 		
-		String phrase = "Z pigs likes to snooze. ZZZZ";
+		String phrase = "Z pigs like to snooze. ZZZZ";
 		System.out.println(phrase + "|=> " + Util.convertGroupPhraseToZPrivateKey(phrase));
 		phrase = "ABCD";
 		System.out.println(phrase + "|=> " + Util.convertGroupPhraseToZPrivateKey(phrase));
