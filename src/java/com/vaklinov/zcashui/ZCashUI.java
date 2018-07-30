@@ -91,6 +91,7 @@ public class ZCashUI
     private JMenuItem menuItemMessagingOptions;
     private JMenuItem menuItemShareFileViaIPFS;
     private JMenuItem menuItemExportToArizen;
+    private JMenuItem menuItemZendParameters;
 
     private DashboardPanel   dashboard;
     private TransactionsDetailPanel transactionDetailsPanel;
@@ -194,6 +195,8 @@ public class ZCashUI
         menuItemImportOnePrivateKey.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, accelaratorKeyMask));
         wallet.add(menuItemExportToArizen = new JMenuItem(langUtil.getString("menu.label.export.to.arizen"), KeyEvent.VK_A));
         menuItemExportToArizen.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_A, accelaratorKeyMask));
+        wallet.add(menuItemZendParameters = new JMenuItem(langUtil.getString("wallet.menu.edit.zend.params"), KeyEvent.VK_Z));
+        menuItemZendParameters.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Z, accelaratorKeyMask));
         mb.add(wallet);
 
         JMenu messaging = new JMenu(langUtil.getString("menu.label.messaging"));
@@ -447,6 +450,18 @@ public class ZCashUI
                     }
                 }
         );
+        
+        menuItemZendParameters.addActionListener(
+                new ActionListener()
+                {
+                    @Override
+                    public void actionPerformed(ActionEvent e)
+                    {
+                        ZCashUI.this.walletOps.editZendOptions();
+                    }
+                }
+        );
+
 
         // Close operation
         this.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
