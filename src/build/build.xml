@@ -160,7 +160,7 @@
 	
 	<!-- TODO: As of Nov 2017 the IPFS wallet integration is suspended. 
 	<target name="unpackIPFSForMacOS" if="isMacOS">
-	    <echo message="Using the IPFS packaged executable on Mac OS..." />
+	    <echo message="Using the IPFS packaged executable on macOS..." />
 		<mkdir dir="${temp.dir}"/>
 		<gunzip src="${basedir}/lib/go-ipfs_v0.4.11_darwin-amd64.tar.gz" dest="${temp.dir}/ipfs.tar"/>
 	</target>

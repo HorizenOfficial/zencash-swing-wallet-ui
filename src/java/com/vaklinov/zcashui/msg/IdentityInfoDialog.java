@@ -101,7 +101,7 @@ public class IdentityInfoDialog
 		
 		addFormField(detailsPanel, "Nick name:",  nicknameTextField = new JTextField(40));
 		addFormField(detailsPanel, "First name:", firstnameTextField = new JTextField(40));
-		addFormField(detailsPanel, "Midle name:", middlenameTextField = new JTextField(40));
+		addFormField(detailsPanel, "Middle name:", middlenameTextField = new JTextField(40));
 		addFormField(detailsPanel, "Surname:",    surnameTextField = new JTextField(40));
 		
 		addFormField(detailsPanel, "E-mail:",         emailTextField = new JTextField(40));
@@ -168,7 +168,7 @@ public class IdentityInfoDialog
 		JPanel tempPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 4, 2));
 		JLabel tempLabel = new JLabel(name, JLabel.RIGHT);
 		// TODO: hard sizing of labels may not scale!
-		final int width = new JLabel("Sender identiication T address:").getPreferredSize().width + 10;
+		final int width = new JLabel("Sender identification T address:").getPreferredSize().width + 10;
 		tempLabel.setPreferredSize(new Dimension(width, tempLabel.getPreferredSize().height));
 		tempPanel.add(tempLabel);
 		tempPanel.add(field);

@@ -333,7 +333,7 @@ public class MessagingPanel
 				} else
 				{
 			        messageStart = 
-			        	"This user is " + (anonymous ? "" : "not ") + "anonumous; " +
+			        	"This user is " + (anonymous ? "" : "not ") + "anonymous; " +
 			        	(anonymous ? "" : "However ") + "his messaging identity is not known. " +
 			        	"He is only identified \nby " + (anonymous ? "thread ID" : "a sender ID address:") + "\n" +
 			        	id + "\n";
@@ -343,7 +343,7 @@ public class MessagingPanel
 		        	MessagingPanel.this.parentFrame, 
 			        messageStart + "\n" + 
 			        "If you believe this user is spamming the group conversation, you have the option to\n" +
-			        "ignore all his mesages. \n\n" + 
+			        "ignore all his messages. \n\n" + 
 			        "WARNING: If you choose to ignore this user's messages, you will not be able to see \n"+
 			        "any new messages he sends from this point forward!", 
 			        "Possibly ignore user messages?", 
@@ -517,7 +517,7 @@ public class MessagingPanel
 	
 
 	/**
-	 * Called when the TAB is selected - currently shows the welcome mesage
+	 * Called when the TAB is selected - currently shows the welcome message
 	 */
 	public void tabSelected()
 	{
@@ -528,14 +528,14 @@ public class MessagingPanel
 		        JOptionPane.showMessageDialog(
 	                this.parentFrame,
 	                "Welcome to ZENCash messaging. As a start you will need to create a new messaging\n" + 
-	                "identity for yourself. As a part of this mesaging identity a pair of T+Z addresses\n" +
+	                "identity for yourself. As a part of this messaging identity a pair of T+Z addresses\n" +
 	                "will be created. The T address is to be used for identifying you to other users.\n" +
 	                "It must never be used for other financial transactions since this might reduce or\n" +
 	                "fully compromise your privacy. The Z address is to be used to send and receive\n" +
 	                "messages.\n\n" +
 	                "When creating a new messaging identity it is only mandatory to specify a nick-name\n" +
 	                "for yourself. All other items such as names/addresses etc. are optional. The \n" +
-	                "information in the mesaging identity is meant to be shared with other users so \n" +
+	                "information in the messaging identity is meant to be shared with other users so \n" +
 	                "you need to be careful about the details you disclose.\n\n" +
 	                "Once your messaging identity has been created you can export it to a file using the\n" +
 	                "menu option Messaging >> Export own identity. This file may then be shared with\n" +
@@ -545,7 +545,7 @@ public class MessagingPanel
 	                "Your messaging history will be saved and maintained in directory:\n" +
 	                OSUtil.getSettingsDirectory() + File.separator + "messaging" + "\n" +
 	                "You need to ensure that no unauthorized users have access to it on this computer.\n\n" +
-	                "(This mesage will be shown only once.)",
+	                "(This message will be shown only once.)",
 	                "Welcome to messaging", JOptionPane.INFORMATION_MESSAGE);
 		        	        
 		        // Show the GUI dialog to edit an initially empty messaging identity
@@ -574,7 +574,7 @@ public class MessagingPanel
 				        "The Z address used to send/receive messages needs to be supplied with ZEN: \n" +
 				        ownIdentity.getSendreceiveaddress() + "\n" +
 				        "You will be redirected to the UI tab for sending ZEN to add some balance to it. You need only\n" +
-				        "a small amount e.g. typically 0.1 ZEN is suffucient to send 500 messages. After sending some\n" +
+				        "a small amount e.g. typically 0.1 ZEN is sufficient to send 500 messages. After sending some\n" +
 				        "ZEN you need to wait for the transaction to be confirmed (typically takes 2.5 minutes). It is\n" +
 				        "recommended to send ZEN to this Z address in two or more separate transactions (though one \n" +
 				        "transaction is sufficient).", 
@@ -625,7 +625,7 @@ public class MessagingPanel
 			}
 		} catch (Exception ex)
 		{
-			Log.error("Unexpected error in messagign TAB selection processing", ex);
+			Log.error("Unexpected error in messaging TAB selection processing", ex);
 			this.errorReporter.reportError(ex, false);
 		}
 	}
@@ -780,7 +780,7 @@ public class MessagingPanel
 			
 			JOptionPane.showMessageDialog(
 				this.parentFrame, 
-				"Your messaging identity has been succesfully exported to file: \n" + 
+				"Your messaging identity has been successfully exported to file: \n" + 
 				f.getName() + "\n" +
 				"You may give this file to other users to establish contact with them.\n" +
 				"They may in turn import it into their wallet/messenger application.",
@@ -857,7 +857,7 @@ public class MessagingPanel
 		        		"There is already a contact in your contact list with the same identity. \n\n" +
 		        		"Existing contact identity: " + mi.getDiplayString() + "\n" +
 		        		"Contact identity being imported: " + contactIdentity.getDiplayString() + "\n\n" +
-		        		"Two identities are consiered the same if their T/Z addresses are the same. \n" +
+		        		"Two identities are considered the same if their T/Z addresses are the same. \n" +
 		        		"Do you want to replace the details of the existing messaging identity, with\n" +
 		        		"the one being imported?", 
 		        		"The same contact identity is already available", JOptionPane.YES_NO_OPTION);
@@ -919,7 +919,7 @@ public class MessagingPanel
 				"You can now send and receive messages from this contact. Do you wish\n" +
 				"to send a limited sub-set of your contact details to this new contact\n" +
 				"as a special message?\n\n" +
-				"This will allow him/her to establish contact with you without manaully\n" +
+				"This will allow him/her to establish contact with you without manually\n" +
 				"importing your messaging identity (the way you imported his identity).",
 				"Successfully imported. Send your identity over?", JOptionPane.YES_NO_OPTION);
 			
@@ -977,7 +977,7 @@ public class MessagingPanel
 	                                 "<NONE>" : id.getSendreceiveaddress();			
 	        int reply = JOptionPane.showConfirmDialog(
 	        	this.parentFrame, 
-	        	"The " + (id.isGroup() ? "messaging group " : "conact ")  + id.getDiplayString() + "\n" +
+	        	"The " + (id.isGroup() ? "messaging group " : "contact ")  + id.getDiplayString() + "\n" +
 	        	"with messaging identification T address:\n" +
 	        	contactTAddress + "\n" +
 	        	"and send/receive Z address:\n" +
@@ -985,7 +985,7 @@ public class MessagingPanel
 	        	"will be permanently deleted from your contact list! All incoming messages from\n" +
 	        	"this contact will subsequently be ignored. Are you sure you want to remove the\n" +
 	        	"selected contact?", 
-	        	"Are you sure you wish to remove the contant?", 
+	        	"Are you sure you wish to remove the contact?", 
 	        	JOptionPane.YES_NO_OPTION);
 	        
 	        if (reply == JOptionPane.NO_OPTION) 
@@ -1082,7 +1082,7 @@ public class MessagingPanel
 				"seems to have no valid Z address for sending and receiving messages. \n";			
 			errroMessage += contactIdentity.isAnonymous() ?
 				("Since the contact is anonymous this means that the contact intentionally did\n" +
-				"not send his Z address (for replies to be psosible). Message cannot be sent!")
+				"not send his Z address (for replies to be possible). Message cannot be sent!")
 				:
 				("Most likely the reason is that this contact's messaging identity is not \n" +
 				"imported yet. Message cannot be sent!");
@@ -1105,7 +1105,7 @@ public class MessagingPanel
 			        // Offer the user to send a return address
 			        int reply = JOptionPane.showConfirmDialog(
 			        	this.parentFrame, 
-			        	"This is the first anomymous message you are sending to contact: \n" +
+			        	"This is the first anonymous message you are sending to contact: \n" +
 			        	contactIdentity.getDiplayString() + "\n" +
 			        	"Do you wish to send him your send/receive messaging Z address so\n" +
 			        	"that the contact may be able to answer your anonymous messages?", 
@@ -1220,8 +1220,8 @@ public class MessagingPanel
 	        	"The Z address used to send/receive messages has insufficient balance: \n" +
 	        	ownIdentity.getSendreceiveaddress() + "\n" +
 	        	"You will be redirected to the UI tab for sending ZEN to add some balance to it. You need only\n" +
-	        	"a small amount e.g. typically 0.1 ZEN is suffucient to send 500 messages. After sending some\n" +
-	        	"ZEN you need to wait for the transaciton to be confirmed (typically takes 2.5 minutes). It is\n" +
+	        	"a small amount e.g. typically 0.1 ZEN is sufficient to send 500 messages. After sending some\n" +
+	        	"ZEN you need to wait for the transaction to be confirmed (typically takes 2.5 minutes). It is\n" +
 	        	"recommended to send ZEN to this Z address in two or more separate transactions (though one \n" +
 	        	"transaction is sufficient).", 
 		        "Z address to send/receive messages has insufficient balance...", JOptionPane.ERROR_MESSAGE);
@@ -1243,8 +1243,8 @@ public class MessagingPanel
 	        	this.parentFrame,
 	        	"The Z address used to send/receive messages has insufficient confirmed balance: \n" +
 	        	ownIdentity.getSendreceiveaddress() + "\n" +
-	        	"This usually means that the previous mesasaging transaction is not yet confirmed. You\n" +
-	        	"need to wait for the transaciton to be confirmed (typically takes 2.5 minutes). This\n" +
+	        	"This usually means that the previous messaging transaction is not yet confirmed. You\n" +
+	        	"need to wait for the transaction to be confirmed (typically takes 2.5 minutes). This\n" +
 	        	"problem may be avoided if you send ZEN to this Z address in two or more separate \n" +
 	        	"transactions (when you supply the ZEN balance to be used for messaging).", 
 		        "Z address to send/receive messages has insufficient confirmed balance...", JOptionPane.ERROR_MESSAGE);
@@ -1544,14 +1544,14 @@ public class MessagingPanel
 					MessagingPanel.this.getRootPane().getParent(), 
 					"The messaging identity send/receive address: \n" +
 					ownZAddress + "\n" +
-					"is not found in the wallet.dat. The reason may be that after a mesaging identity\n" +
+					"is not found in the wallet.dat. The reason may be that after a messaging identity\n" +
 					"was created the wallet.dat was changed or the ZEN node configuration was changed\n" +
 					"(e.g. mainnet -> testnet). If such a change was made, the messaging identity can no\n" +
-					"longer be used. To avoid this error mesage, you may rename the directory:\n" +
+					"longer be used. To avoid this error message, you may rename the directory:\n" +
 					OSUtil.getSettingsDirectory() + File.separator + "messaging" + "\n" +
 					"until the configuration or wallet.dat is restored! Directory may only be renamed when\n" +
 					"the wallet is stopped!", 
-					"Messaging identity address is not found in walet!", JOptionPane.ERROR_MESSAGE);
+					"Messaging identity address is not found in wallet!", JOptionPane.ERROR_MESSAGE);
 				return;
 			}
 			
@@ -1629,7 +1629,7 @@ public class MessagingPanel
 					{
 						// Warn of unexpected message content
 						Log.warningOneTime(
-							"Ignoring received mesage with invalid or incomplete content: {0}",
+							"Ignoring received message with invalid or incomplete content: {0}",
 							jsonMessage.toString());
 					}
 				}	
@@ -1860,7 +1860,7 @@ public class MessagingPanel
 	}
 	
 
-	// Copies the fields sent over the wire - limited set - some day all fields will be sent
+	// Copies the fields sent over the wire - limited set - someday all fields will be sent
 	// Sender ID address is assumed to be the same
 	public void updateAndStoreExistingIdentityFromIDMessage(MessagingIdentity existingIdentity, String idMessage)
 		throws IOException
@@ -1929,7 +1929,7 @@ public class MessagingPanel
 			// TODO: code duplication with import
 			if (sendIDChoice == JOptionPane.YES_OPTION)
 			{
-				// Only a limited set of values is sent over the wire, due tr the limit of 330
+				// Only a limited set of values is sent over the wire, due to the limit of 330
 				// characters. // TODO: use protocol versions with larger messages
 				MessagingIdentity ownIdentity = this.messagingStorage.getOwnIdentity();
 				JsonObject innerIDObject = new JsonObject();
@@ -1996,7 +1996,7 @@ public class MessagingPanel
 	public void sendIdentityMessageTo(MessagingIdentity contactIdentity)
 		throws InterruptedException, IOException, WalletCallException
 	{
-		// Only a limited set of values is sent over the wire, due tr the limit of 330
+		// Only a limited set of values is sent over the wire, due to the limit of 330
 		// characters. // TODO: use protocol versions with larger messages
 		MessagingIdentity ownIdentity = this.messagingStorage.getOwnIdentity();
 		JsonObject innerIDObject = new JsonObject();
@@ -2019,7 +2019,7 @@ public class MessagingPanel
 				this.parentFrame, 
 				"The size of your messaging identity is unfortunately too large to be sent\n" +
 				"as a message. Your contact will have to import your messaging identity\n" +
-				"manaully from a json file...", 
+				"manually from a json file...", 
 				"Messaging identity size is too large!", JOptionPane.ERROR_MESSAGE);
 			return;
 		}
