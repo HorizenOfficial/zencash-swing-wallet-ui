@@ -187,7 +187,7 @@ public class TransactionTable
 						Log.info("Transaction ID for Memo field is: " + txID);
 						Log.info("Account for Memo field is: " + acc);
 						parent.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-						// TODO: some day support outgoing Z transactions
+						// TODO: someday support outgoing Z transactions
  						String MemoField = caller.getMemoField(acc, txID);
  						parent.setCursor(oldCursor);
  						Log.info("Memo field is: " + MemoField);

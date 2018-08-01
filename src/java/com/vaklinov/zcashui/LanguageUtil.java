@@ -14,7 +14,7 @@ import java.util.prefs.Preferences;
  */
 public class LanguageUtil {
 
-    private static final String PREFERED_LOCALE_FILE_NAME = "lnguage_preferences.txt";
+    private static final String PREFERRED_LOCALE_FILE_NAME = "language_preferences.txt";
 
     private static final String RESOURCE_BUNDLE_FILE_NAME = "messages.zencash";
 
@@ -43,7 +43,7 @@ public class LanguageUtil {
     }
 
     private void loadBundle(){
-        Locale currentLocale = getUsersPrferedLocale();
+        Locale currentLocale = getUsersPreferredLocale();
         rb = ResourceBundle.getBundle(RESOURCE_BUNDLE_FILE_NAME, currentLocale);
         Log.info("Loading locale: " + currentLocale.toString());
     }
@@ -64,22 +64,22 @@ public class LanguageUtil {
         }
     }
 
-    public void updatePreferedLanguage(Locale locale) {
+    public void updatePreferredLanguage(Locale locale) {
         try {
-            File languagePrefsFile = new File(OSUtil.getSettingsDirectory(),PREFERED_LOCALE_FILE_NAME );
+            File languagePrefsFile = new File(OSUtil.getSettingsDirectory(),PREFERRED_LOCALE_FILE_NAME );
             try (PrintWriter printWriter = new PrintWriter(new FileWriter(languagePrefsFile))) {
                     printWriter.println(locale.getCountry());
             }
             
         } catch (IOException e) {
-            Log.error("Saving Prefered Locale Failed!!!!", e);
+            Log.error("Saving Preferred Locale Failed!!!!", e);
         }
     }
 
-    public Locale getUsersPrferedLocale() {
+    public Locale getUsersPreferredLocale() {
         File languagePrefsFile;
         try {
-            languagePrefsFile = new File(OSUtil.getSettingsDirectory(),PREFERED_LOCALE_FILE_NAME);
+            languagePrefsFile = new File(OSUtil.getSettingsDirectory(),PREFERRED_LOCALE_FILE_NAME);
 
         if (!languagePrefsFile.exists()) {
             return DEFAULT_LOCALE;

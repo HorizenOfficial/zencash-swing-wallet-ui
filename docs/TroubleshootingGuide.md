@@ -10,15 +10,15 @@ When wallet problems occur, the information about the errors that caused the iss
 ```
 Linux:    ~/.ZENCashSwingWalletUI/ZENCashGUIWallet_xxxx_xx_debug.log 
 Windows:  %LOCALAPPDATA%/ZENCashSwingWalletUI/ZENCashGUIWallet_xxxx_xx_debug.log
-Mac OS:   ~/Library/Application Support/ZENCashSwingWalletUI/ZENCashGUIWallet_xxxx_xx_debug.log
+macOS:   ~/Library/Application Support/ZENCashSwingWalletUI/ZENCashGUIWallet_xxxx_xx_debug.log
 ```
 `zend` that is automatically started by the wallet, stores its logs at locations:
 ```
 Linux:    ~/.zen/debug.log, 
 Windows:  %APPDATA%/Zen/debug.log
-Mac OS:   ~/Library/Application Support/Zen/debug.log
+macOS:   ~/Library/Application Support/Zen/debug.log
  ```
-The log files are the first place too look for clues as to the nature of problem.
+The log files are the first place to look for clues as to the nature of problem.
 
 ### Common Problem 1 - wallet fails during start up
 
@@ -34,7 +34,7 @@ works in 90%+ of cases is to start `zend` manually with a `-reindex` option from
 ```
 zend -reindex
 ```
-For non-technical users here is some information on how to open a terminal on [Windows](https://www.lifewire.com/how-to-open-command-prompt-2618089) and [Mac OS](https://www.wikihow.com/Open-a-Terminal-Window-in-Mac). The full command on Mac OS is:
+For non-technical users here is some information on how to open a terminal on [Windows](https://www.lifewire.com/how-to-open-command-prompt-2618089) and [macOS](https://www.wikihow.com/Open-a-Terminal-Window-in-Mac). The full command on macOS is:
 ```
 /Applications/ZENCashWallet.app/Contents/Java/zend -reindex
 ```

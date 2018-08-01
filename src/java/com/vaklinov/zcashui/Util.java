@@ -109,7 +109,7 @@ public class Util
 	}
 	
 	
-	// Turns a 1.0.7+ error message to a an old JSOn style message
+	// Turns a 1.0.7+ error message to an old JSON style message
 	// info - new style error message
 	public static JsonObject getJsonErrorMessage(String info)
 	    throws IOException
@@ -135,7 +135,7 @@ public class Util
 	 * Escapes a text value to a form suitable to be displayed in HTML content. Important control
 	 * characters are replaced with entities.
 	 * 
-	 * @param inputValue th value to escape
+	 * @param inputValue the value to escape
 	 * 
 	 * @return the "safe" value to display.
 	 */
@@ -353,7 +353,7 @@ public class Util
 	
 	
 	// zc/zt - mainnet and testnet
-	// TODO: We need a much more precise criterion to distinguish T/Z adresses;
+	// TODO: We need a much more precise criterion to distinguish T/Z addresses;
 	public static boolean isZAddress(String address)
 	{
 		return (address != null) && 
@@ -363,7 +363,7 @@ public class Util
 	
 	
 	/**
-	 * Delets a directory and all of its subdirectories.
+	 * Deletes a directory and all of its subdirectories.
 	 * 
 	 * @param dir directory to delete.
 	 * 

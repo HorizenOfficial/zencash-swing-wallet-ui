@@ -228,7 +228,7 @@ public class ZCashUI
                 try {
                     Log.info("Action ["+e.getActionCommand(  )+"] performed");
                     LanguageMenuItem item = (LanguageMenuItem) e.getSource();
-                    langUtil.updatePreferedLanguage(item.getLocale());
+                    langUtil.updatePreferredLanguage(item.getLocale());
                     JOptionPane.showMessageDialog(
                             ZCashUI.this.getRootPane().getParent(),
                             langUtil.getString("dialog.message.language.prefs.update"),
@@ -306,7 +306,7 @@ public class ZCashUI
             }
         );
         
-        /** Encrypt menu item is not initiliazed
+        /** Encrypt menu item is not initialized
         menuItemEncrypt.addActionListener(
             new ActionListener()
             {
@@ -554,7 +554,7 @@ public class ZCashUI
 		int width = 1040;
 		if (os == OS_TYPE.MAC_OS)
 		{
-			width += 100; // Needs to be wider on Mac OS
+			width += 100; // Needs to be wider on macOS
 		}
 		
 		this.setSize(new Dimension(width, currentSize.height));
@@ -666,7 +666,7 @@ public class ZCashUI
             if ((zcashdInfo.status != DAEMON_STATUS.RUNNING) || (daemonStartInProgress))
             {
             	Log.info(
-            		"zend is not runing at the moment or has not started/synchronized 100% - showing splash...");
+            		"zend is not running at the moment or has not started/synchronized 100% - showing splash...");
 	            startupBar = new StartupProgressDialog(initialClientCaller);
 	            startupBar.setVisible(true);
 	            startupBar.waitForStartup();

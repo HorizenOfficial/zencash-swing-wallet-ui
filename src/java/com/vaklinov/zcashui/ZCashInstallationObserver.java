@@ -122,7 +122,7 @@ public class ZCashInstallationObserver
 		return getDaemonInfoForUNIXLikeOS("zend");
 	}
 
-	// So far tested on Mac OS X and Linux - expected to work on other UNIXes as well
+	// So far tested on macOS and Linux - expected to work on other UNIXes as well
 	public static synchronized DaemonInfo getDaemonInfoForUNIXLikeOS(String daemonName)
 		throws IOException, InterruptedException
 	{
