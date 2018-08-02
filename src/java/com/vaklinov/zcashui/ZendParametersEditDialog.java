@@ -29,35 +29,24 @@
 package com.vaklinov.zcashui;
 
 import java.awt.BorderLayout;
-import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
-import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
-import java.util.Locale;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JTextField;
+import javax.swing.JTextArea;
 import javax.swing.border.EtchedBorder;
-
-import com.vaklinov.zcashui.Log;
-import com.vaklinov.zcashui.StatusUpdateErrorReporter;
-import com.vaklinov.zcashui.Util;
 
 
 /**
- * Dialog showing the messaging options and allowing them to be edited.
+ * Dialog showing the zend startup options and allowing them to be edited.
  */
 public class ZendParametersEditDialog
 	extends JDialog
@@ -68,9 +57,8 @@ public class ZendParametersEditDialog
 	protected JLabel infoLabel;
 	protected JPanel buttonPanel;
 	
-	protected JTextField amountTextField;
-	protected JTextField transactionFeeTextField;
-	protected JCheckBox  automaticallyAddUsers;
+	
+	private LanguageUtil langUtil;
 	
 	public ZendParametersEditDialog(JFrame parentFrame, StatusUpdateErrorReporter errorReporter)
 		throws IOException
@@ -78,34 +66,32 @@ public class ZendParametersEditDialog
 		this.parentFrame   = parentFrame;
 		this.errorReporter = errorReporter;
 		
-		this.setTitle("Messaging options");
+		this.langUtil = LanguageUtil.instance();
+		
+		this.setTitle(langUtil.getString("zend.cmd.params.dialog.title"));
 		this.setModal(true);
 		this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 			
 		this.getContentPane().setLayout(new BorderLayout(0, 0));
 			
 		JPanel tempPanel = new JPanel(new BorderLayout(0, 0));
-		tempPanel.setBorder(BorderFactory.createEmptyBorder(4, 4, 4, 4));
-		infoLabel = new JLabel(
-				"<html><span style=\"font-size:0.93em;\">" +
-				"The options below pertain to messaging. It is posisble to set the amount of ZEN<br/>" +
-				"to be sent with every messaging transaction and also the transaction fee. It is<br/>" + 
-			    "also possible to decide if users are to be automatically added to the contact list.<br/><br/>" +
-			    "</span>");
+		tempPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+		infoLabel = new JLabel(langUtil.getString("zend.cmd.params.dialog.info"));
 	    tempPanel.add(infoLabel, BorderLayout.CENTER);
 		this.getContentPane().add(tempPanel, BorderLayout.NORTH);
 			
 		JPanel detailsPanel = new JPanel();
 		detailsPanel.setLayout(new BoxLayout(detailsPanel, BoxLayout.Y_AXIS));
 		
+		detailsPanel.add(new JTextArea("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\n\n\n\n\n\n\n\n\n"));
 		
-		detailsPanel.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
+		detailsPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 		this.getContentPane().add(detailsPanel, BorderLayout.CENTER);
 
 		// Lower buttons - by default only close is available
 		buttonPanel = new JPanel();
 		buttonPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 15, 3));
-		JButton closeButon = new JButton("Close");
+		JButton closeButon = new JButton(langUtil.getString("zend.cmd.params.dialog.close.button"));
 		buttonPanel.add(closeButon);
 		this.getContentPane().add(buttonPanel, BorderLayout.SOUTH);
 
@@ -119,7 +105,7 @@ public class ZendParametersEditDialog
 				}
 		});
 		
-		JButton saveButon = new JButton("Save & close");
+		JButton saveButon = new JButton(langUtil.getString("zend.cmd.params.dialog.save.button"));
 		buttonPanel.add(saveButon);
 		saveButon.addActionListener(new ActionListener()
 		{
@@ -128,8 +114,6 @@ public class ZendParametersEditDialog
 			{
 				try
 				{
-					String amountToSend = ZendParametersEditDialog.this.amountTextField.getText();
-					String transactionFee = ZendParametersEditDialog.this.transactionFeeTextField.getText();
 										
 					ZendParametersEditDialog.this.setVisible(false);
 					ZendParametersEditDialog.this.dispose();

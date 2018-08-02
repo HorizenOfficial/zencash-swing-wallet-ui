@@ -426,16 +426,14 @@ public class WalletOperations
 		{
 			this.issueZendParametersWarning();
 			
-			
-			// ...
-			
+			ZendParametersEditDialog dialog = new ZendParametersEditDialog(this.parent, errorReporter);
+			dialog.setVisible(true);
 		} catch (Exception ex)
 		{
 			this.errorReporter.reportError(ex, false);
 		}
 	}
 	
-
 
 	/**
 	 * export to Arizen wallet
