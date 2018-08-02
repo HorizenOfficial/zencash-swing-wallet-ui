@@ -33,6 +33,7 @@ import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
+import java.util.List;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
@@ -41,6 +42,7 @@ import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.border.EtchedBorder;
 
@@ -57,6 +59,7 @@ public class ZendParametersEditDialog
 	protected JLabel infoLabel;
 	protected JPanel buttonPanel;
 	
+	protected JTextArea optionsEditArea;
 	
 	private LanguageUtil langUtil;
 	
@@ -83,10 +86,23 @@ public class ZendParametersEditDialog
 		JPanel detailsPanel = new JPanel();
 		detailsPanel.setLayout(new BoxLayout(detailsPanel, BoxLayout.Y_AXIS));
 		
-		String content = Util.loadZendParameters().toString();
-		content += "\n\n\n\n\n\n\n\n";
+		// Load the content of the current options file
+		List<String> zendParams = Util.loadZendParameters();
+		while (zendParams.size() < 8)
+		{
+			zendParams.add("");
+		}
 		
-		detailsPanel.add(new JTextArea(content));
+		StringBuilder editContent = new StringBuilder();
+		for (String param : zendParams)
+		{
+			editContent.append(param);
+			editContent.append("\n");
+		}
+		
+		this.optionsEditArea = new JTextArea(editContent.toString());
+		JScrollPane pane = new JScrollPane(this.optionsEditArea);
+		detailsPanel.add(pane);
 		
 		detailsPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 		this.getContentPane().add(detailsPanel, BorderLayout.CENTER);
