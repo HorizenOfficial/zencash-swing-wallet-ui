@@ -83,7 +83,10 @@ public class ZendParametersEditDialog
 		JPanel detailsPanel = new JPanel();
 		detailsPanel.setLayout(new BoxLayout(detailsPanel, BoxLayout.Y_AXIS));
 		
-		detailsPanel.add(new JTextArea("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\n\n\n\n\n\n\n\n\n"));
+		String content = Util.loadZendParameters().toString();
+		content += "\n\n\n\n\n\n\n\n";
+		
+		detailsPanel.add(new JTextArea(content));
 		
 		detailsPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 		this.getContentPane().add(detailsPanel, BorderLayout.CENTER);
