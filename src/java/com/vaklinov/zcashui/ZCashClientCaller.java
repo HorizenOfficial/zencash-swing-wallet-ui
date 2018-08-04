@@ -154,7 +154,7 @@ public class ZCashClientCaller
 	{
 		String exportDir = OSUtil.getUserHomeDirectory().getCanonicalPath();
 		
-		List<String> zendOptions = Util.loadZendParameters();
+		List<String> zendOptions = Util.loadZendParameters(true);
 		Log.info("Custom zend options to be used are: {0}", zendOptions.toString());
 		
 		String zendFullCommandLine[] = new String[zendOptions.size() + 1];

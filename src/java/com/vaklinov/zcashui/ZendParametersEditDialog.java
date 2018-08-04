@@ -29,10 +29,20 @@
 package com.vaklinov.zcashui;
 
 import java.awt.BorderLayout;
+import java.awt.Desktop;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.LineNumberReader;
+import java.io.StringReader;
+import java.net.URI;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.BorderFactory;
@@ -44,7 +54,6 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
-import javax.swing.border.EtchedBorder;
 
 
 /**
@@ -80,6 +89,22 @@ public class ZendParametersEditDialog
 		JPanel tempPanel = new JPanel(new BorderLayout(0, 0));
 		tempPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 		infoLabel = new JLabel(langUtil.getString("zend.cmd.params.dialog.info"));
+		infoLabel.addMouseListener(new MouseAdapter() 
+		{
+			@Override
+			public void mouseClicked(MouseEvent e) 
+			{
+				try
+				{
+					Desktop.getDesktop().browse(new URI(
+						"https://github.com/ZencashOfficial/zencash-swing-wallet-ui/blob/feature/zend-cmd-options/docs/zend.pdf"));
+				}
+				catch(Exception ex)
+				{
+					errorReporter.reportError(ex);
+				}
+			}
+		});
 	    tempPanel.add(infoLabel, BorderLayout.CENTER);
 		this.getContentPane().add(tempPanel, BorderLayout.NORTH);
 			
@@ -87,8 +112,8 @@ public class ZendParametersEditDialog
 		detailsPanel.setLayout(new BoxLayout(detailsPanel, BoxLayout.Y_AXIS));
 		
 		// Load the content of the current options file
-		List<String> zendParams = Util.loadZendParameters();
-		while (zendParams.size() < 8)
+		List<String> zendParams = Util.loadZendParameters(true);
+		while (zendParams.size() < 6)
 		{
 			zendParams.add("");
 		}
@@ -107,7 +132,6 @@ public class ZendParametersEditDialog
 		detailsPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 		this.getContentPane().add(detailsPanel, BorderLayout.CENTER);
 
-		// Lower buttons - by default only close is available
 		buttonPanel = new JPanel();
 		buttonPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 15, 3));
 		JButton closeButon = new JButton(langUtil.getString("zend.cmd.params.dialog.close.button"));
@@ -133,6 +157,7 @@ public class ZendParametersEditDialog
 			{
 				try
 				{
+					// TODO: save logic
 										
 					ZendParametersEditDialog.this.setVisible(false);
 					ZendParametersEditDialog.this.dispose();
@@ -147,9 +172,89 @@ public class ZendParametersEditDialog
 		this.pack();
 		this.setLocation(100, 100);
 		this.setLocationRelativeTo(parentFrame);
+		
+		Dimension currentSize = this.getSize();
+		if ((currentSize.width > 1100) || (currentSize.height > 500))
+		{
+			this.setSize(new Dimension(Math.min(currentSize.width, 1100), Math.min(currentSize.height, 500)));
+	        this.validate();
+			this.repaint();
+		}
 	}
 
 	
+	// TODO": 
+	private void saveZendParameters()
+		throws IOException
+	{
+		// Get the new zend parameters from the text area
+		List<String> optionsToSet = new ArrayList<String>();
+		// Read current text - meaningful lines
+		LineNumberReader r = null;
+		try
+		{
+			r = new LineNumberReader(new StringReader(this.optionsEditArea.getText()));
+			String line;
+			while ((line = r.readLine()) != null)
+			{
+				line = line.trim();
+				
+				if ((line.length() <= 0) || line.startsWith("#"))
+				{
+					continue;
+				}
+				optionsToSet.add(line);
+			}
+			
+		} finally
+		{
+			if (r != null)
+			{
+				r.close();
+			}
+		}
 
+		// Check for multiple options on the same line
+		for (String option : optionsToSet)
+		{
+			if (option.contains(" ") &&
+			    ((option.indexOf("=") != option.lastIndexOf("=")) ||
+			     (option.indexOf("-") != option.lastIndexOf("-"))))
+			{
+				// TODO: Warn on possible multiple options per line
+			}
+		}		
+		
+		// Load the existing file into individual lines (no exceptions).
+		List<String> zendFullFileLines = Util.loadZendParameters(false);
+		
+		// TODO: Double iteration to replace the options
+		
+		// TODO: save the file
+	}
 	
+	
+	
+	/**
+	 * Utility: given a full option specification, provides the option name only
+	 * 
+	 * @param fullParam must not be null
+	 * 
+	 * @return param name (as best as can be identified)
+	 */
+	private String getParamName(String fullParam)
+	{
+		String param = fullParam.trim();
+		while (param.startsWith("-"))
+		{
+			param = param.substring(1);
+		}
+		
+		if (param.contains("="))
+		{
+			param = param.substring(0, param.indexOf("="));
+		}
+		
+		return param;
+	}
 } 

@@ -476,11 +476,13 @@ public class Util
 	/**
 	 * Loads the zend parameters from file zend-cmd-options.conf. 
 	 * 
+	 * @param onlyMeaningfulLines if true, only the essential lines are loaded (not comment/empty ones).
+	 * 
 	 * @return an array that represents the custom parameters of zend to use to start it.
 	 * 
 	 * @throws IOException
 	 */
-	public static List<String> loadZendParameters()
+	public static List<String> loadZendParameters(boolean onlyMeaningfulLines)
 		throws IOException
 	{
     	String settingsDir = OSUtil.getSettingsDirectory();
@@ -503,12 +505,12 @@ public class Util
 			{
 				line = line.trim();
 				
-				if (line.length() <= 0)
+				if (onlyMeaningfulLines && (line.length() <= 0))
 				{
 					continue;
 				}
 				
-				if (line.startsWith("#"))
+				if (onlyMeaningfulLines && line.startsWith("#"))
 				{
 					continue;
 				}
