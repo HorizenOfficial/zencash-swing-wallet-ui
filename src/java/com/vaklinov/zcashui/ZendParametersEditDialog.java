@@ -36,10 +36,12 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.LineNumberReader;
+import java.io.PrintWriter;
 import java.io.StringReader;
 import java.net.URI;
 import java.util.ArrayList;
@@ -157,7 +159,8 @@ public class ZendParametersEditDialog
 			{
 				try
 				{
-					// TODO: save logic
+					// Process the logic of saving the data
+					ZendParametersEditDialog.this.saveZendParameters();
 										
 					ZendParametersEditDialog.this.setVisible(false);
 					ZendParametersEditDialog.this.dispose();
@@ -228,11 +231,56 @@ public class ZendParametersEditDialog
 		// Load the existing file into individual lines (no exceptions).
 		List<String> zendFullFileLines = Util.loadZendParameters(false);
 		
-		// TODO: Double iteration to replace the options
+		// Double iteration to replace the options
+		for (String optionToSet : optionsToSet)
+		{
+			boolean bReplaced = false;
+			for (int oo = 0; oo < zendFullFileLines.size(); oo++)
+			{
+				String currentOptionToCheck = zendFullFileLines.get(oo);
+				if (getParamName(optionToSet).equals(getParamName(currentOptionToCheck)))
+				{
+					if ((!optionToSet.equals(currentOptionToCheck)))
+					{
+						Log.info("Saving user-modified zend option at line {0}: {1}", oo, optionToSet);
+						zendFullFileLines.set(oo, optionToSet);
+					}
+					// TODO: Handle options that may be set multiple times
+					bReplaced = true;
+				}
+			}
+			
+			if (!bReplaced)
+			{
+				Log.info("Adding user-created zend option at line {0}: {1}", zendFullFileLines.size(), optionToSet);
+				zendFullFileLines.add(optionToSet);
+			}
+			
+			// TODO: Handle options that may be deleted - another double iteration
+		}
 		
-		// TODO: save the file
+		// Finally save the file
+    	String settingsDir = OSUtil.getSettingsDirectory();
+    	File dir = new File(settingsDir);
+		File zendOptionsFile = new File(dir, "zend-cmd-options.conf");
+
+		Util.renameFileForMultiVersionBackup(dir, zendOptionsFile.getName());
+		
+		PrintWriter configOut = null;
+		try
+		{
+			configOut =  new PrintWriter(zendOptionsFile, "UTF-8");
+			for (String line : zendFullFileLines)
+			{
+				configOut.println(line);
+			}
+		} finally
+		{
+			Log.info("Successfully created new version of file: {0}", zendOptionsFile.getCanonicalPath());
+			configOut.close();
+		}
+		
 	}
-	
 	
 	
 	/**

@@ -43,6 +43,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.security.SecureRandom;
 import java.util.Date;
@@ -806,7 +807,7 @@ public class ZCashUI
 			Log.info("zend command line options configuration file " + zendOptionsFile.getCanonicalPath() + 
 					 " does not exist. It will be created with default settings.");
 			
-			PrintStream configOut = new PrintStream(new FileOutputStream(zendOptionsFile));
+			PrintWriter configOut = new PrintWriter(zendOptionsFile, "UTF-8");
 			String exportDir = OSUtil.getUserHomeDirectory().getCanonicalPath();
 			
 			configOut.println("########################################################################################");
