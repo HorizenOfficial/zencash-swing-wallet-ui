@@ -53,6 +53,7 @@ import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
@@ -160,10 +161,11 @@ public class ZendParametersEditDialog
 				try
 				{
 					// Process the logic of saving the data
-					ZendParametersEditDialog.this.saveZendParameters();
-										
-					ZendParametersEditDialog.this.setVisible(false);
-					ZendParametersEditDialog.this.dispose();
+					if (ZendParametersEditDialog.this.saveZendParameters())
+					{
+						ZendParametersEditDialog.this.setVisible(false);
+						ZendParametersEditDialog.this.dispose();
+					}
 				} catch (Exception ex)
 				{
 					Log.error("Unexpected error in editing own messaging identity!", ex);
@@ -186,8 +188,14 @@ public class ZendParametersEditDialog
 	}
 
 	
-	// TODO": 
-	private void saveZendParameters()
+	/**
+	 * Handles the saving of the options possibly edited by the user.
+	 * 
+	 * @return true if successufl, false if cancelled
+	 * 
+	 * @throws IOException
+	 */
+	private boolean saveZendParameters()
 		throws IOException
 	{
 		// Get the new zend parameters from the text area
@@ -224,7 +232,16 @@ public class ZendParametersEditDialog
 			    ((option.indexOf("=") != option.lastIndexOf("=")) ||
 			     (option.indexOf("-") != option.lastIndexOf("-"))))
 			{
-				// TODO: Warn on possible multiple options per line
+				// Warn on possible multiple options per line
+			    int answer = JOptionPane.showConfirmDialog(  
+		            ZendParametersEditDialog.this,
+					langUtil.getString("zend.cmd.params.dialog.double.option.warning.text", option),
+					langUtil.getString("zend.cmd.params.dialog.double.option.warning.title"),
+					JOptionPane.YES_NO_OPTION);
+				if (answer == JOptionPane.NO_OPTION)
+				{
+			        return false;
+				}
 			}
 		}		
 		
@@ -329,6 +346,10 @@ public class ZendParametersEditDialog
 			configOut.close();
 		}
 		
+		// TODO: inform the user of successful save - and the need to restart
+		
+		
+		return true;
 	}
 	
 	
