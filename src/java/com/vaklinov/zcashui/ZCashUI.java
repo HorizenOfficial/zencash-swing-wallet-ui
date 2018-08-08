@@ -847,10 +847,6 @@ public class ZCashUI
 			configOut.println("# instance where the wallet backups are stored.");
 			configOut.println("-exportdir=" + exportDir);
 			configOut.println("");
-			configOut.println("");
-			configOut.println("");
-			configOut.println("");
-			configOut.println("");
 			
 			configOut.close();
 		}

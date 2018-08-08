@@ -231,33 +231,82 @@ public class ZendParametersEditDialog
 		// Load the existing file into individual lines (no exceptions).
 		List<String> zendFullFileLines = Util.loadZendParameters(false);
 		
-		// Double iteration to replace the options
+		// Double iteration to replace the options that have changed
 		for (String optionToSet : optionsToSet)
 		{
-			boolean bReplaced = false;
+			boolean bFound = false;
+			
+			all_file_options_loop:
 			for (int oo = 0; oo < zendFullFileLines.size(); oo++)
 			{
 				String currentOptionToCheck = zendFullFileLines.get(oo);
-				if (getParamName(optionToSet).equals(getParamName(currentOptionToCheck)))
+				
+				if ((currentOptionToCheck.trim().length() <= 0) ||
+					 currentOptionToCheck.trim().startsWith("#"))
+				{
+					continue all_file_options_loop;
+				}
+				
+				if (getParamName(optionToSet).equals(getParamName(currentOptionToCheck)) &&
+					(!isMultiOccurrenceOption(currentOptionToCheck)))
 				{
 					if ((!optionToSet.equals(currentOptionToCheck)))
 					{
 						Log.info("Saving user-modified zend option at line {0}: {1}", oo, optionToSet);
 						zendFullFileLines.set(oo, optionToSet);
 					}
-					// TODO: Handle options that may be set multiple times
-					bReplaced = true;
+
+					bFound = true;
+				}
+				
+				if (optionToSet.equals(currentOptionToCheck) && isMultiOccurrenceOption(currentOptionToCheck))
+				{
+					bFound = true; // Found but not replaced
 				}
 			}
 			
-			if (!bReplaced)
+			if (!bFound)
 			{
 				Log.info("Adding user-created zend option at line {0}: {1}", zendFullFileLines.size(), optionToSet);
 				zendFullFileLines.add(optionToSet);
 			}
-			
-			// TODO: Handle options that may be deleted - another double iteration
 		}
+		
+		// Handle options that may be deleted - another double iteration
+		all_file_options_loop2:
+		for (int oo = 0; oo < zendFullFileLines.size(); oo++)
+		{
+			String currentOptionToCheck = zendFullFileLines.get(oo);
+				
+			if ((currentOptionToCheck.trim().length() <= 0) ||
+				 currentOptionToCheck.trim().startsWith("#"))
+			{
+				continue all_file_options_loop2;
+			}
+				
+			boolean bRemove = true;
+			
+			for (String optionToSet : optionsToSet)
+			{
+				if (getParamName(optionToSet).equals(getParamName(currentOptionToCheck)) &&
+					(!isMultiOccurrenceOption(currentOptionToCheck)))
+				{
+					bRemove = false;
+				}
+				
+				if (optionToSet.equals(currentOptionToCheck) && isMultiOccurrenceOption(currentOptionToCheck))
+				{
+					bRemove = false;
+				}
+			}
+			
+			if (bRemove)
+			{
+				Log.info("Removing user-deleted zend option at line {0}: {1}", oo, currentOptionToCheck);
+				zendFullFileLines.set(oo, "");
+			}
+		}
+
 		
 		// Finally save the file
     	String settingsDir = OSUtil.getSettingsDirectory();
@@ -280,6 +329,22 @@ public class ZendParametersEditDialog
 			configOut.close();
 		}
 		
+	}
+	
+	
+	/**
+	 * Distinguishes between single and multi-occurrece options for the purpose
+	 * of replacing them. 
+	 * 
+	 * @param fullParam fill config line
+	 * 
+	 * @return
+	 */
+	private boolean isMultiOccurrenceOption(String fullParam)
+	{
+		String paramName = this.getParamName(fullParam);
+		 
+		return paramName.equals("addnode"); // For now only addnode seems to be a multi-occur option
 	}
 	
 	
