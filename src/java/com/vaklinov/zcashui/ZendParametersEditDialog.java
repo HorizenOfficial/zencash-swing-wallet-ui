@@ -336,9 +336,21 @@ public class ZendParametersEditDialog
 		try
 		{
 			configOut =  new PrintWriter(zendOptionsFile, "UTF-8");
+			int emptyLineCount = 0;
 			for (String line : zendFullFileLines)
 			{
-				configOut.println(line);
+				if (line.trim().length() > 0)
+				{
+					emptyLineCount = 0;
+				} else
+				{
+					emptyLineCount++;
+				}
+				
+				if (emptyLineCount <= 2)
+				{
+					configOut.println(line);
+				}
 			}
 		} finally
 		{
@@ -346,8 +358,12 @@ public class ZendParametersEditDialog
 			configOut.close();
 		}
 		
-		// TODO: inform the user of successful save - and the need to restart
-		
+		// Inform the user of successful save - and the need to restart
+		JOptionPane.showMessageDialog(
+			ZendParametersEditDialog.this, 
+			langUtil.getString("zend.cmd.params.dialog.success.text", zendOptionsFile.getCanonicalPath()),
+			langUtil.getString("zend.cmd.params.dialog.success.title"),
+            JOptionPane.INFORMATION_MESSAGE);
 		
 		return true;
 	}
