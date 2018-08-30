@@ -416,7 +416,24 @@ public class WalletOperations
 		}
 	}
 
-
+	
+	/**
+	 * Brings up a GUI dialog box to edit the command line parameters of zend that the GUI starts.
+	 */
+	public void editZendOptions()
+	{
+		try
+		{
+			this.issueZendParametersWarning();
+			
+			ZendParametersEditDialog dialog = new ZendParametersEditDialog(this.parent, errorReporter);
+			dialog.setVisible(true);
+		} catch (Exception ex)
+		{
+			this.errorReporter.reportError(ex, false);
+		}
+	}
+	
 
 	/**
 	 * export to Arizen wallet
@@ -575,7 +592,6 @@ public class WalletOperations
 	}
 
 
-
 	private void issueBackupDirectoryWarning()
 		throws IOException
 	{
@@ -604,4 +620,35 @@ public class WalletOperations
 	    
 	    warningFlagFile.createNewFile();
 	}
+	
+	
+	private void issueZendParametersWarning()
+			throws IOException
+	{
+	    String userDir = OSUtil.getSettingsDirectory();
+	    File warningFlagFile = new File(userDir + File.separator + "zendParameterWarningShown.flag");
+	    if (warningFlagFile.exists())
+	    {
+	        return;
+	    } 
+	            
+        int reply = JOptionPane.showOptionDialog(
+            this.parent,
+            langUtil.getString("wallet.operations.zend.parameters.warning.text",
+            	new File(userDir + File.separator + "zend-cmd-options.conf").getCanonicalPath()),
+	        langUtil.getString("wallet.operations.zend.parameters.warning.title"),
+	        JOptionPane.YES_NO_OPTION,
+	        JOptionPane.WARNING_MESSAGE, 
+	        null, new String[] { langUtil.getString("wallet.operations.zend.parameters.warning.notagain"),
+                                 langUtil.getString("wallet.operations.zend.parameters.warning.oklabel") },
+	        JOptionPane.NO_OPTION);
+	        
+	    if (reply == JOptionPane.NO_OPTION) 
+	    {
+	    	return;
+	    }
+		    
+	    warningFlagFile.createNewFile();
+	}
+
 }

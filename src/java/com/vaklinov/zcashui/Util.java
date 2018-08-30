@@ -30,7 +30,9 @@ package com.vaklinov.zcashui;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.LineNumberReader;
 import java.io.RandomAccessFile;
 import java.io.Reader;
@@ -40,7 +42,9 @@ import java.lang.reflect.Method;
 import java.security.DigestInputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import com.eclipsesource.json.Json;
 import com.eclipsesource.json.JsonObject;
@@ -444,7 +448,7 @@ public class Util
 
 	
 	/**
-	 * Check if a string is numeric (log int)
+	 * Check if a string is numeric (long int)
 	 * 
 	 * @param s string to check
 	 * 
@@ -467,4 +471,62 @@ public class Util
 		
 		return true;
 	}
+		
+	
+	/**
+	 * Loads the zend parameters from file zend-cmd-options.conf. 
+	 * 
+	 * @param onlyMeaningfulLines if true, only the essential lines are loaded (not comment/empty ones).
+	 * 
+	 * @return an array that represents the custom parameters of zend to use to start it.
+	 * 
+	 * @throws IOException
+	 */
+	public static List<String> loadZendParameters(boolean onlyMeaningfulLines)
+		throws IOException
+	{
+    	String settingsDir = OSUtil.getSettingsDirectory();
+    	File dir = new File(settingsDir);
+		File zendOptionsFile = new File(dir, "zend-cmd-options.conf");
+		if (!zendOptionsFile.exists())
+		{
+			Log.info("zend command line options configuration file zend-cmd-options.conf " + 
+					 " does not exist. This is not expected!");
+			return new ArrayList<String>();
+		}
+		
+		List<String> options = new ArrayList<String>();
+		LineNumberReader r = null;
+		try
+		{
+			r = new LineNumberReader(new InputStreamReader(new FileInputStream(zendOptionsFile), "UTF-8"));
+			String line;
+			while ((line = r.readLine()) != null)
+			{
+				line = line.trim();
+				
+				if (onlyMeaningfulLines && (line.length() <= 0))
+				{
+					continue;
+				}
+				
+				if (onlyMeaningfulLines && line.startsWith("#"))
+				{
+					continue;
+				}
+				
+				options.add(line);
+			}
+			
+		} finally
+		{
+			if (r != null)
+			{
+				r.close();
+			}
+		}
+		
+		return options;
+	}
+
 }
