@@ -130,6 +130,7 @@ SOFTWARE.
 
 ### Known issues and limitations
 
+1. Issue: The ZenCash Desktop GUI Wallet can not be built with `openjdk-11-jdk`, to build, you must install `openjdk-8-jdk`. If `openjdk-11-jdk` is installed you must then run `update-java-alternatives -s java-1.8.0-openjdk-amd64`.
 1. Issue: The ZENCash Desktop GUI Wallet is not compatible with applications that modify the ZEN `wallet.dat` file. The wallet should not be used
 with such applications on the same PC. For instance some distributed exchange applications are known to create watch-only addresses in the
 `wallet.dat` file that cause the GUI wallet to display a wrong balance and/or display addresses that do not belong to the wallet. 
