@@ -63,8 +63,11 @@
 	    <os family="unix" />
 	</condition>
 	
-    <condition property="isJava9">
-	    <equals arg1="${ant.java.version}" arg2="9" />
+    <condition property="isJava9OrLater">
+    	<or>
+	        <equals arg1="${ant.java.version}" arg2="9" />
+    		<equals arg1="${ant.java.version}" arg2="10" />
+    	</or>
     </condition>	
 	
     <!-- TARGETS -->
@@ -83,7 +86,7 @@
     	</copy>
     </target>
 
-    <target name="compileJDK9" depends="clean" if="isJava9">
+    <target name="compileJDK9" depends="clean" if="isJava9OrLater">
         <mkdir dir="${classes.dir}"/>
         <javac srcdir="${src.dir}" destdir="${classes.dir}" debug="on">
         	<compilerarg line="--add-modules java.xml.bind" />
@@ -91,7 +94,7 @@
         </javac>
     </target>
 	
-    <target name="compile" depends="clean" unless="isJava9">
+    <target name="compile" depends="clean" unless="isJava9OrLater">
         <mkdir dir="${classes.dir}"/>
         <javac srcdir="${src.dir}" destdir="${classes.dir}" debug="on">
         	<classpath refid="main-classpath"/>
