@@ -36,12 +36,6 @@ public class ProvingKeyFetcher {
     private static final int SPROUT_GROTH_SIZE = 725523612;
     private static final String SHA256SG = "b685d700c60328498fbde589c8c7c484c722b788b265b72af448a5bf0ee55b50";
     private static final String pathURLSG = "https://d3fpmqdd8wxk96.cloudfront.net/downloads/sprout-groth16.params";
-    private static final int SAPLING_SPEND_SIZE = 47958396;
-    private static final String SHA256SS = "8e48ffd23abb3a5fd9c5589204f32d9c31285a04b78096ba40a79b75677efc13";
-    private static final String pathURLSS = "https://z.cash/downloads/sapling-spend.params";
-    private static final int SAPLING_OUTPUT_SIZE = 3592860;
-    private static final String SHA256SO = "2f0ebbcbb9bb0bcffe95a397e7eba89c29eb4dde6191c339db88570e3f3fb0e4";
-    private static final String pathURLSO = "https://z.cash/downloads/sapling-output.params";
     // TODO: add backups
     private LanguageUtil langUtil;
 
@@ -74,6 +68,7 @@ public class ProvingKeyFetcher {
         zCashParams = zCashParams.getCanonicalFile();
         
         boolean needsFetch = false;
+        boolean needsFetchSG = false;
         if (!zCashParams.exists()) 
         {    
             needsFetch = true;
@@ -172,7 +167,7 @@ public class ProvingKeyFetcher {
         }
         if (needsFetchSG) {
         provingKeyFile.delete();
-        OutputStream os = new BufferedOutputStream(new FileOutputStream(SproutGrothFile));
+        OutputStream os = new BufferedOutputStream(new FileOutputStream(sproutGrothFile));
         URL keyURL = new URL(pathURLSG);
         URLConnection urlc = keyURL.openConnection();
         urlc.setRequestProperty("User-Agent", "Wget/1.17.1 (linux-gnu)");        
