@@ -30,9 +30,9 @@ It requires a 64-bit Windows 7 or later version to run. It includes [ZENCash 2.0
 such as [http://quickhash-gui.org/](http://quickhash-gui.org/) you may calculate the its SHA256 checksum. The 
 result should be:
 ```
-TO_BE_ADDED *ZENCashDesktopGUIWallet_0.84.0.zip
+c33797f675a946fb5cc23a1347c64733d86399425f7b389c289f78878646efc0  ZENCashDesktopGUIWallet_0.84.0.zip
 ```
-**If the resulting checksum is not `TO_BE_ADDED` then**
+**If the resulting checksum is not `c33797f675a946fb5cc23a1347c64733d86399425f7b389c289f78878646efc0` then**
 **something is wrong and you should discard the downloaded wallet!**
 
 3. Unzip the Wallet ZIP file `ZENCashDesktopGUIWallet_0.84.0.zip` in some directory that it will run from.
