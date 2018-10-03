@@ -33,9 +33,9 @@ It includes [ZENCash 2.0.15 binaries](https://github.com/ZencashOfficial/zen/rel
 such as [http://quickhash-gui.org/](http://quickhash-gui.org/) you may calculate the its SHA256 checksum. The 
 result should be:
 ```
-TO_BE_ADDED ZENCashWallet-0.84.1.dmg
+19f9ab03e2b0f019b7472bc6dfeb46a6a76ba8ab736214698c1802c302827858  ZENCashWallet-0.84.1.dmg
 ```
-**If the resulting checksum is not `TO_BE_ADDED` then**
+**If the resulting checksum is not `19f9ab03e2b0f019b7472bc6dfeb46a6a76ba8ab736214698c1802c302827858` then**
 **something is wrong and you should discard the downloaded wallet!**
 
 3. Install the wallet like any other downloaded Mac OS application: Open the disk image `ZENCashWallet-0.84.1.dmg`
