@@ -72,9 +72,12 @@ public class ProvingKeyFetcher {
         
         boolean needsFetch = false;
         boolean needsFetchSG = false;
+        boolean needsFetchSS = false;
         if (!zCashParams.exists()) 
         {    
             needsFetch = true;
+            needsFetchSG = true;
+            needsFetchSS = true;
             zCashParams.mkdirs();
         }
         
@@ -190,10 +193,10 @@ public class ProvingKeyFetcher {
         {
             try { if (is != null) is.close(); } catch (IOException ignore){}
         }
-        parent.setProgressText(langUtil.getString("sapling.spend.fetcher.option.pane.verify.key.text"));
-        if (!checkSHA256SS(saplingSpendFile, parent)) 
+        parent.setProgressText(langUtil.getString("sprout.groth.fetcher.option.pane.verify.key.text"));
+        if (!checkSHA256SG(sproutGrothFile, parent)) 
         {
-            JOptionPane.showMessageDialog(parent, langUtil.getString("sapling.spend.fetcher.option.pane.verify.key.failed.text"));
+            JOptionPane.showMessageDialog(parent, langUtil.getString("sapsproutling.groth.fetcher.option.pane.verify.key.failed.text"));
             System.exit(-4);
         }
         }
