@@ -763,6 +763,15 @@ public class SendCashPanel
 			return;
 		}
 		
+		// TODO: Do not update if user has opened the combo box
+		
+		final int oldSelectedIndex = this.balanceAddressCombo.getSelectedIndex();
+		String originalSelectedAddress = null;
+		if ((this.lastAddressBalanceData != null) && (this.lastAddressBalanceData.length > oldSelectedIndex))
+		{
+			originalSelectedAddress = this.lastAddressBalanceData[oldSelectedIndex][1];
+		}
+		
 		lastAddressBalanceData = newAddressBalanceData;
 		
 		comboBoxItems = new String[lastAddressBalanceData.length];
@@ -787,16 +796,31 @@ public class SendCashPanel
 			comboBoxItems[i] = item;
 		}
 		
-		int selectedIndex = balanceAddressCombo.getSelectedIndex();
-		boolean isEnabled = balanceAddressCombo.isEnabled();
+		final boolean isEnabled = this.balanceAddressCombo.isEnabled();
 		this.comboBoxParentPanel.remove(balanceAddressCombo);
 		balanceAddressCombo = new JComboBox<>(comboBoxItems);
 		comboBoxParentPanel.add(balanceAddressCombo);
-		if ((balanceAddressCombo.getItemCount() > 0) &&
-			(selectedIndex >= 0) &&
-			(balanceAddressCombo.getItemCount() > selectedIndex))
+		// We need to restore the previously selected address in the combo box
+		// The address count/order may have changed as a result of newly confirmed 
+		// transactions, necessitating additional checks.
+		int newIndexToSelect = oldSelectedIndex; // By default index does not change
+		// Try to find the original selected address in the new data - its index may be different
+		// after the data was updated
+		for (int i = 0; i < this.lastAddressBalanceData.length; i++)
 		{
-			balanceAddressCombo.setSelectedIndex(selectedIndex);
+			String currentAddress = this.lastAddressBalanceData[i][1];
+			if ((currentAddress != null) && (originalSelectedAddress != null) &&
+				 currentAddress.trim().equalsIgnoreCase(originalSelectedAddress.trim()))
+			{
+				newIndexToSelect = i;
+			}
+		}
+		// Restore only the selected index - original address was not found
+		if ((balanceAddressCombo.getItemCount() > 0) &&
+			(newIndexToSelect >= 0) &&
+			(balanceAddressCombo.getItemCount() > newIndexToSelect))
+		{		
+			balanceAddressCombo.setSelectedIndex(newIndexToSelect);
 		}
 		balanceAddressCombo.setEnabled(isEnabled);
 
