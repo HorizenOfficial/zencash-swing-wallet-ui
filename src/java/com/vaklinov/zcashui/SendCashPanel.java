@@ -87,7 +87,7 @@ public class SendCashPanel
 	private BackupTracker             backupTracker;
 	private LabelStorage labelStorage;
 	
-	private JComboBox  balanceAddressCombo     = null;
+	private DropdownComboBox  balanceAddressCombo     = null;
 	private JPanel     comboBoxParentPanel     = null;
 	private String[][] lastAddressBalanceData  = null;
 	private String[]   comboBoxItems           = null;
@@ -141,7 +141,7 @@ public class SendCashPanel
 		tempPanel.add(new JLabel(langUtil.getString("send.cash.panel.label.info")));
 		sendCashPanel.add(tempPanel);
 
-		balanceAddressCombo = new JComboBox<>(new String[] { "" });
+		balanceAddressCombo = new DropdownComboBox<>(new String[] { "" });
 		comboBoxParentPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
 		comboBoxParentPanel.add(balanceAddressCombo);
 		sendCashPanel.add(comboBoxParentPanel);
@@ -306,7 +306,6 @@ public class SendCashPanel
 			{
 				try
 				{
-					// TODO: if the user has opened the combo box - this closes it (maybe fix)
 					SendCashPanel.this.updateWalletAddressPositiveBalanceComboBox();
 				} catch (Exception ex)
 				{
@@ -755,6 +754,13 @@ public class SendCashPanel
 	private void updateWalletAddressPositiveBalanceComboBox()
 		throws WalletCallException, IOException, InterruptedException
 	{
+		// If the user has opened the combo box menu - skip update
+		if (this.balanceAddressCombo.isMenuDown())
+		{
+		    Log.info("Skipping refresh of available sending addresses - user menu is open...");
+		    return;
+		}
+		
 		String[][] newAddressBalanceData = this.addressBalanceGatheringThread.getLastData();
 		
 		// The data may be null if nothing is yet obtained
@@ -762,8 +768,6 @@ public class SendCashPanel
 		{
 			return;
 		}
-		
-		// TODO: Do not update if user has opened the combo box
 		
 		final int oldSelectedIndex = this.balanceAddressCombo.getSelectedIndex();
 		String originalSelectedAddress = null;
@@ -798,7 +802,7 @@ public class SendCashPanel
 		
 		final boolean isEnabled = this.balanceAddressCombo.isEnabled();
 		this.comboBoxParentPanel.remove(balanceAddressCombo);
-		balanceAddressCombo = new JComboBox<>(comboBoxItems);
+		balanceAddressCombo = new DropdownComboBox<>(comboBoxItems);
 		comboBoxParentPanel.add(balanceAddressCombo);
 		// We need to restore the previously selected address in the combo box
 		// The address count/order may have changed as a result of newly confirmed 
