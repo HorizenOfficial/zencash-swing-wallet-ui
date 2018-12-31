@@ -28,4 +28,13 @@
 #  THE SOFTWARE.                                    
 # 
 
-java -jar /usr/lib/zencash-gui-wallet/ZENCashSwingWalletUI.jar
+jvm="java"
+
+# On UBUNTU systems - try to run with OpenJDK 8
+jvm8="/usr/lib/jvm/java-8-openjdk-amd64/bin/java"
+if [ -e "${jvm8}" ]; then
+    echo "Found OpenJDK 8 JVM to use: ${jvm8}"
+    jvm="${jvm8}"
+fi 
+
+${jvm} -jar /usr/lib/zencash-gui-wallet/ZENCashSwingWalletUI.jar

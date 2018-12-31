@@ -1,8 +1,8 @@
 Package: zencash-desktop-gui-wallet
-Version: 0.84.0
+Version: 0.84.2
 Section: misc
 Priority: low
 Architecture: all
 Description: ZENCash Desktop GUI Wallet 
 Maintainer: admin@zencash.com
-Depends: default-jdk, zen
+Depends: openjdk-8-jdk, zen
