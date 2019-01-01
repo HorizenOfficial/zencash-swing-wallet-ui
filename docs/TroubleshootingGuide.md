@@ -1,4 +1,4 @@
-## [ZENCash](https://zensystem.io/) Desktop GUI Wallet troubleshooting guide
+## [Horizen](https://horizen.global/) Desktop GUI Wallet troubleshooting guide
 
 ![Screenshot1](ZENChat_small.png "Chat Window") ![Screenshot1](ZENCashWalletMac_0.74.7_small.png "Wallet Window") 
 

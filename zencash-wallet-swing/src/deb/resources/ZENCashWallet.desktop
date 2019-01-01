@@ -1,8 +1,8 @@
 [Desktop Entry]
 Version=1.0
-Name=ZENCash Wallet
-Comment=ZENCash Desktop GUI Wallet (full node)
-GenericName=ZENCash Wallet
+Name=Horizen Wallet
+Comment=Horizen Desktop GUI Wallet (full node)
+GenericName=Horizen Wallet
 Keywords=ZENCash;Crypto-currency;ZEN;
 Exec=zencash-desktop-gui-wallet
 Terminal=false

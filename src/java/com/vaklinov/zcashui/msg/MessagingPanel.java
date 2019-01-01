@@ -527,7 +527,7 @@ public class MessagingPanel
 			{
 		        JOptionPane.showMessageDialog(
 	                this.parentFrame,
-	                "Welcome to ZENCash messaging. As a start you will need to create a new messaging\n" + 
+	                "Welcome to Horizen messaging. As a start you will need to create a new messaging\n" + 
 	                "identity for yourself. As a part of this messaging identity a pair of T+Z addresses\n" +
 	                "will be created. The T address is to be used for identifying you to other users.\n" +
 	                "It must never be used for other financial transactions since this might reduce or\n" +
