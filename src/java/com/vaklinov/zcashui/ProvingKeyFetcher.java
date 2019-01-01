@@ -174,7 +174,7 @@ public class ProvingKeyFetcher {
         }
         }
         if (needsFetchSG) {
-        provingKeyFile.delete();
+        sproutGrothFile.delete();
         OutputStream os = new BufferedOutputStream(new FileOutputStream(sproutGrothFile));
         URL keyURL = new URL(pathURLSG);
         URLConnection urlc = keyURL.openConnection();
@@ -201,7 +201,7 @@ public class ProvingKeyFetcher {
         }
         }
         if (needsFetchSS) {
-        provingKeyFile.delete();
+        saplingSpendFile.delete();
         OutputStream os = new BufferedOutputStream(new FileOutputStream(saplingSpendFile));
         URL keyURL = new URL(pathURLSS);
         URLConnection urlc = keyURL.openConnection();
