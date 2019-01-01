@@ -32,13 +32,13 @@ public class ProvingKeyFetcher {
     
     private static final int PROVING_KEY_SIZE = 910173851;
     private static final String SHA256 = "8bc20a7f013b2b58970cddd2e7ea028975c88ae7ceb9259a5344a16bc2c0eef7";
-    private static final String pathURL = "https://z.cash/downloads/sprout-proving.key";
+    private static final String pathURL = "https://downloads.horizen.global/file/TrustedSetup/sprout-proving.key";
     private static final int SPROUT_GROTH_SIZE = 725523612;
     private static final String SHA256SG = "b685d700c60328498fbde589c8c7c484c722b788b265b72af448a5bf0ee55b50";
-    private static final String pathURLSG = "https://z.cash/downloads/sprout-groth16.params";
+    private static final String pathURLSG = "https://downloads.horizen.global/file/TrustedSetup/sprout-groth16.params";
     private static final int SAPLING_SPEND_SIZE = 47958396;
     private static final String SHA256SS = "8e48ffd23abb3a5fd9c5589204f32d9c31285a04b78096ba40a79b75677efc13";
-    private static final String pathURLSS = "https://z.cash/downloads/sapling-spend.params";
+    private static final String pathURLSS = "https://downloads.horizen.global/file/TrustedSetup/sapling-spend.params";
     // TODO: add backups
     private LanguageUtil langUtil;
 
