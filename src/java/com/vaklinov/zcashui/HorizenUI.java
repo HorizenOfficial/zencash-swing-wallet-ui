@@ -65,9 +65,9 @@ import com.vaklinov.zcashui.msg.MessagingPanel;
 
 
 /**
- * Main ZENCash Window.
+ * Main Horizen Window.
  */
-public class ZCashUI
+public class HorizenUI
     extends JFrame
 {
     private ZCashInstallationObserver installationObserver;
@@ -104,7 +104,7 @@ public class ZCashUI
 
     JTabbedPane tabs;
 
-    public ZCashUI(StartupProgressDialog progressDialog)
+    public HorizenUI(StartupProgressDialog progressDialog)
         throws IOException, InterruptedException, WalletCallException
     {
 
@@ -231,7 +231,7 @@ public class ZCashUI
                     LanguageMenuItem item = (LanguageMenuItem) e.getSource();
                     langUtil.updatePreferredLanguage(item.getLocale());
                     JOptionPane.showMessageDialog(
-                            ZCashUI.this.getRootPane().getParent(),
+                            HorizenUI.this.getRootPane().getParent(),
                             langUtil.getString("dialog.message.language.prefs.update"),
                             langUtil.getString("dialog.message.language.prefs.update.title"),
                             JOptionPane.INFORMATION_MESSAGE);
@@ -272,7 +272,7 @@ public class ZCashUI
                 @Override
                 public void actionPerformed(ActionEvent e)
                 {
-                    ZCashUI.this.exitProgram();
+                    HorizenUI.this.exitProgram();
                 }
             }
         );
@@ -285,12 +285,12 @@ public class ZCashUI
                 {
                 	try
                 	{
-                		AboutDialog ad = new AboutDialog(ZCashUI.this);
+                		AboutDialog ad = new AboutDialog(HorizenUI.this);
                 		ad.setVisible(true);
                 	} catch (UnsupportedEncodingException uee)
                 	{
                 		Log.error("Unexpected error: ", uee);
-                		ZCashUI.this.errorReporter.reportError(uee);
+                		HorizenUI.this.errorReporter.reportError(uee);
                 	}
                 }
             }
@@ -302,7 +302,7 @@ public class ZCashUI
                 @Override
                 public void actionPerformed(ActionEvent e)
                 {
-                    ZCashUI.this.walletOps.backupWallet();
+                    HorizenUI.this.walletOps.backupWallet();
                 }
             }
         );
@@ -314,7 +314,7 @@ public class ZCashUI
                 @Override
                 public void actionPerformed(ActionEvent e)
                 {
-                    ZCashUI.this.walletOps.encryptWallet();
+                    HorizenUI.this.walletOps.encryptWallet();
                 }
             }
         );
@@ -326,7 +326,7 @@ public class ZCashUI
                 @Override
                 public void actionPerformed(ActionEvent e)
                 {
-                    ZCashUI.this.walletOps.exportWalletPrivateKeys();
+                    HorizenUI.this.walletOps.exportWalletPrivateKeys();
                 }
             }
        );
@@ -337,7 +337,7 @@ public class ZCashUI
                 @Override
                 public void actionPerformed(ActionEvent e)
                 {
-                    ZCashUI.this.walletOps.importWalletPrivateKeys();
+                    HorizenUI.this.walletOps.importWalletPrivateKeys();
                 }
             }
        );
@@ -348,7 +348,7 @@ public class ZCashUI
                 @Override
                 public void actionPerformed(ActionEvent e)
                 {
-                    ZCashUI.this.walletOps.showPrivateKey();
+                    HorizenUI.this.walletOps.showPrivateKey();
                 }
             }
        );
@@ -359,7 +359,7 @@ public class ZCashUI
                @Override
                public void actionPerformed(ActionEvent e)
                {
-                   ZCashUI.this.walletOps.importSinglePrivateKey();
+                   HorizenUI.this.walletOps.importSinglePrivateKey();
                }
            }
        );
@@ -370,7 +370,7 @@ public class ZCashUI
                    @Override
                    public void actionPerformed(ActionEvent e)
                    {
-            			ZCashUI.this.messagingPanel.openOwnIdentityDialog();
+            			HorizenUI.this.messagingPanel.openOwnIdentityDialog();
                    }
                }
         );
@@ -381,7 +381,7 @@ public class ZCashUI
                    @Override
                    public void actionPerformed(ActionEvent e)
                    {
-            			ZCashUI.this.messagingPanel.exportOwnIdentity();
+            			HorizenUI.this.messagingPanel.exportOwnIdentity();
                    }
                }
         );
@@ -392,7 +392,7 @@ public class ZCashUI
                    @Override
                    public void actionPerformed(ActionEvent e)
                    {
-            			ZCashUI.this.messagingPanel.importContactIdentity();
+            			HorizenUI.this.messagingPanel.importContactIdentity();
                    }
                }
         );
@@ -403,7 +403,7 @@ public class ZCashUI
                    @Override
                    public void actionPerformed(ActionEvent e)
                    {
-            			ZCashUI.this.messagingPanel.addMessagingGroup();
+            			HorizenUI.this.messagingPanel.addMessagingGroup();
                    }
                }
         );
@@ -414,7 +414,7 @@ public class ZCashUI
                    @Override
                    public void actionPerformed(ActionEvent e)
                    {
-            			ZCashUI.this.messagingPanel.removeSelectedContact();
+            			HorizenUI.this.messagingPanel.removeSelectedContact();
                    }
                }
         );
@@ -425,7 +425,7 @@ public class ZCashUI
                    @Override
                    public void actionPerformed(ActionEvent e)
                    {
-            			ZCashUI.this.messagingPanel.openOptionsDialog();
+            			HorizenUI.this.messagingPanel.openOptionsDialog();
                    }
                }
        );
@@ -436,7 +436,7 @@ public class ZCashUI
                    @Override
                    public void actionPerformed(ActionEvent e)
                    {
-            			ZCashUI.this.messagingPanel.shareFileViaIPFS();
+            			HorizenUI.this.messagingPanel.shareFileViaIPFS();
                    }
                }
        );
@@ -447,7 +447,7 @@ public class ZCashUI
                     @Override
                     public void actionPerformed(ActionEvent e)
                     {
-                        ZCashUI.this.walletOps.exportToArizenWallet();
+                        HorizenUI.this.walletOps.exportToArizenWallet();
                     }
                 }
         );
@@ -458,7 +458,7 @@ public class ZCashUI
                     @Override
                     public void actionPerformed(ActionEvent e)
                     {
-                        ZCashUI.this.walletOps.editZendOptions();
+                        HorizenUI.this.walletOps.editZendOptions();
                     }
                 }
         );
@@ -471,7 +471,7 @@ public class ZCashUI
             @Override
             public void windowClosing(WindowEvent e)
             {
-                ZCashUI.this.exitProgram();
+                HorizenUI.this.exitProgram();
             }
         });
 
@@ -483,7 +483,7 @@ public class ZCashUI
                 try
                 {
                     String userDir = OSUtil.getSettingsDirectory();
-                    File warningFlagFile = new File(userDir + File.separator + "initialInfoShown_0.84.flag");
+                    File warningFlagFile = new File(userDir + File.separator + "initialInfoShown_0.85.flag");
                     if (warningFlagFile.exists())
                     {
                         return;
@@ -496,7 +496,7 @@ public class ZCashUI
                    	};
                     
                     int option = JOptionPane.showOptionDialog(
-                    		ZCashUI.this.getRootPane().getParent(), 
+                    		HorizenUI.this.getRootPane().getParent(), 
                             langUtil.getString("main.frame.disclaimer.text"),
                             langUtil.getString("main.frame.disclaimer.title"),
                             JOptionPane.DEFAULT_OPTION, 
@@ -510,7 +510,7 @@ public class ZCashUI
                         warningFlagFile.createNewFile();
                     } else
                     {
-                    	ZCashUI.this.exitProgram();
+                    	HorizenUI.this.exitProgram();
                     }
 
                 } catch (IOException ioe)
@@ -537,7 +537,7 @@ public class ZCashUI
     				JTabbedPane tabs = (JTabbedPane)e.getSource();
     				if (tabs.getSelectedIndex() == 5)
     				{
-    					ZCashUI.this.messagingPanel.tabSelected();
+    					HorizenUI.this.messagingPanel.tabSelected();
     				}
     			}
     		}
@@ -575,8 +575,8 @@ public class ZCashUI
         this.sendPanel.stopThreadsAndTimers();
         this.messagingPanel.stopThreadsAndTimers();
         
-        ZCashUI.this.setVisible(false);
-        ZCashUI.this.dispose();
+        HorizenUI.this.setVisible(false);
+        HorizenUI.this.dispose();
 
         System.exit(0);
     }
@@ -597,7 +597,7 @@ public class ZCashUI
 
         	LanguageUtil langUtil = LanguageUtil.instance();
         	
-        	Log.info("Starting ZENCash Swing Wallet ...");
+        	Log.info("Starting Horizen Swing Wallet ...");
         	Log.info("OS: " + System.getProperty("os.name") + " = " + os);
         	Log.info("Current directory: " + new File(".").getCanonicalPath());
         	Log.info("Class path: " + System.getProperty("java.class.path"));
@@ -675,7 +675,7 @@ public class ZCashUI
             initialClientCaller = null;
             
             // Main GUI is created here
-            ZCashUI ui = new ZCashUI(startupBar);
+            HorizenUI ui = new HorizenUI(startupBar);
             ui.setVisible(true);
 
         } catch (InstallationDetectionException ide)
@@ -764,7 +764,7 @@ public class ZCashUI
 			configOut.println("#############################################################################");
 			configOut.println("#                         ZEN configuration file                            #");
 			configOut.println("#############################################################################");
-			configOut.println("# This file has been automatically generated by the ZENCash GUI wallet with #");
+			configOut.println("# This file has been automatically generated by the Horizen GUI wallet with #");
 			configOut.println("# default settings. It may be further cutsomized by hand only.              #");
 			configOut.println("#############################################################################");
 			configOut.println("# Creation date: " + new Date().toString());
@@ -816,7 +816,7 @@ public class ZCashUI
 			configOut.println("#                                                                                      #");
 			configOut.println("########################################################################################");
 			configOut.println("#                                                                                      #");
-			configOut.println("# This file has been automatically generated by the ZENCash GUI wallet with            #");
+			configOut.println("# This file has been automatically generated by the Horizen GUI wallet with            #");
 			configOut.println("# default settings. It may be further cutsomized by hand only. The command             #");
 			configOut.println("# line options specified here are used to start zend in the GUI wallet!                #");
 			configOut.println("#                                                                                      #");

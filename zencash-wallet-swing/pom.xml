@@ -6,15 +6,15 @@
 
     <parent>
         <groupId>com.zencash</groupId>
-        <artifactId>ZENCashOfficialSwingWalletUI</artifactId>
-        <version>0.84.2-SNAPSHOT</version>
+        <artifactId>HorizenSwingWalletUI</artifactId>
+        <version>0.85.0-SNAPSHOT</version>
     </parent>
 
     <artifactId>zencash-wallet-swing</artifactId>
     <packaging>jar</packaging>
 
     <properties>
-        <main.class>com.vaklinov.zcashui.ZCashUI</main.class>
+        <main.class>com.vaklinov.zcashui.HorizenUI</main.class>
         <application.finalName>ZENCashSwingWalletUI</application.finalName>
     </properties>
 

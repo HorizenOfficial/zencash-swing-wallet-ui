@@ -325,7 +325,7 @@ public class IPFSWrapper
 			"the details of IPFS at this web site: https://ipfs.io/\n"                           +
 			"\n"                                                                                 +
 			"The IPFS server needs TCP ports 4001, 5001, 8080 on the system for its own use!\n"  +
-			"The IPFS server will be stopped automatically if you quit the ZENCash wallet. To\n" +
+			"The IPFS server will be stopped automatically if you quit the Horizen wallet. To\n" +
 			"ensure that your contacts can reach the data you share, you may not quit the\n"     +
 			"wallet for as long as you expect your contacts to access the data. The data you\n"  + 
 			"share over IPFS is public - may be accessed by anyone! The IPFS server startup\n"   +

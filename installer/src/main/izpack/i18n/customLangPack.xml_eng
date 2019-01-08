@@ -1,4 +1,4 @@
 <langpack>
     <str id="installer.reversetitle" txt="$APP_NAME $APP_VER"/>
-    <str id="installation.panel.header" txt="ZENCash Desktop GUI Wallet binary release 0.80.5 for Windows"/>
+    <str id="installation.panel.header" txt="Horizen Desktop GUI Wallet binary release 0.85.0 for Windows"/>
 </langpack>
