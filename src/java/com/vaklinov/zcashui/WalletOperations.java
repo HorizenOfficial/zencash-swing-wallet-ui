@@ -53,7 +53,7 @@ import com.vaklinov.zcashui.arizen.repo.WalletRepo;
  */
 public class WalletOperations
 {	
-	private ZCashUI parent;
+	private HorizenUI parent;
 	private JTabbedPane tabs;
 	private DashboardPanel dashboard;
 	private SendCashPanel  sendCash;
@@ -67,7 +67,7 @@ public class WalletOperations
 	private LanguageUtil langUtil;
 
 
-	public WalletOperations(ZCashUI parent,
+	public WalletOperations(HorizenUI parent,
 			                JTabbedPane tabs,
 			                DashboardPanel dashboard,
 			                AddressesPanel addresses,

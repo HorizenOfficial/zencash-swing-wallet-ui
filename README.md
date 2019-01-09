@@ -1,8 +1,8 @@
-# [ZENCash](https://zensystem.io/) Desktop GUI Wallet
+# [Horizen](https://horizen.global/) Desktop GUI Wallet
 
-## Graphical user interface wrapper for the [ZENCash](https://zensystem.io/) command line tools
+## Graphical user interface wrapper for the [Horizen](https://horizen.global/) command line tools
 
-This program provides a Graphical User Interface (GUI) for the ZENCash client tools that acts as a wrapper and 
+This program provides a Graphical User Interface (GUI) for the Horizen client tools that acts as a wrapper and 
 presents the information in a user-friendly manner.
 
 ![Screenshot](https://github.com/ZencashOfficial/zencash-swing-wallet-ui/raw/master/docs/ZENCashWallet.png "Main Window")
@@ -11,7 +11,7 @@ presents the information in a user-friendly manner.
 **the local machine, maintaining a full local copy of the blockchain, maintaining and backing up the**
 **Zen nodes's `wallet.dat` file etc! The wallet is not suitable for novice crypto-currency users!**
 
-**SECURITY WARNING: Encryption of the wallet.dat file is not yet supported for ZENCash. Using the wallet** 
+**SECURITY WARNING: Encryption of the wallet.dat file is not yet supported for Horizen. Using the wallet** 
 **on a system infected with malware may result in wallet data/funds being stolen. The**
 **wallet.dat needs to be backed up regularly (not just once - e.g. after every 30-40**
 **outgoing transactions) and it must also be backed up after creating a new Z address.**
@@ -25,19 +25,19 @@ presents the information in a user-friendly manner.
 **they are considered outdated after 16 weeks and stop working. So they need to be updated to a newer version before this term expires.**
 **Users need to ensure they use an up-to-date version of the wallet (e.g. update the wallet every two months or so).**
 
-#### New/Experimental: [ZENCash Desktop GUI Wallet packages for Debian/Ubuntu Linux](https://github.com/ZencashOfficial/zencash-swing-wallet-ui/blob/master/docs/ReleaseUbuntuRepository.md) are available
+#### New/Experimental: [Horizen Desktop GUI Wallet packages for Debian/Ubuntu Linux](https://github.com/ZencashOfficial/zencash-swing-wallet-ui/blob/master/docs/ReleaseUbuntuRepository.md) are available
 
-#### New/Experimental: [ZENCash Desktop GUI Wallet for macOS](https://github.com/ZencashOfficial/zencash-swing-wallet-ui/blob/master/docs/Release_0.84.1.md) is available
+#### New/Experimental: [Horizen Desktop GUI Wallet for macOS](https://github.com/ZencashOfficial/zencash-swing-wallet-ui/blob/master/docs/Release_0.85.1.md) is available
 
-#### New/Experimental: [ZENCash Desktop GUI Wallet for Windows](https://github.com/ZencashOfficial/zencash-swing-wallet-ui/blob/master/docs/Release_0.84.0.md) is available
+#### New/Experimental: [Horizen Desktop GUI Wallet for Windows](https://github.com/ZencashOfficial/zencash-swing-wallet-ui/blob/master/docs/Release_0.85.0.md) is available
 
 #### Information on diagnosing some common problems may be found in this [troubleshooting guide](docs/TroubleshootingGuide.md).
 
 ## Building, installing and running the Wallet GUI
 
-Before installing the Desktop GUI Wallet you need to have ZENCash up and running. The following 
+Before installing the Desktop GUI Wallet you need to have Horizen up and running. The following 
 [guide](https://github.com/ZencashOfficial/zen/blob/master/README.md) 
-explains how to set up [ZENCash](https://zensystem.io/). 
+explains how to set up [Horizen](https://horizen.global/). 
 
 **For security reasons it is recommended to always build the GUI wallet program from GitHub**
 **[source](https://github.com/ZencashOfficial/zencash-swing-wallet-ui/archive/master.zip).**
@@ -46,7 +46,7 @@ The details of how to build it are described below (easy to follow).
 
 1. Operating system and tools
 
-   As of July 2018 (ZENCash v2.0.14) this program supports Linux, macOS Sierra/High Sierra and Windows.
+   As of January 2019 (Horizen v2.0.16) this program supports Linux, macOS Sierra/High Sierra and Windows.
    The Linux tools you need to build and run the Wallet GUI are Git, Java (JDK8) and
    Ant. If using Ubuntu Linux, they may be installed via command: 
    ```
@@ -85,28 +85,28 @@ The details of how to build it are described below (easy to follow).
    file `./build/jars/ZENCashSwingWalletUI.jar`. In addition the JAR file 
    `bitcoinj-core-0.14.5.jar` is also necessary to run the wallet. 
 
-3. Installing the built ZENCash GUI wallet
+3. Installing the built Horizen GUI wallet
 
-   3.1. If you have built ZENCash from source code:
+   3.1. If you have built Horizen from source code:
 
-     Assuming you have already built from source code [ZENCash](https://github.com/ZencashOfficial/zen) in directory `/home/user/zen/src` (for example - this is the typical build dir. for ZENCash v2.0.14) which contains the command line tools `zen-cli` and `zend` you need to take the created JAR files and copy them to directory `/home/user/zen/src` (the same dir. that contains `zen-cli` and `zend`). Example copy command:
+     Assuming you have already built from source code [Horizen](https://github.com/ZencashOfficial/zen) in directory `/home/user/zen/src` (for example - this is the typical build dir. for Horizen v2.0.16) which contains the command line tools `zen-cli` and `zend` you need to take the created JAR files and copy them to directory `/home/user/zen/src` (the same dir. that contains `zen-cli` and `zend`). Example copy command:
       ```
       user@ubuntu:~/build-dir/zencash-swing-wallet-ui$ cp -R -v ./build/jars/* /home/user/zen/src    
       ```
 
-4. Running the installed ZENCash GUI wallet
+4. Running the installed Horizen GUI wallet
 
    It may be run from command line or started from another GUI tool (e.g. file manager). 
-   Assuming you have already installed [ZENCash](https://zensystem.io/) and the GUI Wallet `ZENCashSwingWalletUI.jar` in 
+   Assuming you have already installed [Horizen](https://horizen.global/) and the GUI Wallet `ZENCashSwingWalletUI.jar` in 
    directory `/home/user/zen/src` one way to run it from command line is:
    ```
    user@ubuntu:~/build-dir/zencash-swing-wallet-ui$ java -jar /home/user/zen/src/ZENCashSwingWalletUI.jar
    ```
    If you are using Ubuntu (or similar ;) Linux you may instead just use the file manager and 
    right-click on the `ZENCashSwingWalletUI.jar` file and choose the option "Open with OpenJDK 8 Runtime". 
-   This will start the ZENCash GUI wallet.
+   This will start the Horizen GUI wallet.
    
-   **Important:** the ZENCash configuration file `~/.zen/zen.conf` needs to be correctly set up for the GUI
+   **Important:** the Horizen configuration file `~/.zen/zen.conf` needs to be correctly set up for the GUI
    wallet to work. Specifically the RPC user and password need to be set in it like:
    ```
    rpcuser=username
@@ -130,15 +130,15 @@ SOFTWARE.
 
 ### Known issues and limitations
 
-1. Issue: The ZenCash Desktop GUI Wallet can not be built with `openjdk-11-jdk`, to build, you must install `openjdk-8-jdk`. If `openjdk-11-jdk` is installed you must then run `update-java-alternatives -s java-1.8.0-openjdk-amd64`.
-1. Issue: The ZENCash Desktop GUI Wallet is not compatible with applications that modify the ZEN `wallet.dat` file. The wallet should not be used
+1. Issue: The Horizen Desktop GUI Wallet can not be built with `openjdk-11-jdk`, to build, you must install `openjdk-8-jdk`. If `openjdk-11-jdk` is installed you must then run `update-java-alternatives -s java-1.8.0-openjdk-amd64`.
+1. Issue: The Horizen Desktop GUI Wallet is not compatible with applications that modify the ZEN `wallet.dat` file. The wallet should not be used
 with such applications on the same PC. For instance some distributed exchange applications are known to create watch-only addresses in the
 `wallet.dat` file that cause the GUI wallet to display a wrong balance and/or display addresses that do not belong to the wallet. 
 1. Limitation: if two users exchange text messages via the messaging UI TAB and one of them has a system clock, substantially running slow or fast by more than 1 minute, it is possible that this user will see text messages appearing out of order. 
 1. Limitation: if a messaging identity has been created (happens on first click on the messaging UI tab), then replacing the `wallet.dat` or changing the node configuration between mainnet and testnet will make the identity invalid. This will result in a wallet update error. To remove the error the directory `~/.ZENCashSwingWalletUI/messaging` may be manually renamed or deleted (when the wallet is stopped). **CAUTION: all messaging history will be lost in this case!**
-1. Limitation: Wallet encryption has been temporarily disabled in ZENCash due to stability problems. A corresponding issue 
+1. Limitation: Wallet encryption has been temporarily disabled in Horizen due to stability problems. A corresponding issue 
 [#1552](https://github.com/zcash/zcash/issues/1552) has been opened by the ZCash developers. Correspondingly
-wallet encryption has been temporarily disabled in the ZENCash Desktop GUI Wallet.
+wallet encryption has been temporarily disabled in the Horizen Desktop GUI Wallet.
 The latter needs to be disabled. 
 1. Limitation: The list of transactions does not show all outgoing ones (specifically outgoing Z address 
 transactions). A corresponding issue [#1438](https://github.com/zcash/zcash/issues/1438) has been opened 

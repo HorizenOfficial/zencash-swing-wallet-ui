@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <installation version="5.0">
   <info>
-    <appname>ZencashOfficialSwingWalletUI</appname>
-    <appversion>0.84.2</appversion>
-    <url>https://zencash.com</url>
+    <appname>HorizenSwingWalletUI</appname>
+    <appversion>0.85.0</appversion>
+    <url>https://horizen.global</url>
     <authors>
         <author name="Ivan Vaklinov" email="ivan@vaklinov.com"/>
         <author name="Armand Ballaci" email="aballaci@gmail.com"/>
@@ -46,8 +46,8 @@
   </resources>
   <variables>
     <variable name="InstallerFrame.logfilePath" value="Default"/>
-    <variable name="WELCOME_TEXT" value="Zencash Swing Wallet Installation"/>
-    <variable name="WELCOME_VERSION" value="Version: 0.82.9"/>
+    <variable name="WELCOME_TEXT" value="Horizen Swing Wallet Installation"/>
+    <variable name="WELCOME_VERSION" value="Version: 0.85.0"/>
     <variable name="WELCOME_BG_COLOR" value="#404B62"/>
     <variable name="WELCOME_TEXT_COLOR" value="#ffffff"/>
   </variables>

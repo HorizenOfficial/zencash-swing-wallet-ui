@@ -114,7 +114,7 @@ public class LabelStorage
 			try
 			{
 				out = new BufferedOutputStream(new FileOutputStream(newLabelsFile));
-				this.labels.store(out, "ZENCash GUI wallet address labels");
+				this.labels.store(out, "Horizen GUI wallet address labels");
 			} finally
 			{
 				if (out != null)
