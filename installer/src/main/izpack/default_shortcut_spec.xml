@@ -7,11 +7,11 @@
         <lateShortcutInstall/>
         <skipIfNotSupported/>
         <shortcut
-                name = "Zencash Wallet"
+                name = "Horizen Wallet"
                 target = "$INSTALL_PATH\zencashwallet.bat"
                 commandLine = ""
                 workingDirectory= "$INSTALL_PATH\app"
-                description="Zencash Wallet Launch"
+                description="Horizen Wallet Launch"
                 iconFile="$INSTALL_PATH\zencash.ico"
                 iconIndex="0"
                 initialState="normal"

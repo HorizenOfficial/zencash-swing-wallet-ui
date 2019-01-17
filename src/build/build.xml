@@ -40,7 +40,7 @@
     <property name="jar.dir"     value="${build.dir}/jars"/>
 	<property name="ubuntu.package.dir" value="${build.dir}/ubuntu-package"/>
 
-    <property name="main-class"  value="com.vaklinov.zcashui.ZCashUI"/>
+    <property name="main-class"  value="com.vaklinov.zcashui.HorizenUI"/>
 
 	<path id="main-classpath">
 		<pathelement path="${basedir}/lib/bitcoinj-core-0.14.5.jar" />
@@ -118,7 +118,7 @@
 	
     <target name="ubuntuPackage" depends="jar,copyothers">	
     	<mkdir dir="${ubuntu.package.dir}"/>
-	    <deb destfile="${ubuntu.package.dir}/zencash-desktop-gui-wallet_0.84.2_all.deb"
+	    <deb destfile="${ubuntu.package.dir}/zencash-desktop-gui-wallet_0.85.2_all.deb"
 	    	 control="${deb.dir}/control"
 	    	 verbose="true">
 	    	
@@ -194,7 +194,7 @@
 	</target>
 	
     <target name="buildit" depends="clean,jar,copyothers,ubuntuPackage">
-    	<echo message="Built ZENCash Desktop GUI Wallet with JDK ${ant.java.version}"/>
+    	<echo message="Built Horizen Desktop GUI Wallet with JDK ${ant.java.version}"/>
     	<!-- Final cleanup -->
     	<delete dir="${classes.dir}"/>
     	<delete dir="${temp.dir}"/>

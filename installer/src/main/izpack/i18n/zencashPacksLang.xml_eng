@@ -1,4 +1,4 @@
 <langpack>
-    <str id="myApplicationPack" txt="ZENCash Desktop GUI Wallet"/>
-    <str id="myApplicationPack.description" txt="ZENCash Desktop GUI Wallet"/>
+    <str id="myApplicationPack" txt="Horizen Desktop GUI Wallet"/>
+    <str id="myApplicationPack.description" txt="Horizen Desktop GUI Wallet"/>
 </langpack>
