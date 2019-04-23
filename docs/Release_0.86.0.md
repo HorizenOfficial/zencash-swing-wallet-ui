@@ -31,9 +31,9 @@ It requires a 64-bit Windows 7 or later version to run.
 such as [http://quickhash-gui.org/](http://quickhash-gui.org/) you may calculate the its SHA256 checksum. The 
 result should be:
 ```
-TODO  HorizenDesktopGUIWallet_0.86.0.zip
+c21676bd909bcb10589f4a6f3409830f346f4d32fa448b12668630dc3cf8e50b  HorizenDesktopGUIWallet_0.86.0.zip
 ```
-**If the resulting checksum is not `TODO` then**
+**If the resulting checksum is not `c21676bd909bcb10589f4a6f3409830f346f4d32fa448b12668630dc3cf8e50b` then**
 **something is wrong and you should discard the downloaded wallet!**
 
 3. Unzip the Wallet ZIP file `HorizenDesktopGUIWallet_0.86.0.zip` in some directory that it will run from.
@@ -48,15 +48,15 @@ Double click on `HorizenDesktopGUIWallet.exe`. On first run (only) the wallet wi
 It requires Mac OS Sierra/High Sierra/Mojave.
 
 1. Download the Wallet image file
-[HorizenWallet-0.86.0.dmg](https://github.com/ZencashOfficial/zencash-swing-wallet-ui/releases/download/0.88.0/HorizenWallet-0.86.0.dmg).
+[HorizenWallet-0.86.0.dmg](https://github.com/ZencashOfficial/zencash-swing-wallet-ui/releases/download/0.86.0/HorizenWallet-0.86.0.dmg).
 
 2. Security check: You may decide to run a virus scan on it before proceeding... In addition using a tool
 such as [http://quickhash-gui.org/](http://quickhash-gui.org/) you may calculate the its SHA256 checksum. The
 result should be:
 ```
-TODO  HorizenWallet-0.86.0.dmg
+e32ebd283364fbb3d4fab5984aefd400e9377c87c891661af32ac01b58888d16  HorizenWallet-0.86.0.dmg
 ```
-**If the resulting checksum is not `TODO` then**
+**If the resulting checksum is not `e32ebd283364fbb3d4fab5984aefd400e9377c87c891661af32ac01b58888d16` then**
 **something is wrong and you should discard the downloaded wallet!**
 
 3. Install the wallet like any other downloaded Mac OS application: Open the disk image `HorizenWallet-0.86.0.dmg`
