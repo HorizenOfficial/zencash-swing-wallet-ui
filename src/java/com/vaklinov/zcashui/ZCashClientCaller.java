@@ -268,7 +268,7 @@ public class ZCashClientCaller
 		}
 		
 	    JsonArray jsonTransactions = executeCommandAndGetJsonArray(
-	    	"listtransactions", wrapStringParameter(""), "300");
+	    	"listtransactions", wrapStringParameter(""), "2147483647");
 	    String strTransactions[][] = new String[jsonTransactions.size()][];
 	    for (int i = 0; i < jsonTransactions.size(); i++)
 	    {
