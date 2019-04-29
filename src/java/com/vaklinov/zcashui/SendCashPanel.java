@@ -372,7 +372,9 @@ public class SendCashPanel
 	private void sendCash()
 		throws WalletCallException, IOException, InterruptedException
 	{
-		if (balanceAddressCombo.getItemCount() <= 0)
+		if ((balanceAddressCombo.getItemCount() <= 0) ||
+			(this.lastAddressBalanceData == null)     || 
+			(this.lastAddressBalanceData.length <= 0))
 		{
 			JOptionPane.showMessageDialog(
 				SendCashPanel.this.getRootPane().getParent(), 
