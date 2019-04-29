@@ -764,14 +764,15 @@ public class SendCashPanel
 		String[][] newAddressBalanceData = this.addressBalanceGatheringThread.getLastData();
 		
 		// The data may be null if nothing is yet obtained
-		if (newAddressBalanceData == null)
+		if ((newAddressBalanceData == null) || (newAddressBalanceData.length <= 0))
 		{
 			return;
 		}
 		
 		final int oldSelectedIndex = this.balanceAddressCombo.getSelectedIndex();
 		String originalSelectedAddress = null;
-		if ((this.lastAddressBalanceData != null) && (this.lastAddressBalanceData.length > oldSelectedIndex))
+		if ((this.lastAddressBalanceData != null) && (this.lastAddressBalanceData.length > oldSelectedIndex) &&
+			(balanceAddressCombo.getItemCount() > 0) && (oldSelectedIndex >= 0))
 		{
 			originalSelectedAddress = this.lastAddressBalanceData[oldSelectedIndex][1];
 		}
@@ -819,7 +820,7 @@ public class SendCashPanel
 				newIndexToSelect = i;
 			}
 		}
-		// Restore only the selected index - original address was not found
+		// Restore only the selected index - original address was found (perhaps)
 		if ((balanceAddressCombo.getItemCount() > 0) &&
 			(newIndexToSelect >= 0) &&
 			(balanceAddressCombo.getItemCount() > newIndexToSelect))
