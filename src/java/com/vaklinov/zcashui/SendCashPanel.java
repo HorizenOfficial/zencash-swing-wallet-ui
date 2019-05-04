@@ -766,14 +766,15 @@ public class SendCashPanel
 		String[][] newAddressBalanceData = this.addressBalanceGatheringThread.getLastData();
 		
 		// The data may be null if nothing is yet obtained
-		if ((newAddressBalanceData == null) || (newAddressBalanceData.length <= 0))
+		if (newAddressBalanceData == null)
 		{
 			return;
 		}
 		
 		final int oldSelectedIndex = this.balanceAddressCombo.getSelectedIndex();
 		String originalSelectedAddress = null;
-		if ((this.lastAddressBalanceData != null) && (this.lastAddressBalanceData.length > oldSelectedIndex) &&
+		if ((this.lastAddressBalanceData != null) && (this.lastAddressBalanceData.length > 0) &&
+			(this.lastAddressBalanceData.length > oldSelectedIndex) &&
 			(balanceAddressCombo.getItemCount() > 0) && (oldSelectedIndex >= 0))
 		{
 			originalSelectedAddress = this.lastAddressBalanceData[oldSelectedIndex][1];
