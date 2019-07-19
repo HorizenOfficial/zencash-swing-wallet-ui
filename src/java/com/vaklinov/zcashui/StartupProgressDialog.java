@@ -129,7 +129,11 @@ public class StartupProgressDialog extends JFrame {
             	info = clientCaller.getDaemonRawRuntimeInfo();
             } catch (IOException e)
             {
-            	if (iteration > 4)
+            	// We expect that within 20+ seconds the zend will at least show some signs of life
+            	// like being able to report that it is loading the block index etc.
+            	// So we have 15 iterations of 1.5 sec. of waiting. If after this time zend is not yet
+            	// there - we assume something is wrong and an error is reported.
+            	if (iteration > 15)
             	{
             		throw e;
             	} else
