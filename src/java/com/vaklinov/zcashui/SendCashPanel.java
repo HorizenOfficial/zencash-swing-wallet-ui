@@ -588,7 +588,8 @@ public class SendCashPanel
     	    	sendCashNotToBeShownFlagFile.createNewFile();
     	    }
     	    
-    	    if (option == 1)
+            // on "no" or close ("X")
+            if (option == 1 || option == -1)
     	    {
     	    	return;
     	    }
@@ -988,7 +989,8 @@ public class SendCashPanel
     	    	sendChangeBackNotToBeShownFlagFile.createNewFile();
     	    }
     	    
-    	    if (option == 1)
+            // on "no" or close ("X")
+            if (option == 1 || option == -1)
     	    {
     	    	return false;
     	    }
