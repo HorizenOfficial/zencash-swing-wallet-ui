@@ -25,7 +25,7 @@ It includes [Horizen 2.0.18 binaries](https://github.com/ZencashOfficial/zen/rel
 It requires a 64-bit Windows 7 or later version to run.
 
 1. Download the Wallet ZIP file 
-[HorizenDesktopGUIWallet_0.87.0.zip](https://github.com/ZencashOfficial/zencash-swing-wallet-ui/releases/download/0.87.0/HorizenDesktopGUIWallet_0.87.0.zip). 
+[HorizenDesktopGUIWallet_0.87.0.zip](https://github.com/ZencashOfficial/zencash-swing-wallet-ui/releases/download/0.87.0/HorizenDesktopGUIWallet-0.87.0.zip). 
 
 2. Security check: You may decide to run a virus scan on it, before proceeding... In addition using a tool 
 such as [http://quickhash-gui.org/](http://quickhash-gui.org/) you may calculate the its SHA256 checksum. The 
