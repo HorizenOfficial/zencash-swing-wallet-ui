@@ -5,4 +5,4 @@ Priority: low
 Architecture: all
 Description: Horizen Desktop GUI Wallet 
 Maintainer: admin@horizen.global
-Depends: openjdk-8-jdk, zen
+Depends: default-jdk, zen
