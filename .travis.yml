@@ -1,1 +1,34 @@
-language: java
+install:
+  - chmod 755 ./scripts/install.sh && source ./scripts/install.sh
+  - chmod 755 ./scripts/setup-env.sh && source ./scripts/setup-env.sh
+script: chmod 755 ./scripts/build.sh && ./scripts/build.sh
+before_deploy:
+  - git config --local user.name $GITHUB_USERNAME
+  - git config --local user.email $GITHUB_EMAIL
+  - if [[ -z $TRAVIS_TAG ]]; then export TRAVIS_TAG=$TRAVIS_BRANCH; fi
+deploy:
+  provider: releases
+  api_key: $GITHUB_AUTH
+  file_glob: true
+  file: ./releases/*
+  skip_cleanup: true
+  overwrite: true
+  draft: true
+  name: $READABLE_NAME
+  on:
+    all_branches: true
+jobs:
+  include:
+    - stage: "Builds and Deploy"
+      os: osx
+      language: java
+    -
+      os: linux
+      language: java
+    -
+      os: windows
+      language: shell
+      before_install:
+        - powershell Set-ExecutionPolicy -ExecutionPolicy Unrestricted -Scope LocalMachine
+        - powershell Install-WindowsFeature Net-Framework-Core
+        - cinst -y wixtoolset
