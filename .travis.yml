@@ -1,7 +1,9 @@
+env:
+  - ZEND_VERSION=2.0.19
 install:
-  - chmod 755 ./scripts/install.sh && source ./scripts/install.sh
-  - chmod 755 ./scripts/setup-env.sh && source ./scripts/setup-env.sh
-script: chmod 755 ./scripts/build.sh && ./scripts/build.sh
+  - chmod +x ./scripts/install.sh && source ./scripts/install.sh
+  - chmod +x ./scripts/setup-env.sh && source ./scripts/setup-env.sh
+script: chmod +x ./scripts/build.sh && ./scripts/build.sh
 before_deploy:
   - git config --local user.name $GITHUB_USERNAME
   - git config --local user.email $GITHUB_EMAIL
@@ -21,10 +23,13 @@ jobs:
   include:
     - stage: "Builds and Deploy"
       os: osx
+      osx_image: xcode9.4
       language: java
     -
       os: linux
-      language: java
+      dist: bionic
+      sudo: required
+      language: generic
     -
       os: windows
       language: shell

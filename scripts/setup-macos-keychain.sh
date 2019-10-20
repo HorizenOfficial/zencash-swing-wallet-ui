@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-set -eo
+set -eo pipefail
 
 export KEY_CHAIN=mac-build.keychain
 security create-keychain -p travis $KEY_CHAIN
