@@ -43,6 +43,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.net.URL;
+import java.net.URISyntaxException;;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -397,7 +398,7 @@ public class DashboardPanel
 	
 
 	private void updateDaemonStatusLabel()
-		throws IOException, InterruptedException, WalletCallException
+		throws IOException, InterruptedException, WalletCallException, URISyntaxException
 	{
 		DaemonInfo daemonInfo = this.daemonInfoGatheringThread.getLastData();
 		

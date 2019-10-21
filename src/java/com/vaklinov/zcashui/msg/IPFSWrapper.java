@@ -195,7 +195,7 @@ public class IPFSWrapper
 	
 	// true if started OK
 	private boolean ensureIPFSIsRunning()
-		throws IOException, InterruptedException
+		throws IOException, InterruptedException, URISyntaxException
 	{
 		// TODO: As of Nov 2017 the IPFS wallet integration is suspended. This method just returns
 		// true. This is to be corrected when IPFS integration resumes.
@@ -220,7 +220,7 @@ public class IPFSWrapper
 	
 	// true if started OK
 	private boolean startIPFS()
-		throws IOException, InterruptedException
+		throws IOException, InterruptedException, URISyntaxException
 	{
 		// Warn user if executable and dir are missing!
 		File dir = new File(this.getIPFSDirectory());
@@ -374,14 +374,14 @@ public class IPFSWrapper
 	
 	
 	private String getIPFSFullExecutablePath()
-		throws IOException
+		throws IOException, URISyntaxException
 	{
 		return this.getIPFSDirectory() + File.separator + this.getIPFSExecutableName();
 	}
 	
 	
 	private String getIPFSDirectory()
-		throws IOException
+		throws IOException, URISyntaxException
 	{
 		String walletBase = OSUtil.getProgramDirectory();
 		
