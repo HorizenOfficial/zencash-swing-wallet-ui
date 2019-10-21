@@ -27,7 +27,7 @@ presents the information in a user-friendly manner.
 
 #### New/Experimental: [Horizen Desktop GUI Wallet packages for Debian/Ubuntu Linux](https://github.com/ZencashOfficial/zencash-swing-wallet-ui/blob/master/docs/ReleaseUbuntuRepository.md) are available
 
-#### New/Experimental: [Horizen Desktop GUI Wallet for Windows/macOS](https://github.com/ZencashOfficial/zencash-swing-wallet-ui/blob/master/docs/Release_0.87.0.md) is available
+#### New/Experimental: [Horizen Desktop GUI Wallet for Windows/macOS](https://github.com/ZencashOfficial/zencash-swing-wallet-ui/blob/master/docs/Release_0.88.0.md) is available
 
 #### Information on diagnosing some common problems may be found in this [troubleshooting guide](docs/TroubleshootingGuide.md).
 
@@ -45,18 +45,17 @@ The details of how to build it are described below (easy to follow).
 1. Operating system and tools
 
    As of January 2019 (Horizen v2.0.16) this program supports Linux, macOS Sierra/High Sierra and Windows.
-   The Linux tools you need to build and run the Wallet GUI are Git, Java (JDK8) and
-   Ant. If using Ubuntu Linux, they may be installed via command: 
+   The Linux tools you need to build and run the Wallet GUI are Git, Java (JDK12) and Ant.
+   To install OpenJDK to meet the Java dependency, please follow the instructions on these links:
+   [Windows](https://adoptopenjdk.net/installation.html?variant=openjdk12&jvmVariant=hotspot#windows-msi)
+   [Linux](https://adoptopenjdk.net/installation.html?variant=openjdk12&jvmVariant=hotspot#linux-pkg)
+   [MacOS](https://adoptopenjdk.net/installation.html?variant=openjdk12&jvmVariant=hotspot#macos-pkg)
+
+   For RedHat/CentOS/Fedora-type, you should be able to install git and ant running the following command:
    ```
-   user@ubuntu:~/build-dir$ sudo apt-get install git default-jdk ant
-   ``` 
-   For RedHat/CentOS/Fedora-type Linux systems the command is (like):
+   user@centos:~/build-dir$ sudo yum install git ant 
    ```
-   user@centos:~/build-dir$ sudo yum install java-1.8.0-openjdk git ant 
-   ```
-   The name of the JDK package (`java-1.8.0-openjdk`) may vary depending on the Linux system, so you need to
-   check it, if name `java-1.8.0-openjdk` is not accepted.
-   If you have some other Linux distribution, please check your relevant documentation on installing Git, 
+   If you have some Linux distribution that those instructions do not apply to, please check your relevant documentation on installing Git, 
    JDK and Ant. The commands `git`, `java`, `javac` and `ant` need to be startable from command line 
    before proceeding with build.
 
@@ -128,7 +127,6 @@ SOFTWARE.
 
 ### Known issues and limitations
 
-1. Issue: The Horizen Desktop GUI Wallet can not be built with `openjdk-11-jdk`, to build, you must install `openjdk-8-jdk`. If `openjdk-11-jdk` is installed you must then run `update-java-alternatives -s java-1.8.0-openjdk-amd64`.
 1. Issue: The Horizen Desktop GUI Wallet is not compatible with applications that modify the ZEN `wallet.dat` file. The wallet should not be used
 with such applications on the same PC. For instance some distributed exchange applications are known to create watch-only addresses in the
 `wallet.dat` file that cause the GUI wallet to display a wrong balance and/or display addresses that do not belong to the wallet. 

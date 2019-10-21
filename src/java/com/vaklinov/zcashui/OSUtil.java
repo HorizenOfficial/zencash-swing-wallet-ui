@@ -28,7 +28,7 @@
  **********************************************************************************/
 package com.vaklinov.zcashui;
 
-
+import java.net.URISyntaxException;
 import java.io.File;
 import java.io.IOException;
 import java.util.Locale;
@@ -129,11 +129,19 @@ public class OSUtil
 
 	// Returns the directory that the wallet program was started from
 	public static String getProgramDirectory()
-		throws IOException
+		throws IOException, URISyntaxException
 	{
+		final String JAR_NAME = "ZENCashSwingWalletUI.jar";
+		File jarFile = new File(HorizenUI.class.getProtectionDomain().getCodeSource().getLocation().toURI());
+
+		if (jarFile.exists()) {
+			String path = jarFile.getCanonicalPath();
+
+			return new File(path.substring(0, path.length() - JAR_NAME.length())).getCanonicalPath();
+		}
+
 		// TODO: this way of finding the dir is JAR name dependent - tricky, may not work
 		// if program is repackaged as different JAR!
-		final String JAR_NAME = "ZENCashSwingWalletUI.jar";
 		String cp = System.getProperty("java.class.path");
 		if ((cp != null) && (cp.indexOf(File.pathSeparator) == -1) &&
 			(cp.endsWith(JAR_NAME)))

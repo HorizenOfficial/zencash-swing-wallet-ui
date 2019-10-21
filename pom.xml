@@ -6,7 +6,7 @@
 
     <groupId>com.zencash</groupId>
     <artifactId>HorizenSwingWalletUI</artifactId>
-    <version>0.87.0-SNAPSHOT</version>
+    <version>0.88.0-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>Horizen Swing Wallet UI</name>
 
@@ -116,19 +116,19 @@
 
     <profiles>
         <profile>
-            <id>java9</id>
+            <id>java8</id>
             <activation>
-                <jdk>9</jdk>
+                <jdk>8</jdk>
             </activation>
             <build>
                 <plugins>
-                    <!-- target Java 9 -->
+                    <!-- target Java 8 -->
                     <plugin>
                         <artifactId>maven-compiler-plugin</artifactId>
                         <configuration>
                             <!-- fork compilation and use the specified executable -->
                             <fork>true</fork>
-                            <executable>javac9</executable>
+                            <executable>javac8</executable>
                         </configuration>
                     </plugin>
                 </plugins>

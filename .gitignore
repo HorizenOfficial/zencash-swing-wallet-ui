@@ -13,3 +13,11 @@ hs_err_pid*
 .idea/*
 .iml
 *.iml
+
+.vscode
+.classpath
+.settings
+installer/.project
+installer/bin
+zencash-wallet-swing/.project
+zencash-wallet-swing/bin

@@ -45,6 +45,7 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
+import java.net.URISyntaxException;
 import java.security.SecureRandom;
 import java.util.Date;
 import java.util.Locale;
@@ -105,7 +106,7 @@ public class HorizenUI
     JTabbedPane tabs;
 
     public HorizenUI(StartupProgressDialog progressDialog)
-        throws IOException, InterruptedException, WalletCallException
+        throws IOException, InterruptedException, WalletCallException, URISyntaxException
     {
 
         langUtil = LanguageUtil.instance();
@@ -582,7 +583,7 @@ public class HorizenUI
     }
 
     public static void main(String argv[])
-        throws IOException
+        throws IOException, URISyntaxException
     {
         try
         {
