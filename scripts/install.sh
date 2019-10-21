@@ -33,6 +33,6 @@ fi
 export PATH="$(pwd)/${antdir}/bin:$PATH"
 
 if [[ $TRAVIS_OS_NAME == "osx" ]]; then
-#  brew update-reset
+  brew update-reset
   brew upgrade coreutils
 fi

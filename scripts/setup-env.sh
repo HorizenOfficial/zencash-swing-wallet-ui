@@ -28,9 +28,9 @@ export MAIN_JAR="ZENCashSwingWalletUI.jar"
 export PNG_ICON="./zencash-wallet-swing/src/icons/ZENCashWallet.iconset/icon_128x128.png"
 export ICNS_ICON="./zencash-wallet-swing/src/icons/ZENCashWallet.icns"
 export ICO_ICON="./zencash-wallet-swing/src/icons/ZEN.ico"
-export VERSION=$(if [[ $TRAVIS_TAG != $TRAVIS_BRANCH && $TRAVIS_TAG ]]; then echo $TRAVIS_TAG; else echo "0.1.0"; fi)
+export VERSION=$(if [ ! -z ${TRAVIS_TAG+x} ] && [[ "$TRAVIS_TAG" =~ $SEMVER_REGEX ]]; then echo $TRAVIS_TAG; else echo "0.1.0"; fi)
 export PACKAGE_TYPE=$(if [[ $TRAVIS_OS_NAME == "osx" ]]; then echo dmg; elif [[ $TRAVIS_OS_NAME == "windows" ]]; then echo exe; fi)
-export MAC_PARAMS=$(if [[ $TRAVIS_OS_NAME == "osx" ]]; then echo -n "--icon $ICNS_ICON"; fi; if [[ "$SIGN" = true ]]; then echo " --mac-sign"; fi)
+export MAC_PARAMS=$(if [[ $TRAVIS_OS_NAME == "osx" ]]; then echo -n "--icon $ICNS_ICON"; if [[ "$SIGN" = true ]]; then echo " --mac-sign"; fi; fi)
 export WINDOWS_PARAMS=$(if [[ $TRAVIS_OS_NAME == "windows" ]]; then echo "--icon $ICO_ICON --win-dir-chooser --win-shortcut --win-menu --win-upgrade-uuid e51de4ee-2dc7-45d8-b32d-aebd3fe81547"; fi)
 export COMMON_PARAMS="--java-options -Xmx1536m --verbose --license-file ./LICENSE --copyright \"Copyright (c) 2019 Zen Blockchain Foundation\" --description \"This program provides a Graphical User Interface (GUI) for the Horizen client tools that acts as a wrapper and presents the information in a user-friendly manner.\""
 export APPLICATION_NAME="$NAME-$VERSION.${PACKAGE_TYPE}"
