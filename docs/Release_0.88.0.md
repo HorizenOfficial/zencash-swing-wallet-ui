@@ -24,24 +24,25 @@ It includes [Horizen 2.0.19 binaries](https://github.com/ZencashOfficial/zen/rel
 
 It requires a 64-bit Windows 7 or later version to run.
 
-1. Download the Wallet ZIP file 
-[HorizenDesktopGUIWallet_0.88.0.zip](https://github.com/ZencashOfficial/zencash-swing-wallet-ui/releases/download/0.88.0/HorizenDesktopGUIWallet-0.88.0.zip). 
+1. Download the Wallet EXE file
+[HorizenDesktopGUIWallet-0.88.0.exe](https://github.com/ZencashOfficial/zencash-swing-wallet-ui/releases/download/0.88.0/HorizenDesktopGUIWallet-0.88.0.exe).
 
 2. Security check: You may decide to run a virus scan on it, before proceeding... In addition using a tool 
 such as [http://quickhash-gui.org/](http://quickhash-gui.org/) you may calculate the its SHA256 checksum. The 
 result should be:
 ```
-TODO  HorizenDesktopGUIWallet-0.88.0.zip
+58ce0261f80d49dacd3e5542c1282e44fba377c4f8ab7fa51d29c61e06e04df9  HorizenDesktopGUIWallet-0.88.0.exe
 ```
-**If the resulting checksum is not `2caa932df847211abde12bc4fdb7b831769746f05c7776848ee6e00785ce4e6f` then**
+**If the resulting checksum is not `58ce0261f80d49dacd3e5542c1282e44fba377c4f8ab7fa51d29c61e06e04df9` then**
 **something is wrong and you should discard the downloaded wallet!**
 
-3. Unzip the Wallet ZIP file `HorizenDesktopGUIWallet_0.88.0.zip` in some directory that it will run from.
+3. Run the `HorizenDesktopGUIWallet-0.88.0.exe` installer and choose an installation folder.
    
 ### Running the Horizen Desktop GUI Wallet on Windows
 
-Double click on `HorizenDesktopGUIWallet.exe`. On first run (only) the wallet will download the cryptographic keys 
-(1.6GB or so). In case of problems logs are written in `%LOCALAPPDATA%\ZENCashSwingWalletUI\` for diagnostics.
+Double click on `HorizenDesktopGUIWallet.exe` in the installation folder or run `HorizenDesktopGUIWallet` from the start menu.
+On first run (only) the wallet will download the cryptographic keys (1.6GB or so).
+In case of problems logs are written in `%LOCALAPPDATA%\ZENCashSwingWalletUI\` for diagnostics.
 
 ### Installing the Horizen Desktop GUI Wallet on Mac OS
 
@@ -54,9 +55,9 @@ It requires Mac OS Sierra/High Sierra/Mojave.
 such as [http://quickhash-gui.org/](http://quickhash-gui.org/) you may calculate the its SHA256 checksum. The
 result should be:
 ```
-TODO  HorizenDesktopGUIWallet-0.88.0.dmg
+7f7956ed954591826b50999898b9b6ada8dc0839595e09f4eedc2feff4526e50  HorizenDesktopGUIWallet-0.88.0.dmg
 ```
-**If the resulting checksum is not `701d6279bbc0420723d162b9b2b4f7bc24f3ead20b581e3a240eb8cce096f303` then**
+**If the resulting checksum is not `7f7956ed954591826b50999898b9b6ada8dc0839595e09f4eedc2feff4526e50` then**
 **something is wrong and you should discard the downloaded wallet!**
 
 3. Install the wallet like any other downloaded Mac OS application: Open the disk image `HorizenWallet-0.88.0.dmg`
