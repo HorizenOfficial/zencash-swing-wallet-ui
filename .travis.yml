@@ -1,35 +1,42 @@
+os: linux
+language: shell
+
 env:
-  - ZEND_VERSION=2.0.19
+  - ZEND_VERSION=2.0.20 JDK=14
+
 install:
-  - chmod +x ./scripts/install.sh && source ./scripts/install.sh
-  - chmod +x ./scripts/setup-env.sh && source ./scripts/setup-env.sh
-script: chmod +x ./scripts/build.sh && ./scripts/build.sh
+  - source ./scripts/install.sh
+  - source ./scripts/setup-env.sh
+
+script: ./scripts/build.sh
+
 before_deploy:
   - git config --local user.name $GITHUB_USERNAME
   - git config --local user.email $GITHUB_EMAIL
   - if [[ -z $TRAVIS_TAG ]]; then export TRAVIS_TAG=$TRAVIS_BRANCH; fi
+
 deploy:
   provider: releases
-  api_key: $GITHUB_AUTH
+  token: $GITHUB_AUTH
   file_glob: true
-  file: ./releases/*
+  file: "./releases/*"
   skip_cleanup: true
   overwrite: true
   draft: true
   name: $READABLE_NAME
   on:
     all_branches: true
+
 jobs:
   include:
     - stage: "Builds and Deploy"
       os: osx
       osx_image: xcode9.4
-      language: java
+      language: shell
     -
       os: linux
       dist: bionic
-      sudo: required
-      language: generic
+      language: shell
     -
       os: windows
       language: shell
