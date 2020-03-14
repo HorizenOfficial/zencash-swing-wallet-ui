@@ -903,7 +903,8 @@ public class DashboardPanel
 			
 			try
 			{
-				URL u = new URL("https://api.coinmarketcap.com/v1/ticker/zencash");
+				//switched from deprecated CMC api to our own price api service
+				URL u = new URL("https://papi.zenchain.info/api/v1/zen/ticker");
 				Reader r = new InputStreamReader(u.openStream(), "UTF-8");
 				JsonArray ar = Json.parse(r).asArray();
 				data = ar.get(0).asObject();
