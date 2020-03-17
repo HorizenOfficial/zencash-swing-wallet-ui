@@ -906,11 +906,11 @@ public class DashboardPanel
 				//switched from deprecated CMC api to our own price api service
 				URL u = new URL("https://papi.zenchain.info/api/v1/zen/ticker");
 				Reader r = new InputStreamReader(u.openStream(), "UTF-8");
-				JsonArray ar = Json.parse(r).asArray();
-				data = ar.get(0).asObject();
+				JsonObject ob = Json.parse(r).asObject();
+				data = ob;
 			} catch (Exception ioe)
 			{
-				Log.warning("Could not obtain ZEN exchange information from coinmarketcap.com due to: {0} {1}", 
+				Log.warning("Could not obtain ZEN exchange information from price api due to: {0} {1}", 
 						    ioe.getClass().getName(), ioe.getMessage());
 			}
 			
