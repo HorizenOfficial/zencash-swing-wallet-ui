@@ -43,6 +43,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.net.URL;
+import java.net.URLConnection;
 import java.net.URISyntaxException;;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -855,35 +856,44 @@ public class DashboardPanel
 		// Forms the exchange data for a table
 		private Object[][] getExchangeDataInTableForm()
 		{
+                        // sample data
+                        //    {
+                        //      "usd": 5.48,
+                        //      "btc": "0.00056185",
+                        //      "24h": -0.35,
+                        //      "7d": 1.06,
+                        //      "cap": 49858001.8,
+                        //      "date": "2020-05-20T07:58:59"
+                        //    }
 			JsonObject data = this.zenDataGatheringThread.getLastData();
 			if (data == null)
 			{
 				data = new JsonObject();
 			}
-			
-			String usdPrice = data.getString("price_usd", "N/A");
-			try
-			{
-				Double usdPriceD = Double.parseDouble(usdPrice);
-				usdPrice = new DecimalFormat("########0.00").format(usdPriceD);
-				this.lastUsdPrice = usdPriceD;
-			} catch (NumberFormatException nfe) { /* Do nothing */ }
-			
-			String usdMarketCap = data.getString("market_cap_usd", "N/A");
-			try
-			{
-				Double usdMarketCapD = Double.parseDouble(usdMarketCap) / 1000000;
-				usdMarketCap = new DecimalFormat("########0.000").format(usdMarketCapD) + " million";
-			} catch (NumberFormatException nfe) { /* Do nothing */ }
-			
+
+                        String usdPrice = "N/A";
+                        Double usdPriceD = data.getDouble("usd", 0);
+                        if (usdPriceD != 0)
+                        {
+                                usdPrice = new DecimalFormat("###,###,###,##0.00").format(usdPriceD)
+                                this.lastUsdPrice = usdPriceD;
+                        }
+
+                        Double usdMarketCapD = data.getDouble("cap", 0);
+                        String usdMarketCap = (usdMarketCapD != 0) ? new DecimalFormat("###,###,###,##0.00").format(usdMarketCapD) : "N/A";
+                        Double dailyChangeD = data.getDouble("24h", 0);
+                        String dailyChange = (dailyChangeD != 0) ? new DecimalFormat("###0.00").format(dailyChangeD) : "N/A";
+                        Double weeklyChangeD = data.getDouble("7d", 0);
+                        String weeklyChange = (weeklyChangeD != 0) ? new DecimalFormat("###0.00").format(weeklyChangeD) : "N/A";
+
 			// Query the object for individual fields
 			String tableData[][] = new String[][]
 			{
-				{ langUtil.getString("panel.dashboard.marketcap.price.usd"),     usdPrice},
-				{ langUtil.getString("panel.dashboard.marketcap.price.btc"),     data.getString("price_btc",          "N/A") },
+				{ langUtil.getString("panel.dashboard.marketcap.price.usd"),      usdPrice },
+				{ langUtil.getString("panel.dashboard.marketcap.price.btc"),      data.getString("btc", "N/A") },
 				{ langUtil.getString("panel.dashboard.marketcap.capitalisation"), usdMarketCap },
-				{ langUtil.getString("panel.dashboard.marketcap.daily.change"), data.getString("percent_change_24h", "N/A") + "%"},
-				{ langUtil.getString("panel.dashboard.marketcap.weekly.change"), data.getString("percent_change_7d", "N/A") + "%"},
+				{ langUtil.getString("panel.dashboard.marketcap.daily.change"),   dailyChange + "%" },
+				{ langUtil.getString("panel.dashboard.marketcap.weekly.change"),  weeklyChange + "%" },
 			};
 
 			return tableData;
@@ -904,10 +914,11 @@ public class DashboardPanel
 			try
 			{
 				//switched from deprecated CMC api to our own price api service
-				URL u = new URL("https://papi.zenchain.info/api/v1/zen/ticker");
-				Reader r = new InputStreamReader(u.openStream(), "UTF-8");
-				JsonObject ob = Json.parse(r).asObject();
-				data = ob;
+                                URL u = new URL("https://papi.zenchain.info/api/v1/flagship/overview");
+                                URLConnection uc = u.openConnection();
+                                uc.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HorizenSwingWallet Chrome/69.0.3497.128 Safari/537.36");
+                                Reader r = new InputStreamReader(uc.getInputStream(), "UTF-8");
+                                data = Json.parse(r).asObject().get("data").asObject().get("market").asObject();
 			} catch (Exception ioe)
 			{
 				Log.warning("Could not obtain ZEN exchange information from price api due to: {0} {1}", 
