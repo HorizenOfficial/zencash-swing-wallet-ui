@@ -65,7 +65,6 @@ import javax.swing.Timer;
 import javax.swing.border.EtchedBorder;
 
 import com.eclipsesource.json.Json;
-import com.eclipsesource.json.JsonArray;
 import com.eclipsesource.json.JsonObject;
 
 import com.vaklinov.zcashui.OSUtil.OS_TYPE;
@@ -875,7 +874,7 @@ public class DashboardPanel
                         Double usdPriceD = data.getDouble("usd", 0);
                         if (usdPriceD != 0)
                         {
-                                usdPrice = new DecimalFormat("###,###,###,##0.00").format(usdPriceD)
+                                usdPrice = new DecimalFormat("###,###,###,##0.00").format(usdPriceD);
                                 this.lastUsdPrice = usdPriceD;
                         }
 
@@ -919,6 +918,7 @@ public class DashboardPanel
                                 uc.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HorizenSwingWallet Chrome/69.0.3497.128 Safari/537.36");
                                 Reader r = new InputStreamReader(uc.getInputStream(), "UTF-8");
                                 data = Json.parse(r).asObject().get("data").asObject().get("market").asObject();
+                                r.close();
 			} catch (Exception ioe)
 			{
 				Log.warning("Could not obtain ZEN exchange information from price api due to: {0} {1}", 
