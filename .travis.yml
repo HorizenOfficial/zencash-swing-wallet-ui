@@ -16,14 +16,15 @@ before_deploy:
   - if [[ -z $TRAVIS_TAG ]]; then export TRAVIS_TAG=$TRAVIS_BRANCH; fi
 
 deploy:
+  edge: true
   provider: releases
   token: $GITHUB_AUTH
   file_glob: true
   file: "./releases/*"
-  skip_cleanup: true
+  cleanup: false
   overwrite: true
   draft: true
-  name: $READABLE_NAME
+  release_notes: $READABLE_NAME
   on:
     all_branches: true
 
