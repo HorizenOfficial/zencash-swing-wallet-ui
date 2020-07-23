@@ -16,7 +16,7 @@
     <staging.dir>${project.build.directory}/staging</staging.dir>
     <installer-output-filename>zencash-wallet-installer</installer-output-filename>
     <zen.project.url>https://github.com</zen.project.url>
-    <zen.binaries.file.name.windows>ZencashOfficial/zen/releases/download/v2.0.16/Zen_Win_binaries_v2.0.16.zip</zen.binaries.file.name.windows>
+    <zen.binaries.file.name.windows>HorizenOfficial/zen/releases/download/v2.0.16/Zen_Win_binaries_v2.0.16.zip</zen.binaries.file.name.windows>
     <izpack.version>5.0.6</izpack.version>
   </properties>
 

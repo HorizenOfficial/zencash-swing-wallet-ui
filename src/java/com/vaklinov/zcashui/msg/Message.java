@@ -317,7 +317,7 @@ public class Message
 	/**
 	 * Verifies if a message represented as a JSON object is valid according to the
 	 * ZEN messaging protocol:
-	 * https://github.com/ZencashOfficial/messaging-protocol/blob/master/README.md
+	 * https://github.com/HorizenOfficial/messaging-protocol/blob/master/README.md
 	 * 
 	 * @param message
 	 * 

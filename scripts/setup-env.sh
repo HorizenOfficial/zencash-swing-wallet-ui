@@ -7,7 +7,7 @@ SEMVER_REGEX="^(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)(\\-[0-9A-Za-z
 if [ ! -z "${TRAVIS_TAG+x}" ] && [[ "${TRAVIS_TAG}" =~ ${SEMVER_REGEX} ]] && [[ "${TRAVIS_OS_NAME}" != "linux" ]]; then
   echo "Release tag found, packages will be code signed."
   export SIGN=true
-  curl -sLH "Authorization: token ${GITHUB_AUTH}" -H "Accept: application/vnd.github.v3.raw" https://api.github.com/repos/ZencashOfficial/codesign_ci/contents/current | openssl enc -d -aes-256-cbc -md sha256 -pass "pass:${CERT_ARCHIVE_PASSWORD}" | tar -xzf-
+  curl -sLH "Authorization: token ${GITHUB_AUTH}" -H "Accept: application/vnd.github.v3.raw" https://api.github.com/repos/HorizenOfficial/codesign_ci/contents/current | openssl enc -d -aes-256-cbc -md sha256 -pass "pass:${CERT_ARCHIVE_PASSWORD}" | tar -xzf-
   if [[ "${TRAVIS_OS_NAME}" == "osx" ]]; then
     source ./scripts/setup-macos-keychain.sh
   fi

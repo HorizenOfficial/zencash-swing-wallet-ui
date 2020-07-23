@@ -1,7 +1,7 @@
 ## [ZENCash](https://zensystem.io/) Desktop GUI Wallet binary release 0.81.0 for Mac OS
 
 This is a [ZENCash](https://zensystem.io/) Desktop GUI Wallet binary release 0.81.0 for Mac OS. 
-It includes [ZENCash 2.0.11 binaries](https://github.com/ZencashOfficial/zen/releases/tag/v2.0.11).
+It includes [ZENCash 2.0.11 binaries](https://github.com/HorizenOfficial/zen/releases/tag/v2.0.11).
 
 **This wallet is targeted at advanced users who understand the implications of running a full Zen node on**
 **the local machine, maintaining a full local copy of the blockchain, maintaining and backing up the**
@@ -24,7 +24,7 @@ It includes [ZENCash 2.0.11 binaries](https://github.com/ZencashOfficial/zen/rel
 ### Installing the ZENCash Desktop GUI Wallet on Mac OS
 
 1. Download the Wallet image file 
-[ZENCashWallet-0.81.0.dmg](https://github.com/ZencashOfficial/zencash-swing-wallet-ui/releases/download/0.81.0/ZENCashWallet-0.81.0.dmg). 
+[ZENCashWallet-0.81.0.dmg](https://github.com/HorizenOfficial/zencash-swing-wallet-ui/releases/download/0.81.0/ZENCashWallet-0.81.0.dmg). 
 
 2. Security check: You may decide to run a virus scan on it before proceeding... In addition using a tool 
 such as [http://quickhash-gui.org/](http://quickhash-gui.org/) you may calculate the its SHA256 checksum. The 

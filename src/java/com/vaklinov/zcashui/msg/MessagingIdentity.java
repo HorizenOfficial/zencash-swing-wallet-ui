@@ -51,7 +51,7 @@ import com.vaklinov.zcashui.Util;
 public class MessagingIdentity
 {
 	// Fields based on the ZEN messaging protocol
-	// https://github.com/ZencashOfficial/messaging-protocol/blob/master/README.md
+	// https://github.com/HorizenOfficial/messaging-protocol/blob/master/README.md
 	private String nickname;
 	private String sendreceiveaddress;
 	private String senderidaddress;

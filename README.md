@@ -5,7 +5,7 @@
 ## Deprecation notice
 
 Horizen Desktop GUI Wallet will not receive any new features, future releases will be limited to critical bug fixes and compatibility with newer versions of zend.
-[Sphere by Horizen](https://github.com/ZencashOfficial/Sphere_by_Horizen) is its successor and ongoing development will be focused on Sphere by Horizen, to migrate to Sphere by Horizen please see our [wiki]( https://horizenofficial.atlassian.net/wiki/spaces/ZEN/pages/729776153).
+[Sphere by Horizen](https://github.com/HorizenOfficial/Sphere_by_Horizen) is its successor and ongoing development will be focused on Sphere by Horizen, to migrate to Sphere by Horizen please see our [wiki]( https://horizenofficial.atlassian.net/wiki/spaces/ZEN/pages/729776153).
 
 **Running Horizen Desktop GUI Wallet on macOS Catalina**: Horizen Desktop GUI Wallet is not going to be notarized and as such won't start on macOS Catalina without going through some extra steps, if you want to run it on MacOS Catalina please read and follow https://support.apple.com/en-us/HT202491 `How to open an app that hasn’t been notarized or is from an unidentified developer`.
 
@@ -14,7 +14,7 @@ Horizen Desktop GUI Wallet will not receive any new features, future releases wi
 This program provides a Graphical User Interface (GUI) for the Horizen client tools that acts as a wrapper and 
 presents the information in a user-friendly manner.
 
-![Screenshot](https://github.com/ZencashOfficial/zencash-swing-wallet-ui/raw/master/docs/ZENCashWallet.png "Main Window")
+![Screenshot](https://github.com/HorizenOfficial/zencash-swing-wallet-ui/raw/master/docs/ZENCashWallet.png "Main Window")
 
 **This wallet is targeted at advanced users who understand the implications of running a full Zen node on**
 **the local machine, maintaining a full local copy of the blockchain, maintaining and backing up the**
@@ -34,20 +34,20 @@ presents the information in a user-friendly manner.
 **they are considered outdated after 16 weeks and stop working. So they need to be updated to a newer version before this term expires.**
 **Users need to ensure they use an up-to-date version of the wallet (e.g. update the wallet every two months or so).**
 
-#### New/Experimental: [Horizen Desktop GUI Wallet packages for Debian/Ubuntu Linux](https://github.com/ZencashOfficial/zencash-swing-wallet-ui/blob/master/docs/ReleaseUbuntuRepository.md) are available
+#### New/Experimental: [Horizen Desktop GUI Wallet packages for Debian/Ubuntu Linux](https://github.com/HorizenOfficial/zencash-swing-wallet-ui/blob/master/docs/ReleaseUbuntuRepository.md) are available
 
-#### New/Experimental: [Horizen Desktop GUI Wallet for Windows/macOS](https://github.com/ZencashOfficial/zencash-swing-wallet-ui/blob/master/docs/Release_0.90.1.md) is available
+#### New/Experimental: [Horizen Desktop GUI Wallet for Windows/macOS](https://github.com/HorizenOfficial/zencash-swing-wallet-ui/blob/master/docs/Release_0.90.1.md) is available
 
 #### Information on diagnosing some common problems may be found in this [troubleshooting guide](docs/TroubleshootingGuide.md).
 
 ## Building, installing and running the Wallet GUI
 
 Before installing the Desktop GUI Wallet you need to have Horizen up and running. The following 
-[guide](https://github.com/ZencashOfficial/zen/blob/master/README.md) 
+[guide](https://github.com/HorizenOfficial/zen/blob/master/README.md) 
 explains how to set up [Horizen](https://horizen.global/). 
 
 **For security reasons it is recommended to always build the GUI wallet program from GitHub**
-**[source](https://github.com/ZencashOfficial/zencash-swing-wallet-ui/archive/master.zip).**
+**[source](https://github.com/HorizenOfficial/zencash-swing-wallet-ui/archive/master.zip).**
 The details of how to build it are described below (easy to follow). 
 
 
@@ -72,7 +72,7 @@ The details of how to build it are described below (easy to follow).
 
    As a start you need to clone the zencash-swing-wallet-ui Git repository:
    ```
-   user@ubuntu:~/build-dir$ git clone https://github.com/ZencashOfficial/zencash-swing-wallet-ui.git
+   user@ubuntu:~/build-dir$ git clone https://github.com/HorizenOfficial/zencash-swing-wallet-ui.git
    ```
    Change the current directory:
    ```
@@ -95,7 +95,7 @@ The details of how to build it are described below (easy to follow).
 
    3.1. If you have built Horizen from source code:
 
-     Assuming you have already built from source code [Horizen](https://github.com/ZencashOfficial/zen) in directory `/home/user/zen/src` (for example - this is the typical build dir. for Horizen v2.0.16) which contains the command line tools `zen-cli` and `zend` you need to take the created JAR files and copy them to directory `/home/user/zen/src` (the same dir. that contains `zen-cli` and `zend`). Example copy command:
+     Assuming you have already built from source code [Horizen](https://github.com/HorizenOfficial/zen) in directory `/home/user/zen/src` (for example - this is the typical build dir. for Horizen v2.0.16) which contains the command line tools `zen-cli` and `zend` you need to take the created JAR files and copy them to directory `/home/user/zen/src` (the same dir. that contains `zen-cli` and `zend`). Example copy command:
       ```
       user@ubuntu:~/build-dir/zencash-swing-wallet-ui$ cp -R -v ./build/jars/* /home/user/zen/src    
       ```
@@ -122,7 +122,7 @@ The details of how to build it are described below (easy to follow).
 
 
 ### License
-This program is distributed under an [MIT License](https://github.com/ZencashOfficial/zencash-swing-wallet-ui/raw/master/LICENSE).
+This program is distributed under an [MIT License](https://github.com/HorizenOfficial/zencash-swing-wallet-ui/raw/master/LICENSE).
 
 ### Disclaimer
 
