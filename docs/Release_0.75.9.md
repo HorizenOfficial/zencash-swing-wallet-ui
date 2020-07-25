@@ -1,7 +1,7 @@
 ## [ZENCash](https://zensystem.io/) Desktop GUI Wallet binary release 0.75.9a for Mac OS
 
 This is a [ZENCash](https://zensystem.io/) Desktop GUI Wallet binary release 0.75.9a for Mac OS. 
-It includes [ZENCash 2.0.11 binaries](https://github.com/ZencashOfficial/zen/releases/tag/v2.0.11).
+It includes [ZENCash 2.0.11 binaries](https://github.com/HorizenOfficial/zen/releases/tag/v2.0.11).
 Originally the release was created with ZENCash 2.0.10-1 binaries but was upgraded to 2.0.11 due to
 stability issues.
 
@@ -12,7 +12,7 @@ One notable new feature is the ability to send encrypted text messages in group 
 ### Installing the ZENCash Desktop GUI Wallet on Mac OS
 
 1. Download the Wallet image file 
-[ZENCashWallet-0.75.9a.dmg](https://github.com/ZencashOfficial/zencash-swing-wallet-ui/releases/download/0.75.9/ZENCashWallet-0.75.9a.dmg). 
+[ZENCashWallet-0.75.9a.dmg](https://github.com/HorizenOfficial/zencash-swing-wallet-ui/releases/download/0.75.9/ZENCashWallet-0.75.9a.dmg). 
 
 2. Security check: You may decide to run a virus scan on it before proceeding... In addition using a tool 
 such as [http://quickhash-gui.org/](http://quickhash-gui.org/) you may calculate the its SHA256 checksum. The 

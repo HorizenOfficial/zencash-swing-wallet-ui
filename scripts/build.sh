@@ -19,8 +19,8 @@ if [[ "${TRAVIS_OS_NAME}" == "osx" || "${TRAVIS_OS_NAME}" == "windows" ]]; then
   export ZEND_FILE_NAME="${FOLDER_NAME}.zip"
   export FILE_EXT=""
 
-  curl -sL "https://github.com/ZencashOfficial/zen/releases/download/v${ZEND_VERSION}/${ZEND_FILE_NAME}" > "${ZEND_FILE_NAME}"
-  curl -sL "https://github.com/ZencashOfficial/zen/releases/download/v${ZEND_VERSION}/${ZEND_FILE_NAME}.sha256" > "${ZEND_FILE_NAME}.sha256"
+  curl -sL "https://github.com/HorizenOfficial/zen/releases/download/v${ZEND_VERSION}/${ZEND_FILE_NAME}" > "${ZEND_FILE_NAME}"
+  curl -sL "https://github.com/HorizenOfficial/zen/releases/download/v${ZEND_VERSION}/${ZEND_FILE_NAME}.sha256" > "${ZEND_FILE_NAME}.sha256"
 
   echo "DOWLNOADED"
 

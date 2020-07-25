@@ -1,6 +1,6 @@
 ## [Horizen](https://horizen.global/) Desktop GUI Wallet binary release 0.87.0
 
-It includes [Horizen 2.0.18 binaries](https://github.com/ZencashOfficial/zen/releases/tag/v2.0.18). 
+It includes [Horizen 2.0.18 binaries](https://github.com/HorizenOfficial/zen/releases/tag/v2.0.18). 
 
 **This wallet is targeted at advanced users who understand the implications of running a full Zen node on**
 **the local machine, maintaining a full local copy of the blockchain, maintaining and backing up the**
@@ -25,7 +25,7 @@ It includes [Horizen 2.0.18 binaries](https://github.com/ZencashOfficial/zen/rel
 It requires a 64-bit Windows 7 or later version to run.
 
 1. Download the Wallet ZIP file 
-[HorizenDesktopGUIWallet_0.87.0.zip](https://github.com/ZencashOfficial/zencash-swing-wallet-ui/releases/download/0.87.0/HorizenDesktopGUIWallet-0.87.0.zip). 
+[HorizenDesktopGUIWallet_0.87.0.zip](https://github.com/HorizenOfficial/zencash-swing-wallet-ui/releases/download/0.87.0/HorizenDesktopGUIWallet-0.87.0.zip). 
 
 2. Security check: You may decide to run a virus scan on it, before proceeding... In addition using a tool 
 such as [http://quickhash-gui.org/](http://quickhash-gui.org/) you may calculate the its SHA256 checksum. The 
@@ -48,7 +48,7 @@ Double click on `HorizenDesktopGUIWallet.exe`. On first run (only) the wallet wi
 It requires Mac OS Sierra/High Sierra/Mojave.
 
 1. Download the Wallet image file
-[HorizenDesktopGUIWallet-0.87.0.dmg](https://github.com/ZencashOfficial/zencash-swing-wallet-ui/releases/download/0.87.0/HorizenDesktopGUIWallet-0.87.0.dmg).
+[HorizenDesktopGUIWallet-0.87.0.dmg](https://github.com/HorizenOfficial/zencash-swing-wallet-ui/releases/download/0.87.0/HorizenDesktopGUIWallet-0.87.0.dmg).
 
 2. Security check: You may decide to run a virus scan on it before proceeding... In addition using a tool
 such as [http://quickhash-gui.org/](http://quickhash-gui.org/) you may calculate the its SHA256 checksum. The

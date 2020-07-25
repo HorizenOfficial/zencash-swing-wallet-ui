@@ -100,7 +100,7 @@ public class ZendParametersEditDialog
 				try
 				{
 					Desktop.getDesktop().browse(new URI(
-						"https://github.com/ZencashOfficial/zencash-swing-wallet-ui/blob/feature/zend-cmd-options/docs/zend.pdf"));
+						"https://github.com/HorizenOfficial/zencash-swing-wallet-ui/blob/feature/zend-cmd-options/docs/zend.pdf"));
 				}
 				catch(Exception ex)
 				{

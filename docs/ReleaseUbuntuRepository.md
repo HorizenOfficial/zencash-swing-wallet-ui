@@ -26,7 +26,7 @@ To setup the APT repository and install packages, using a terminal run the follo
 sudo apt-get update
 sudo apt-get install apt-transport-https lsb-release
 
-echo 'deb https://zencashofficial.github.io/repo/ '$(lsb_release -cs)' main' | sudo tee --append /etc/apt/sources.list.d/zen.list
+echo 'deb https://HorizenOfficial.github.io/repo/ '$(lsb_release -cs)' main' | sudo tee --append /etc/apt/sources.list.d/zen.list
 gpg --keyserver ha.pool.sks-keyservers.net --recv 219F55740BBF7A1CE368BA45FB7053CE4991B669
 gpg --export 219F55740BBF7A1CE368BA45FB7053CE4991B669 | sudo apt-key add -
 

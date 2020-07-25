@@ -1,7 +1,7 @@
 ## [Horizen](https://horizen.global/) Desktop GUI Wallet binary release 0.85.0 for Windows
 
 This is a [Horizen](https://horizen.global/) Desktop GUI Wallet binary release 0.85.0 for Windows. 
-It requires a 64-bit Windows 7 or later version to run. It includes [Horizen 2.0.16 binaries](https://github.com/ZencashOfficial/zen/releases/tag/v2.0.16). 
+It requires a 64-bit Windows 7 or later version to run. It includes [Horizen 2.0.16 binaries](https://github.com/HorizenOfficial/zen/releases/tag/v2.0.16). 
 
 **This wallet is targeted at advanced users who understand the implications of running a full Zen node on**
 **the local machine, maintaining a full local copy of the blockchain, maintaining and backing up the**
@@ -24,7 +24,7 @@ It requires a 64-bit Windows 7 or later version to run. It includes [Horizen 2.0
 ### Installing the Horizen Desktop GUI Wallet on Windows
 
 1. Download the Wallet ZIP file 
-[HorizenDesktopGUIWallet_0.85.0.zip](https://github.com/ZencashOfficial/zencash-swing-wallet-ui/releases/download/0.85.0/HorizenDesktopGUIWallet_0.85.0.zip). 
+[HorizenDesktopGUIWallet_0.85.0.zip](https://github.com/HorizenOfficial/zencash-swing-wallet-ui/releases/download/0.85.0/HorizenDesktopGUIWallet_0.85.0.zip). 
 
 2. Security check: You may decide to run a virus scan on it, before proceeding... In addition using a tool 
 such as [http://quickhash-gui.org/](http://quickhash-gui.org/) you may calculate the its SHA256 checksum. The 

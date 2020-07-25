@@ -829,7 +829,7 @@ public class HorizenUI
 			configOut.println("# The file as automatically created by the GUI wallet contains some                    #");
 			configOut.println("# common command line options. The complete list of options may be found               #");
 			configOut.println("# under this link:                                                                     #");
-			configOut.println("# https://github.com/ZencashOfficial/zencash-swing-wallet-ui/raw/master/docs/zend.pdf  #");
+			configOut.println("# https://github.com/HorizenOfficial/zencash-swing-wallet-ui/raw/master/docs/zend.pdf  #");
 			configOut.println("#                                                                                      #");
 			configOut.println("########################################################################################");
 			configOut.println("#                                                                                      #");
