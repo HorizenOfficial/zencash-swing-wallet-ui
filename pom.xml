@@ -6,7 +6,7 @@
 
     <groupId>com.zencash</groupId>
     <artifactId>HorizenSwingWalletUI</artifactId>
-    <version>0.90.1-SNAPSHOT</version>
+    <version>0.90.2-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>Horizen Swing Wallet UI</name>
 
