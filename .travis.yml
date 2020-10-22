@@ -2,7 +2,7 @@ os: linux
 language: shell
 
 env:
-  - ZEND_VERSION=2.0.21 JDK=14
+  - ZEND_VERSION=2.0.22 JDK=14
 
 install:
   - source ./scripts/install.sh
