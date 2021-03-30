@@ -7,7 +7,7 @@
 Horizen Desktop GUI Wallet will not receive any new features, future releases will be limited to critical bug fixes and compatibility with newer versions of zend.
 [Sphere by Horizen](https://github.com/HorizenOfficial/Sphere_by_Horizen) is its successor and ongoing development will be focused on Sphere by Horizen, to migrate to Sphere by Horizen please see our [wiki]( https://horizenofficial.atlassian.net/wiki/spaces/ZEN/pages/729776153).
 
-**Running Horizen Desktop GUI Wallet on macOS Catalina**: Horizen Desktop GUI Wallet is not going to be notarized and as such won't start on macOS Catalina without going through some extra steps, if you want to run it on MacOS Catalina please read and follow https://support.apple.com/en-us/HT202491 `How to open an app that hasn’t been notarized or is from an unidentified developer`.
+**Running Horizen Desktop GUI Wallet on macOS Catalina**: Horizen Desktop GUI Wallet is not going to be notarized and as such won't start on macOS Catalina without going through some extra steps, if you want to run it on MacOS Catalina or later please read and follow https://support.apple.com/en-us/HT202491 `How to open an app that hasn’t been notarized or is from an unidentified developer`.
 
 ## Graphical user interface wrapper for the [Horizen](https://horizen.global/) command line tools
 
@@ -36,7 +36,7 @@ presents the information in a user-friendly manner.
 
 #### New/Experimental: [Horizen Desktop GUI Wallet packages for Debian/Ubuntu Linux](https://github.com/HorizenOfficial/zencash-swing-wallet-ui/blob/master/docs/ReleaseUbuntuRepository.md) are available
 
-#### New/Experimental: [Horizen Desktop GUI Wallet for Windows/macOS](https://github.com/HorizenOfficial/zencash-swing-wallet-ui/blob/master/docs/Release_0.90.2.md) is available
+#### New/Experimental: [Horizen Desktop GUI Wallet for Windows/macOS](https://github.com/HorizenOfficial/zencash-swing-wallet-ui/blob/master/docs/Release_1.0.0.md) is available
 
 #### Information on diagnosing some common problems may be found in this [troubleshooting guide](docs/TroubleshootingGuide.md).
 
