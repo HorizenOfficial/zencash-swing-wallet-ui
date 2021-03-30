@@ -1,6 +1,6 @@
-## [Horizen](https://horizen.global/) Desktop GUI Wallet binary release 0.85.0 for Windows
+## [Horizen](https://horizen.io/) Desktop GUI Wallet binary release 0.85.0 for Windows
 
-This is a [Horizen](https://horizen.global/) Desktop GUI Wallet binary release 0.85.0 for Windows. 
+This is a [Horizen](https://horizen.io/) Desktop GUI Wallet binary release 0.85.0 for Windows. 
 It requires a 64-bit Windows 7 or later version to run. It includes [Horizen 2.0.16 binaries](https://github.com/HorizenOfficial/zen/releases/tag/v2.0.16). 
 
 **This wallet is targeted at advanced users who understand the implications of running a full Zen node on**

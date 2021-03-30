@@ -1,4 +1,4 @@
-## [Horizen](https://horizen.global/) Desktop GUI Wallet binary release 0.898.0
+## [Horizen](https://horizen.io/) Desktop GUI Wallet binary release 0.898.0
 
 It includes [Horizen 2.0.20 binaries](https://github.com/HorizenOfficial/zen/releases/tag/v2.0.20). 
 
