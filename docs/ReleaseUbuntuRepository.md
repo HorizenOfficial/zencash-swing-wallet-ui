@@ -1,6 +1,6 @@
-## [Horizen](https://horizen.global/) Desktop GUI Wallet APT repository for Debian/Ubuntu Linux
+## [Horizen](https://horizen.io/) Desktop GUI Wallet APT repository for Debian/Ubuntu Linux
 
-This is a [Horizen](https://horizen.global/) Desktop GUI Wallet made available through a package repository
+This is a [Horizen](https://horizen.io/) Desktop GUI Wallet made available through a package repository
 for Debian/Ubuntu (and similar) Linux systems.
 
 ![Screenshot](ZENCashWalletUbuntu.png "Main Window")

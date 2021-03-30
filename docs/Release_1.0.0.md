@@ -1,7 +1,6 @@
-## [Horizen](https://horizen.io/) Desktop GUI Wallet binary release 0.85.0 for Windows
+## [Horizen](https://horizen.io/) Desktop GUI Wallet binary release 1.0.0
 
-This is a [Horizen](https://horizen.io/) Desktop GUI Wallet binary release 0.85.0 for Windows. 
-It requires a 64-bit Windows 7 or later version to run. It includes [Horizen 2.0.16 binaries](https://github.com/HorizenOfficial/zen/releases/tag/v2.0.16). 
+It includes [Horizen 2.0.23 binaries](https://github.com/HorizenOfficial/zen/releases/tag/v2.0.23). 
 
 **This wallet is targeted at advanced users who understand the implications of running a full Zen node on**
 **the local machine, maintaining a full local copy of the blockchain, maintaining and backing up the**
@@ -14,7 +13,7 @@ It requires a 64-bit Windows 7 or later version to run. It includes [Horizen 2.0
 
 **STABILITY WARNING: The GUI wallet is as yet considered experimental! It is known to exhibit occasional stability problems related to running a full Zen node.**
 **Specifically if the locally running `zend` cannot start properly due to issues with the local blockchain, the GUI cannot start either!**
-**Users need to be prepared to fix such problems manually as described in the [troubleshooting guide](TroubleshootingGuide.md).**
+**Users need to be prepared to fix such problems manually as described in the [troubleshooting guide](https://github.com/HorizenOfficial/zencash-swing-wallet-ui/blob/master/docs/TroubleshootingGuide.md).**
 **Doing so requires command line skills.**
 
 **AUTO-DEPRECATION WARNING: Wallet binary releases for Mac/Windows contain ZEN full node binaries. These have an auto-deprecation feature:**
@@ -23,25 +22,50 @@ It requires a 64-bit Windows 7 or later version to run. It includes [Horizen 2.0
 
 ### Installing the Horizen Desktop GUI Wallet on Windows
 
-1. Download the Wallet ZIP file 
-[HorizenDesktopGUIWallet_0.85.0.zip](https://github.com/HorizenOfficial/zencash-swing-wallet-ui/releases/download/0.85.0/HorizenDesktopGUIWallet_0.85.0.zip). 
+It requires a 64-bit Windows 7 or later version to run.
+
+1. Download the Wallet EXE file
+[HorizenDesktopGUIWallet-1.0.0.exe](https://github.com/HorizenOfficial/zencash-swing-wallet-ui/releases/download/1.0.0/HorizenDesktopGUIWallet-1.0.0.exe).
 
 2. Security check: You may decide to run a virus scan on it, before proceeding... In addition using a tool 
 such as [http://quickhash-gui.org/](http://quickhash-gui.org/) you may calculate the its SHA256 checksum. The 
 result should be:
 ```
-facef7a71047851199689606a563fbe9b12c4dcfbdb369340dc388ae239af3c1  HorizenDesktopGUIWallet_0.85.0.zip
+TODO  HorizenDesktopGUIWallet-1.0.0.exe
 ```
-**If the resulting checksum is not `facef7a71047851199689606a563fbe9b12c4dcfbdb369340dc388ae239af3c1` then**
+**If the resulting checksum is not `TODO` then**
 **something is wrong and you should discard the downloaded wallet!**
 
-3. Unzip the Wallet ZIP file `HorizenDesktopGUIWallet_0.85.0.zip` in some directory that it will run from.
+3. Run the `HorizenDesktopGUIWallet-1.0.0.exe` installer and choose an installation folder.
    
 ### Running the Horizen Desktop GUI Wallet on Windows
 
-Double click on `HorizenDesktopGUIWallet.exe`. On first run (only) the wallet will download the cryptographic keys 
-(1.6GB or so). In case of problems logs are written in `%LOCALAPPDATA%\ZENCashSwingWalletUI\` for diagnostics.
+Double click on `HorizenDesktopGUIWallet.exe` in the installation folder or run `HorizenDesktopGUIWallet` from the start menu.
+On first run (only) the wallet will download the cryptographic keys (1.6GB or so).
+In case of problems logs are written in `%LOCALAPPDATA%\ZENCashSwingWalletUI\` for diagnostics.
 
+### Installing the Horizen Desktop GUI Wallet on Mac OS
+
+It requires Mac OS Sierra/High Sierra/Mojave.
+
+1. Download the Wallet image file
+[HorizenDesktopGUIWallet-1.0.0.dmg](https://github.com/HorizenOfficial/zencash-swing-wallet-ui/releases/download/1.0.0/HorizenDesktopGUIWallet-1.0.0.dmg).
+
+2. Security check: You may decide to run a virus scan on it before proceeding... In addition using a tool
+such as [http://quickhash-gui.org/](http://quickhash-gui.org/) you may calculate the its SHA256 checksum. The
+result should be:
+```
+TODO  HorizenDesktopGUIWallet-1.0.0.dmg
+```
+**If the resulting checksum is not `TODO` then**
+**something is wrong and you should discard the downloaded wallet!**
+
+3. Install the wallet like any other downloaded Mac OS application: Open the disk image `HorizenWallet-1.0.0.dmg`
+and copy the HorizenWallet application to the Applications folder. You can then discard the disk image.
+
+### Running the Horizen Desktop GUI Wallet on Mac OS
+
+Simply click on HorizenWallet in the Mac OS application launchpad.
 
 ### Disclaimer
 

@@ -1,6 +1,6 @@
-## [Horizen](https://horizen.global/) Desktop GUI Wallet binary release 0.85.1 for Mac OS Sierra/High Sierra/Mojave
+## [Horizen](https://horizen.io/) Desktop GUI Wallet binary release 0.85.1 for Mac OS Sierra/High Sierra/Mojave
 
-This is a [Horizen](https://horizen.global/) Desktop GUI Wallet binary release 0.85.1 for Mac OS. 
+This is a [Horizen](https://horizen.io/) Desktop GUI Wallet binary release 0.85.1 for Mac OS. 
 It includes [Horizen 2.0.16 binaries](https://github.com/HorizenOfficial/zen/releases/tag/v2.0.16).
 
 **This release does not support OS X 10.11 El Capitan anymore which is end of life,**

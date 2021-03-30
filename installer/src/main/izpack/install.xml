@@ -2,8 +2,8 @@
 <installation version="5.0">
   <info>
     <appname>HorizenSwingWalletUI</appname>
-    <appversion>0.90.2</appversion>
-    <url>https://horizen.global</url>
+    <appversion>1.0.0</appversion>
+    <url>https://horizen.io</url>
     <authors>
         <author name="Ivan Vaklinov" email="ivan@vaklinov.com"/>
         <author name="Armand Ballaci" email="aballaci@gmail.com"/>
@@ -47,7 +47,7 @@
   <variables>
     <variable name="InstallerFrame.logfilePath" value="Default"/>
     <variable name="WELCOME_TEXT" value="Horizen Swing Wallet Installation"/>
-    <variable name="WELCOME_VERSION" value="Version: 0.90.2"/>
+    <variable name="WELCOME_VERSION" value="Version: 1.0.0"/>
     <variable name="WELCOME_BG_COLOR" value="#404B62"/>
     <variable name="WELCOME_TEXT_COLOR" value="#ffffff"/>
   </variables>
