@@ -8,7 +8,7 @@ source "${TRAVIS_BUILD_DIR}/scripts/install-jdk.sh" --feature "${JDK}" -v --targ
 
 set -eo pipefail
 # ant
-antver="1.10.9"
+antver="1.10.11"
 antdir="apache-ant-${antver}"
 antfile="${antdir}-bin.zip"
 anturl="https://downloads.apache.org/ant/binaries/${antfile}"
