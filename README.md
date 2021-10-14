@@ -36,7 +36,7 @@ presents the information in a user-friendly manner.
 
 #### New/Experimental: [Horizen Desktop GUI Wallet packages for Debian/Ubuntu Linux](https://github.com/HorizenOfficial/zencash-swing-wallet-ui/blob/master/docs/ReleaseUbuntuRepository.md) are available
 
-#### New/Experimental: [Horizen Desktop GUI Wallet for Windows/macOS](https://github.com/HorizenOfficial/zencash-swing-wallet-ui/blob/master/docs/Release_1.0.0.md) is available
+#### New/Experimental: [Horizen Desktop GUI Wallet for Windows/macOS](https://github.com/HorizenOfficial/zencash-swing-wallet-ui/blob/master/docs/Release_1.0.1.md) is available
 
 #### Information on diagnosing some common problems may be found in this [troubleshooting guide](docs/TroubleshootingGuide.md).
 
