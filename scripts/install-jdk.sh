@@ -199,7 +199,7 @@ function determine_url() {
        11) url="${DOWNLOAD}/GA/jdk11/9/GPL/openjdk-11.0.2_${os}_bin.tar.gz"; return;;
        12) url="${DOWNLOAD}/GA/jdk12.0.2/e482c34c86bd4bf8b56c0b35558996b9/10/GPL/openjdk-12.0.2_${os}_bin.tar.gz"; return;;
        13) url="${DOWNLOAD}/GA/jdk13.0.2/d4173c853231432d94f001e99d882ca7/8/GPL/openjdk-13.0.2_${os}_bin.tar.gz"; return;;
-#       14) url="${DOWNLOAD}/GA/jdk14.0.1/664493ef4a6946b186ff29eb326336a2/7/GPL/openjdk-14.0.1_${os}_bin.tar.gz"; return;;
+       16) url="${DOWNLOAD}/GA/jdk16.0.1/7147401fd7354114ac51ef3e1328291f/9/GPL/openjdk-16.0.1_${os}_bin.${ext}"; return;;
     esac
 
     # EA or RC build? Grab URL from HTML source of jdk.java.net/${feature}
@@ -215,10 +215,13 @@ function prepare_variables() {
     if [[ ${os} == '?' ]]; then
         if [[ "$OSTYPE" == "darwin"* ]]; then
           os='osx-x64'
+          ext='tar.gz'
         elif [[ "$OSTYPE" == "msys" ]]; then
           os='windows-x64'
+          ext='zip'
         else
           os='linux-x64'
+          ext='tar.gz'
         fi
     fi
     if [[ ${url} == '?' ]]; then

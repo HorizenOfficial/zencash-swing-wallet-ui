@@ -15,7 +15,7 @@ elif [[ "${TRAVIS_OS_NAME}" == "windows" ]]; then
 fi
 
 if [[ "${TRAVIS_OS_NAME}" == "osx" || "${TRAVIS_OS_NAME}" == "windows" ]]; then
-  export FOLDER_NAME="Zen_${PLATFORM_NAME}_binaries_v${ZEND_VERSION}"
+  export FOLDER_NAME="Zen_${PLATFORM_NAME}_binaries_v${ZEND_VERSION}_legacy_cpu"
   export ZEND_FILE_NAME="${FOLDER_NAME}.zip"
   export FILE_EXT=""
 
