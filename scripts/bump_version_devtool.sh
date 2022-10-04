@@ -2,11 +2,11 @@
 
 set -euo pipefail
 
-zend_version_old="3.0.3"
-zend_version_new="3.1.0"
+zend_version_old="3.1.0"
+zend_version_new="3.2.0"
 
-swing_version_old="1.0.5"
-swing_version_new="1.0.6"
+swing_version_old="1.0.6"
+swing_version_new="1.0.7"
 
 # bump zend version
 sed -i "s/${zend_version_old//./\\.}/${zend_version_new//./\\.}/g" .travis.yml
