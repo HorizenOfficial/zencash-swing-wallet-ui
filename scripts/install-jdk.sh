@@ -159,7 +159,7 @@ function determine_latest_jdk() {
     local curl_result
     local url
 
-    number=15
+    number=21
     verbose "Determine latest JDK feature release number, starting with ${number}"
     while [[ ${number} != 99 ]]
     do
