@@ -155,24 +155,7 @@ function parse_options() {
 }
 
 function determine_latest_jdk() {
-    local number
-    local curl_result
-    local url
-
-    number=15
-    verbose "Determine latest JDK feature release number, starting with ${number}"
-    while [[ ${number} != 99 ]]
-    do
-      url="https://jdk.java.net/${number}"
-      curl_result=$(curl -o /dev/null --silent --head --write-out %{http_code} ${url})
-      if [[ ${curl_result} -ge 400 ]]; then
-        break
-      fi
-      verbose "  Found ${url} [${curl_result}]"
-      latest_jdk=${number}
-      number=$[$number +1]
-    done
-
+    latest_jdk=21
     verbose "Latest JDK feature release number is: ${latest_jdk}"
 }
 
