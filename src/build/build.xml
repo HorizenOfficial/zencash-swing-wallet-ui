@@ -103,7 +103,7 @@
 	
     <target name="ubuntuPackage" depends="jar,copyothers">	
     	<mkdir dir="${ubuntu.package.dir}"/>
-	    <deb destfile="${ubuntu.package.dir}/zencash-desktop-gui-wallet_1.0.10_all.deb"
+	    <deb destfile="${ubuntu.package.dir}/zencash-desktop-gui-wallet_1.0.11_all.deb"
 	    	 control="${deb.dir}/control"
 	    	 verbose="true">
 	    	
