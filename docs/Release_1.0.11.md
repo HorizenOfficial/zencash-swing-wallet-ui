@@ -31,9 +31,9 @@ It requires a 64-bit Windows 7 or later version to run.
 such as [http://quickhash-gui.org/](http://quickhash-gui.org/) you may calculate the its SHA256 checksum. The 
 result should be:
 ```
-e4de2fb3dc68888dad45dffdefb34213f27ddab9aa23a54c57ace6e38cd52de7  HorizenDesktopGUIWallet-1.0.11.exe
+341a52e9488772338d471ba00839c393803973b1158aabebe4bcc2fa199a6aeb  HorizenDesktopGUIWallet-1.0.11.exe
 ```
-**If the resulting checksum is not `e4de2fb3dc68888dad45dffdefb34213f27ddab9aa23a54c57ace6e38cd52de7` then**
+**If the resulting checksum is not `341a52e9488772338d471ba00839c393803973b1158aabebe4bcc2fa199a6aeb` then**
 **something is wrong and you should discard the downloaded wallet!**
 
 3. Run the `HorizenDesktopGUIWallet-1.0.11.exe` installer and choose an installation folder.
@@ -55,9 +55,9 @@ It requires Mac OS Sierra/High Sierra/Mojave.
 such as [http://quickhash-gui.org/](http://quickhash-gui.org/) you may calculate the its SHA256 checksum. The
 result should be:
 ```
-de46776da659fb4639ad46002da30bfafee93e8bb1c180a9e1c8740815ab24e4  HorizenDesktopGUIWallet-1.0.11.dmg
+eb581627d35f25ff23a675febdaee81afbe099ab6b20768b73ebb9468b864435  HorizenDesktopGUIWallet-1.0.11.dmg
 ```
-**If the resulting checksum is not `de46776da659fb4639ad46002da30bfafee93e8bb1c180a9e1c8740815ab24e4` then**
+**If the resulting checksum is not `eb581627d35f25ff23a675febdaee81afbe099ab6b20768b73ebb9468b864435` then**
 **something is wrong and you should discard the downloaded wallet!**
 
 3. Install the wallet like any other downloaded Mac OS application: Open the disk image `HorizenWallet-1.0.11.dmg`
