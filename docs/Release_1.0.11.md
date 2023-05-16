@@ -31,9 +31,9 @@ It requires a 64-bit Windows 7 or later version to run.
 such as [http://quickhash-gui.org/](http://quickhash-gui.org/) you may calculate the its SHA256 checksum. The 
 result should be:
 ```
-341a52e9488772338d471ba00839c393803973b1158aabebe4bcc2fa199a6aeb  HorizenDesktopGUIWallet-1.0.11.exe
+667bf7321cc2681e4fb84cae4dcfb5af83bb32c6a359e1462c0356e1b56d23c2  HorizenDesktopGUIWallet-1.0.11.exe
 ```
-**If the resulting checksum is not `341a52e9488772338d471ba00839c393803973b1158aabebe4bcc2fa199a6aeb` then**
+**If the resulting checksum is not `667bf7321cc2681e4fb84cae4dcfb5af83bb32c6a359e1462c0356e1b56d23c2` then**
 **something is wrong and you should discard the downloaded wallet!**
 
 3. Run the `HorizenDesktopGUIWallet-1.0.11.exe` installer and choose an installation folder.
