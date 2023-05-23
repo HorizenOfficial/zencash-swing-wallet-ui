@@ -47,7 +47,7 @@
             <dependency>
                 <groupId>org.xerial</groupId>
                 <artifactId>sqlite-jdbc</artifactId>
-                <version>3.21.0</version>
+                <version>3.41.2.2</version>
             </dependency>
             <!-- https://mvnrepository.com/artifact/com.eclipsesource.minimal-json/minimal-json -->
             <dependency>
