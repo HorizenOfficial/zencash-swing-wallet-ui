@@ -155,7 +155,7 @@ function parse_options() {
 }
 
 function determine_latest_jdk() {
-    latest_jdk=21
+    latest_jdk=22
     verbose "Latest JDK feature release number is: ${latest_jdk}"
 }
 
