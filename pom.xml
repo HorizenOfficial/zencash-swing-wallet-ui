@@ -14,6 +14,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <source.version>1.8</source.version>
         <main.basedir>${project.basedir}</main.basedir>
+        <versions.java-security-toolkit>1.0.7</versions.java-security-toolkit>
     </properties>
 
     <licenses>
@@ -54,6 +55,11 @@
                 <groupId>com.eclipsesource.minimal-json</groupId>
                 <artifactId>minimal-json</artifactId>
                 <version>0.9.5</version>
+            </dependency>
+            <dependency>
+                <groupId>io.github.pixee</groupId>
+                <artifactId>java-security-toolkit</artifactId>
+                <version>${versions.java-security-toolkit}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -135,4 +141,10 @@
             </build>
         </profile>
     </profiles>
+    <dependencies>
+        <dependency>
+            <groupId>io.github.pixee</groupId>
+            <artifactId>java-security-toolkit</artifactId>
+        </dependency>
+    </dependencies>
 </project>

@@ -2,6 +2,7 @@
 // Taken from repository https://github.com/zlatinb/zcash-swing-wallet-ui under an MIT licemse
 package com.vaklinov.zcashui;
 
+import io.github.pixee.security.BoundedLineReader;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.FlowLayout;
@@ -139,7 +140,7 @@ public class AddressBookPanel extends JPanel {
             return;
         try (BufferedReader bufferedReader = new BufferedReader(new FileReader(addressBookFile))) {
             String line;
-            while((line = bufferedReader.readLine()) != null) {
+            while((line = BoundedLineReader.readLine(bufferedReader, 5_000_000)) != null) {
                 // format is address,name - this way name can contain commas ;-)
                 int addressEnd = line.indexOf(',');
                 if (addressEnd < 0)

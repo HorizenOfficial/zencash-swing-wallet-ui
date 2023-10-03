@@ -1,5 +1,6 @@
 package com.vaklinov.zcashui;
 
+import io.github.pixee.security.BoundedLineReader;
 import javax.swing.*;
 import java.io.*;
 import java.text.MessageFormat;
@@ -85,7 +86,7 @@ public class LanguageUtil {
             return DEFAULT_LOCALE;
         }
             BufferedReader bufferedReader = new BufferedReader(new FileReader(languagePrefsFile));
-            String country = bufferedReader.readLine().trim();
+            String country = BoundedLineReader.readLine(bufferedReader, 5_000_000).trim();
             bufferedReader.close();
             return supportedLocale.get(country);
         } catch (FileNotFoundException e) {
