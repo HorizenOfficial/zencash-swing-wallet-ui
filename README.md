@@ -4,8 +4,27 @@
 
 ## Deprecation notice
 
-Horizen Desktop GUI Wallet will not receive any new features, future releases will be limited to critical bug fixes and compatibility with newer versions of zend.
+Horizen Desktop GUI Wallet is no longer actively maintained.
+
 [Sphere by Horizen](https://github.com/HorizenOfficial/Sphere_by_Horizen) is its successor and ongoing development will be focused on Sphere by Horizen, to migrate to Sphere by Horizen please see our [wiki]( https://horizenofficial.atlassian.net/wiki/spaces/ZEN/pages/729776153).
+
+If you still wish to use Horizen Desktop GUI Wallet, you can manually update the bundled binaries of [Zen](https://github.com/HorizenOfficial/zen) by following these steps:
+
+1. Access the **[Releases](https://github.com/HorizenOfficial/zen/releases)** section of the Zen repository to download the last zend binaries for your operating system.
+2. Once you have downloaded the necessary binaries (make sure you have `zen-cli`, `zen-tx`, `zend`), you need to update them in the installation path of your app, which varies depending on your operating system. Make sure Horizen Desktop GUI Wallet is closed before proceeding.
+
+- **Windows**:
+   - Replace the binaries in the `/app` folder where you installed the wallet. The default path for this is `C:\Program Files\HorizenDesktopGUIWallet\app`.
+- **macOS**:
+   - Inspect the app by right-clicking and selecting "Show Package Contents."
+   - Navigate to the `/Contents/app` directory within the package.
+   - Replace the existing binaries with the new ones.
+
+Once you have updated the binaries, you can open the wallet again and it will be running the latest version of Zen.
+
+**Note**: The Linux version of Swing doesn't include Zend binaries by default; instead, it relies on the presence of the Zen Debian package being installed. Therefore, there's no Linux-specific installation instructions in the repository since Zend is updated and installed separately as part of an external process.
+
+---
 
 **Running Horizen Desktop GUI Wallet on macOS Catalina**: Horizen Desktop GUI Wallet is not going to be notarized and as such won't start on macOS Catalina without going through some extra steps, if you want to run it on MacOS Catalina or later please read and follow https://support.apple.com/en-us/HT202491 `How to open an app that hasn’t been notarized or is from an unidentified developer`.
 
