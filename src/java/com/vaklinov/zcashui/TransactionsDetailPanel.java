@@ -5,7 +5,8 @@
  *    / / |  __| | . ` | |    / _` / __| '_ \| | |_ | |  | | | |   \ \/  \/ / _` | | |/ _ \ __|
  *   / /__| |____| |\  | |___| (_| \__ \ | | | |__| | |__| |_| |_   \  /\  / (_| | | |  __/ |_ 
  *  /_____|______|_| \_|\_____\__,_|___/_| |_|\_____|\____/|_____|   \/  \/ \__,_|_|_|\___|\__|
- *                                       
+ *      
+ * Copyright (c) 2023 Horizen Foundation                                 
  * Copyright (c) 2016-2021 Zen Blockchain Foundation
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy

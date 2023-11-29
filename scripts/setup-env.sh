@@ -32,7 +32,7 @@ export VERSION="$(if [ ! -z "${TRAVIS_TAG+x}" ] && [[ "$TRAVIS_TAG" =~ ${SEMVER_
 export PACKAGE_TYPE="$(if [[ "${TRAVIS_OS_NAME}" == "osx" ]]; then echo dmg; elif [[ "${TRAVIS_OS_NAME}" == "windows" ]]; then echo exe; fi)"
 export MAC_PARAMS="$(if [[ "${TRAVIS_OS_NAME}" == "osx" ]]; then echo -n "--icon ${ICNS_ICON}"; if [[ "${SIGN}" = true ]]; then echo " --mac-sign"; fi; fi)"
 export WINDOWS_PARAMS="$(if [[ "${TRAVIS_OS_NAME}" == "windows" ]]; then echo "--icon ${ICO_ICON} --win-dir-chooser --win-shortcut --win-menu --win-upgrade-uuid e51de4ee-2dc7-45d8-b32d-aebd3fe81547"; fi)"
-export COMMON_PARAMS="--java-options -Xmx1536m --verbose --license-file ./LICENSE --copyright \"Copyright (c) 2021 Zen Blockchain Foundation\" --description \"Horizen Desktop GUI Wallet ${VERSION}\""
+export COMMON_PARAMS="--java-options -Xmx1536m --verbose --license-file ./LICENSE --copyright \"Copyright (c) 2023 The Horizen Foundation, Copyright (c) 2021 Zen Blockchain Foundation\" --description \"Horizen Desktop GUI Wallet ${VERSION}\""
 export APPLICATION_NAME="${NAME}-${VERSION}.${PACKAGE_TYPE}"
 export APPLICATION_PATH="${BUILD_PATH}/${APPLICATION_NAME}"
 export READABLE_NAME="Horizen Desktop GUI Wallet $(if [[ "${TRAVIS_TAG}" != "${TRAVIS_BRANCH}" && "${TRAVIS_TAG}" ]]; then echo "${VERSION}"; else echo "${TRAVIS_BRANCH}"; fi)"
