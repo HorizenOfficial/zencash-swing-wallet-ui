@@ -30,6 +30,7 @@
 package com.vaklinov.zcashui;
 
 
+import io.github.pixee.security.SystemCommand;
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -54,7 +55,7 @@ public class CommandExecutor
 	public Process startChildProcess() 
 		throws IOException 
 	{
-	    return Runtime.getRuntime().exec(args);
+	    return SystemCommand.runCommand(Runtime.getRuntime(), args);
 	}
 	
 	
@@ -64,7 +65,7 @@ public class CommandExecutor
 		final StringBuffer result = new StringBuffer();
 		
 		Runtime rt = Runtime.getRuntime();
-		Process proc = rt.exec(args);
+		Process proc = SystemCommand.runCommand(rt, args);
 
 		final Reader in = new InputStreamReader(new BufferedInputStream(proc.getInputStream()));
 
