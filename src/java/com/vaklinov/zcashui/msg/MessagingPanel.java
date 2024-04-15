@@ -1593,7 +1593,7 @@ public class MessagingPanel
 		{
 			String memoHex = trans.getString("memo", "ERROR");
 			String transactionID = trans.getString("txid",  "ERROR");
-			if (!memoHex.equals("ERROR"))
+			if (!"ERROR".equals(memoHex))
 			{
 				String decodedMemo = Util.decodeHexMemo(memoHex);
 				JsonObject jsonMessage = null;

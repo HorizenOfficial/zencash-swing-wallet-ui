@@ -335,7 +335,7 @@ public class ZCashClientCaller
 		    		this.transactionConfirmations.clear();
 		    	}
 		    	String confirmations = this.transactionConfirmations.get(txID);
-		    	if ((confirmations == null) || confirmations.equals("0"))
+		    	if ((confirmations == null) || "0".equals(confirmations))
 		    	{
 		    		currentTransaction[2] = this.getWalletTransactionConfirmations(txID);
 		    		this.transactionConfirmations.put(txID, currentTransaction[2]);
@@ -860,7 +860,7 @@ public class ZCashClientCaller
 	    	wrapStringParameter(signature), 
 	    	wrapStringParameter(message));
 
-		return response.trim().equalsIgnoreCase("true");
+		return "true".equalsIgnoreCase(response.trim());
 	}
 
 
@@ -875,12 +875,12 @@ public class ZCashClientCaller
 
 		Log.info("Operation " + opID + " status is " + response + ".");
 
-		if (status.equalsIgnoreCase("success") ||
-			status.equalsIgnoreCase("error") ||
-			status.equalsIgnoreCase("failed"))
+		if ("success".equalsIgnoreCase(status) ||
+			"error".equalsIgnoreCase(status) ||
+			"failed".equalsIgnoreCase(status))
 		{
 			return true;
-		} else if (status.equalsIgnoreCase("executing") || status.equalsIgnoreCase("queued"))
+		} else if ("executing".equalsIgnoreCase(status) || "queued".equalsIgnoreCase(status))
 		{
 			return false;
 		} else
@@ -901,10 +901,10 @@ public class ZCashClientCaller
 
 		Log.info("Operation " + opID + " status is " + response + ".");
 
-		if (status.equalsIgnoreCase("success"))
+		if ("success".equalsIgnoreCase(status))
 		{
 			return true;
-		} else if (status.equalsIgnoreCase("error") || status.equalsIgnoreCase("failed"))
+		} else if ("error".equalsIgnoreCase(status) || "failed".equalsIgnoreCase(status))
 		{
 			return false;
 		} else

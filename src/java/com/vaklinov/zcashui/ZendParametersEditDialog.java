@@ -382,7 +382,7 @@ public class ZendParametersEditDialog
 	{
 		String paramName = this.getParamName(fullParam);
 		 
-		return paramName.equals("addnode"); // For now only addnode seems to be a multi-occur option
+		return "addnode".equals(paramName); // For now only addnode seems to be a multi-occur option
 	}
 	
 	

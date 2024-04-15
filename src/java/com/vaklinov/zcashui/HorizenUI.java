@@ -624,7 +624,7 @@ public class HorizenUI
 	            for (LookAndFeelInfo ui : UIManager.getInstalledLookAndFeels())
 	            {
 	            	Log.info("Available look and feel: " + ui.getName() + " " + ui.getClassName());
-	                if (ui.getName().equals("Nimbus"))
+	                if ("Nimbus".equals(ui.getName()))
 	                {
 	                	Log.info("Setting look and feel: {0}", ui.getClassName());
 	                    UIManager.setLookAndFeel(ui.getClassName());

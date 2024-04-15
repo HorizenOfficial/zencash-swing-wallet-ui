@@ -246,13 +246,13 @@ public class TransactionsDetailPanel
 			public int compare(String[] o1, String[] o2)
 			{
 				Date d1 = new Date(0);
-				if ((!o1[4].equals("N/A")) && Util.isNumeric(o1[4]))
+				if ((!"N/A".equals(o1[4])) && Util.isNumeric(o1[4]))
 				{
 					d1 = new Date(Long.valueOf(o1[4]).longValue() * 1000L);
 				}
 
 				Date d2 = new Date(0);
-				if (!o2[4].equals("N/A") && Util.isNumeric(o2[4]))
+				if (!"N/A".equals(o2[4]) && Util.isNumeric(o2[4]))
 				{
 					d2 = new Date(Long.valueOf(o2[4]).longValue() * 1000L);
 				}
@@ -287,22 +287,22 @@ public class TransactionsDetailPanel
 		for (String[] trans : allTransactions)
 		{
 			// Direction
-			if (trans[1].equals("receive"))
+			if ("receive".equals(trans[1]))
 			{
 				trans[1] = "\u21E8 IN";
-			} else if (trans[1].equals("send"))
+			} else if ("send".equals(trans[1]))
 			{
 				trans[1] = "\u21E6 OUT";
-			} else if (trans[1].equals("generate"))
+			} else if ("generate".equals(trans[1]))
 			{
 				trans[1] = "\u2692\u2699 MINED";
-			} else if (trans[1].equals("immature"))
+			} else if ("immature".equals(trans[1]))
 			{
 				trans[1] = "\u2696 Immature";
 			};
 
 			// Date
-			if ((!trans[4].equals("N/A")) && Util.isNumeric(trans[4]))
+			if ((!"N/A".equals(trans[4])) && Util.isNumeric(trans[4]))
 			{
 				trans[4] = new Date(Long.valueOf(trans[4]).longValue() * 1000L).toLocaleString();
 			}
@@ -325,7 +325,7 @@ public class TransactionsDetailPanel
 			// Confirmed?
 			try
 			{
-				boolean isConfirmed = !trans[2].trim().equals("0"); 
+				boolean isConfirmed = !"0".equals(trans[2].trim()); 
 				
 				trans[2] = isConfirmed ? (langUtil.getString("transactions.detail.panel.yes", confirmed))
 									   : (langUtil.getString("transactions.detail.panel.no", notConfirmed));
